@@ -1,0 +1,202 @@
+@import 'tailwindcss';
+
+/* Radix Presence only defers unmount for CSS animations (not transitions). */
+@keyframes dance-sheet-in-right {
+  from {
+    transform: translate3d(100%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes dance-sheet-out-right {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+
+@keyframes dance-sheet-in-left {
+  from {
+    transform: translate3d(-100%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes dance-sheet-out-left {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+@keyframes dance-sheet-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dance-sheet-overlay-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@theme {
+  /* Dance dark palette */
+  /** App chrome (shell, inputs): slightly lifted vs gantt canvas for depth. */
+  --color-background: #121212;
+  --color-foreground: #e0e0e0;
+  --color-card: #1a1a1a;
+  --color-card-foreground: #e0e0e0;
+  --color-popover: #1a1a1a;
+  --color-popover-foreground: #e0e0e0;
+  --color-muted: #141414;
+  --color-muted-foreground: #757575;
+  --color-border: #2a2a2a;
+  --color-input: #2a2a2a;
+  /* Focus rings — 1px via utilities (`ring-1`); keep separate from primary brand accent */
+  --color-ring: #ffffff;
+  --color-primary: #ffffff;
+  --color-primary-foreground: #0d0d0d;
+  --color-secondary: #1a1a1a;
+  --color-secondary-foreground: #e0e0e0;
+  --color-accent: rgba(255, 255, 255, 0.12);
+  --color-accent-foreground: #ffffff;
+  --color-destructive: #ff6b6b;
+  --color-destructive-foreground: #0d0d0d;
+  --color-agent: #ffffff;
+  --color-assignee-blue: #5c6bc0;
+  /** Missed / blocked accent — same hue as Gantt `CORAL` in `ganttBarTaskTokens.ts`. */
+  --color-coral: #ff886a;
+  --color-assignee-coral: var(--color-coral);
+
+  /** Gantt / timeline chart pit — sticky date fade and scroller share this so transparent heels don’t flash a mismatched tone. */
+  --color-gantt-canvas: #0d0d0d;
+
+  /* Gantt task bar surfaces (status-driven; typography uses foreground + drop-shadow where needed). */
+  --color-task-bar-todo: #383838;
+  --color-task-bar-progress: #e7ff97;
+  --color-task-bar-done: #383838;
+  --color-task-bar-missed: color-mix(in srgb, var(--color-coral) 32%, var(--color-gantt-canvas));
+  --color-task-bar-missed-foreground: #f0e8e6;
+
+  /*
+   * Radius scale — outermost anchor is `--radius-lg` (1rem). Medium / small step down by 0.25rem.
+   * Nested tokens: inner = max(0, outer − padding); pair with rounded-md or rounded-lg + matching p-*.
+   */
+  --radius-lg: 1rem;
+  --radius-md: calc(var(--radius-lg) - 0.25rem);
+  --radius-sm: calc(var(--radius-lg) - 0.5rem);
+
+  --radius-nested-md-p0_5: max(0px, calc(var(--radius-md) - 0.125rem));
+  --radius-nested-md-p1: max(0px, calc(var(--radius-md) - 0.25rem));
+  --radius-nested-md-p2: max(0px, calc(var(--radius-md) - 0.5rem));
+
+  --radius-nested-lg-p0_5: max(0px, calc(var(--radius-lg) - 0.125rem));
+  --radius-nested-lg-p1: max(0px, calc(var(--radius-lg) - 0.25rem));
+  --radius-nested-lg-p2: max(0px, calc(var(--radius-lg) - 0.5rem));
+
+  /*
+   * Motion — product-wide defaults (animations.dev-style curves).
+   * Enter/exit & feedback: ease-out. On-screen morph: ease-in-out. Subtle hover tint: ease-hover.
+   */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.86, 0, 0.07, 1);
+  --ease-hover: ease;
+
+  --default-transition-duration: 180ms;
+  --default-transition-timing-function: var(--ease-out);
+
+  /* Sheet / drawer — paired with Radix Presence (must use animation, not transition). */
+  --animate-dance-sheet-in-right: dance-sheet-in-right 250ms var(--ease-out) both;
+  --animate-dance-sheet-out-right: dance-sheet-out-right 250ms var(--ease-out) both;
+  --animate-dance-sheet-in-left: dance-sheet-in-left 250ms var(--ease-out) both;
+  --animate-dance-sheet-out-left: dance-sheet-out-left 250ms var(--ease-out) both;
+  --animate-dance-sheet-overlay-in: dance-sheet-overlay-in 250ms var(--ease-out) both;
+  --animate-dance-sheet-overlay-out: dance-sheet-overlay-out 250ms var(--ease-out) both;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply min-h-dvh bg-background font-sans text-foreground antialiased;
+    font-family:
+      Inter,
+      ui-sans-serif,
+      system-ui,
+      sans-serif;
+  }
+}
+
+@layer components {
+  /*
+   * GPU-friendly surface transitions — use on buttons, tabs, cards, list rows.
+   */
+  .transition-surface {
+    transition-property:
+      color,
+      background-color,
+      border-color,
+      outline-color,
+      text-decoration-color,
+      fill,
+      stroke,
+      opacity,
+      transform,
+      filter;
+    transition-duration: var(--default-transition-duration);
+    transition-timing-function: var(--ease-out);
+  }
+
+  /*
+   * Hairline keyboard focus — real 1px outline (Tailwind `ring-*` uses box-shadow and reads thicker).
+   */
+  .dance-focus-ring {
+    outline: none;
+  }
+
+  .dance-focus-ring:focus-visible {
+    outline: 1px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+
+  /*
+   * Tactile press — use with .transition-surface; only adds :active transform (no transition-property).
+   */
+  .pressable:active {
+    transform: scale(0.99);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pressable:active {
+      transform: none;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

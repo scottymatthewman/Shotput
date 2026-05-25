@@ -1,0 +1,34 @@
+---
+description: Dance UI motion — transitions, easing, and accessibility
+alwaysApply: true
+---
+
+# Motion and interaction (Dance)
+
+Source of truth: motion tokens and helpers live in `src/index.css` (`@theme` motion block, `.transition-surface`, `.pressable`).
+
+## Do this
+
+- **Interactive controls** (buttons, tabs, pills, dense list rows): use `transition-surface` and, when a physical press helps, `pressable` together. Override duration with Tailwind only when the control is smaller or snappier (e.g. `duration-150`).
+- **Easing by intent**: user-driven appear/settle → `ease-out` (default surface uses `--ease-out`). Elements already on screen that move or morph → `ease-in-out`. Hover-only color/border softening → `ease-hover` when it reads better than `ease-out`.
+- **Durations**: micro feedback ~100–150ms; standard UI ~150–250ms; modals/drawers ~200–300ms. Stay under ~300ms unless it is rare, marketing-style motion.
+- **Performance**: prefer animating **`transform`** and **`opacity`** for continuous motion; avoid animating layout (`width`/`height`/`margin`/`padding`) for polish unless there is no jank.
+- **Paired surfaces**: overlay + panel share the **same** duration and easing.
+- **Reduced motion**: respect `prefers-reduced-motion`. The project has a global shorten rule; do not add long decorative motion without a reduced-motion path. Radix overlays may use `motion-reduce:transition-none` where already established.
+- **Touch / hover**: use `@media (hover: hover) and (pointer: fine)` for hover-only transforms if they would fire oddly on touch (optional pattern; not every hover needs it).
+
+## Avoid this
+
+- One-off `transition-all` on new components without a reason (harder to keep GPU-friendly and consistent).
+- **New random** duration/easing constants in components instead of theme defaults and Tailwind utilities.
+- **Expo AV** — never; this repo’s mobile rule is **Expo Audio only** (if/when React Native code exists).
+
+## Quick reference
+
+```tsx
+className={cn('transition-surface pressable', className)}
+// snappier segment controls:
+className={cn('transition-surface pressable duration-150', className)}
+```
+
+`Button` and timeline tabs already follow this pattern—match them for new controls.

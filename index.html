@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dance — UI prototype</title>
+    <style>
+      :root {
+        --bg: #121212;
+        --canvas: #0d0d0d;
+        --border: #2a2a2a;
+        --sidebar-width: 244px;
+      }
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: var(--bg);
+        color: #e0e0e0;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      }
+      #root {
+        min-height: 100%;
+      }
+      .dance-boot {
+        display: flex;
+        min-height: 100dvh;
+        gap: 12px;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      .dance-boot-sidebar {
+        display: none;
+        width: var(--sidebar-width);
+        flex-shrink: 0;
+        border-right: 1px solid var(--border);
+        padding: 12px;
+      }
+      .dance-boot-main {
+        flex: 1;
+        min-width: 0;
+        padding: 12px 12px 12px 0;
+      }
+      .dance-boot-panel {
+        height: calc(100dvh - 24px);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: var(--canvas);
+      }
+      html[data-sidebar-collapsed='1'] {
+        --sidebar-width: 56px;
+      }
+      @media (min-width: 768px) {
+        .dance-boot-sidebar {
+          display: block;
+        }
+      }
+    </style>
+    <script>
+      performance.mark('appStart')
+      try {
+        var ui = localStorage.getItem('dance-ui-v1')
+        if (ui) {
+          var parsed = JSON.parse(ui)
+          if (parsed && parsed.state && parsed.state.sidebarCollapsed) {
+            document.documentElement.dataset.sidebarCollapsed = '1'
+          }
+        }
+        if (localStorage.getItem('dance-prototype-v1') || localStorage.getItem('dance-ui-v1')) {
+          document.documentElement.dataset.hasPersistedData = '1'
+        }
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root">
+      <div class="dance-boot" aria-hidden="true">
+        <div class="dance-boot-sidebar"></div>
+        <div class="dance-boot-main">
+          <div class="dance-boot-panel"></div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
