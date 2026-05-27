@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router-dom'
 const CAN_MANAGE_WORKSPACE = true
 
 const settingsSectionShell = cn(
-  'flex flex-col gap-3 rounded-lg inset-edge-ring inset-edge-ring-full inset-edge-soft bg-muted p-6',
+  'flex flex-col gap-3 rounded-lg inset-edge-ring inset-edge-ring-full inset-edge-soft bg-surface-contrast p-6',
 )
 
 /** White outline control (overview-adjacent); edge strengthens on hover. */

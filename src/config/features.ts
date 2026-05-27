@@ -1,6 +1,7 @@
 export const features = {
   home: false,
   inbox: false,
+  events: false,
   plans: true,
   reports: false,
   settings: true,

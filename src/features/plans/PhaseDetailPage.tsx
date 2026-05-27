@@ -1,59 +1,14 @@
-import { ActivityItem } from '@/components/dance/ActivityItem'
-import { BudgetAmountField } from '@/components/dance/BudgetAmountField'
-import { PriorityIcon } from '@/components/dance/PriorityIcon'
-import { PhaseStatusIcon } from '@/components/dance/StatusBadge'
-import { phaseStatusMenuLabel } from '@/components/dance/phaseStatusMenu'
-import { PhaseDatePickerField } from '@/features/plans/PhaseDatePickerField'
-import { ScheduleYearPickerField } from '@/features/plans/ScheduleYearPickerField'
+import { PhaseDetailPanel } from '@/features/plans/PhaseDetailPanel'
 import { PhaseQuickActionDialogs } from '@/features/plans/PhaseQuickActionDialogs'
-import { PhaseStatusDropdown } from '@/features/plans/PhaseStatusDropdown'
-import {
-  inkBody,
-  inkDatePickers,
-  inkTitle,
-  overviewMetricSectionShell,
-  overviewSectionShell,
-  OverviewRow,
-} from '@/features/plans/overviewPageLayout'
 import { CenteredPageScroll } from '@/layouts/CenteredPageScroll'
 import { PageHeader } from '@/layouts/PageHeader'
 import { PageShell } from '@/layouts/PageShell'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { planBudgetCurrency } from '@/lib/budget'
 import { phaseDetailPath } from '@/lib/planRoute'
-import { PHASE_PRIORITY_ORDER, phasePriorityLabel } from '@/lib/phasePriority'
-import { getEffectivePhaseStatus, normalizePhaseStatus } from '@/lib/phaseStatus'
-import { cn } from '@/lib/utils'
 import { usePlansStore } from '@/state/store'
-import type { Phase } from '@/types/domain'
-import {
-  CalendarPlus,
-  ChevronLeft,
-  Layers2,
-  MessageSquare,
-  Sparkles,
-  Tag,
-  UserPlus,
-} from 'lucide-react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { ChevronLeft } from 'lucide-react'
+import { useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-
-const ACTIVITY_INITIAL_VISIBLE = 3
-const ACTIVITY_LOAD_MORE_STEP = 10
-
-function initials(name: string) {
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase()
-}
 
 export function PhaseDetailPage() {
   const { planId: planIdParam, phaseId, eventId: legacyEventId } = useParams<{
@@ -65,21 +20,10 @@ export function PhaseDetailPage() {
   const navigate = useNavigate()
 
   const workspace = usePlansStore((s) => s.workspace)
-  const updatePhaseDetails = usePlansStore((s) => s.updatePhaseDetails)
-  const toggleChecklistTask = usePlansStore((s) => s.toggleChecklistTask)
-  const setPhaseQuickDialog = usePlansStore((s) => s.setPhaseQuickDialog)
   const setSelectedPhaseId = usePlansStore((s) => s.setSelectedPhaseId)
-  const activityLog = usePlansStore((s) => s.activityLog)
 
   const phase = phaseId ? workspace.phases[phaseId] : undefined
-  const livePhase = phaseId ? workspace.phases[phaseId] ?? phase : undefined
   const plan = planId ? workspace.plans[planId] : undefined
-
-  const [titleDraft, setTitleDraft] = useState('')
-  const [descriptionDraft, setDescriptionDraft] = useState('')
-  const [activityExpansion, setActivityExpansion] = useState<number | 'all'>(
-    ACTIVITY_INITIAL_VISIBLE,
-  )
 
   useEffect(() => {
     if (!phaseId) return
@@ -88,63 +32,13 @@ export function PhaseDetailPage() {
   }, [phaseId, setSelectedPhaseId])
 
   useEffect(() => {
-    if (!livePhase) return
-    setTitleDraft(livePhase.title)
-    setDescriptionDraft(livePhase.description)
-  }, [livePhase?.id, livePhase?.title, livePhase?.description])
-
-  useEffect(() => {
-    setActivityExpansion(ACTIVITY_INITIAL_VISIBLE)
-  }, [phaseId])
-
-  useEffect(() => {
     if (!planId || !phaseId) return
     if (!phase || phase.planId !== planId) {
       navigate(`/plans/${planId}`, { replace: true })
     }
   }, [navigate, phase, phaseId, planId])
 
-  const budgetCurrency = plan ? planBudgetCurrency(plan) : undefined
-  const storedStatus = livePhase ? normalizePhaseStatus(livePhase.status) : 'todo'
-  const status = livePhase ? getEffectivePhaseStatus(livePhase) : 'todo'
-
-  const phaseEvents = useMemo(() => {
-    if (!phaseId || !planId) return []
-    return activityLog.filter((e) => e.objectId === phaseId && e.planId === planId)
-  }, [activityLog, phaseId, planId])
-
-  const activityVisibleCount =
-    activityExpansion === 'all'
-      ? phaseEvents.length
-      : Math.min(activityExpansion, phaseEvents.length)
-  const displayedActivity = phaseEvents.slice(0, activityVisibleCount)
-  const hasMoreActivity = phaseEvents.length > activityVisibleCount
-
-  const leadUserId = livePhase?.assigneeUserIds[0]
-  const leadUser = leadUserId ? workspace.users[leadUserId] : undefined
-  const leadAgentId =
-    !leadUser && livePhase?.assigneeAgentIds[0] ? livePhase.assigneeAgentIds[0] : undefined
-  const leadAgent = leadAgentId ? workspace.agents[leadAgentId] : undefined
-  const teamAgent =
-    livePhase?.assigneeAgentIds.map((id) => workspace.agents[id]).filter(Boolean)[0] ??
-    workspace.agents.a1
-  const coral = leadUser ? leadUser.id.charCodeAt(1) % 2 === 0 : false
-
-  const commitTitle = useCallback(() => {
-    if (!phaseId || !livePhase || titleDraft.trim() === livePhase.title) return
-    if (!titleDraft.trim()) {
-      setTitleDraft(livePhase.title)
-      return
-    }
-    updatePhaseDetails(phaseId, { title: titleDraft })
-  }, [livePhase, phaseId, titleDraft, updatePhaseDetails])
-
-  const commitDescription = useCallback(() => {
-    if (!phaseId || !livePhase || descriptionDraft === livePhase.description) return
-    updatePhaseDetails(phaseId, { description: descriptionDraft })
-  }, [descriptionDraft, livePhase, phaseId, updatePhaseDetails])
-
-  if (!planId || !phaseId || !plan || !livePhase) {
+  if (!planId || !phaseId || !plan || !phase || phase.planId !== planId) {
     return (
       <div className="p-6">
         <p className="text-sm text-muted-foreground">Phase not found.</p>
@@ -173,317 +67,7 @@ export function PhaseDetailPage() {
         }
       />
       <CenteredPageScroll columnClassName="gap-2">
-        <div className={overviewSectionShell}>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-            <Input
-              value={titleDraft}
-              onChange={(e) => setTitleDraft(e.target.value)}
-              onBlur={commitTitle}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  ;(e.target as HTMLInputElement).blur()
-                }
-              }}
-              aria-label="Phase title"
-              className={cn(inkTitle, 'sm:min-w-0 sm:flex-1')}
-            />
-            <div className="flex shrink-0 flex-wrap items-center justify-start gap-1 text-sm sm:justify-end">
-              <PhaseDatePickerField
-                value={livePhase.start}
-                ariaLabel="Start date"
-                labelFormat="short"
-                scrub
-                align="end"
-                maxDate={livePhase.end}
-                onChange={(next) => updatePhaseDetails(phaseId, { start: next })}
-                className={cn(inkDatePickers)}
-              />
-              <span className="shrink-0 text-muted-foreground" aria-hidden>
-                –
-              </span>
-              <PhaseDatePickerField
-                value={livePhase.end}
-                ariaLabel="End date"
-                labelFormat="short"
-                scrub
-                align="end"
-                minDate={livePhase.start}
-                onChange={(next) => updatePhaseDetails(phaseId, { end: next })}
-                className={cn(inkDatePickers)}
-              />
-              <ScheduleYearPickerField
-                startDate={livePhase.start}
-                endDate={livePhase.end}
-                align="end"
-                onChange={({ start, end }) => updatePhaseDetails(phaseId, { start, end })}
-              />
-            </div>
-          </div>
-
-          <Textarea
-            value={descriptionDraft}
-            onChange={(e) => setDescriptionDraft(e.target.value)}
-            onBlur={commitDescription}
-            placeholder="Add a description…"
-            aria-label="Phase description"
-            className={inkBody}
-          />
-        </div>
-
-        <div className={overviewMetricSectionShell}>
-          <OverviewRow label="Status">
-            <PhaseStatusDropdown phaseId={phaseId} currentStatus={storedStatus} modal={false}>
-              <button
-                type="button"
-                className="pressable dance-focus-ring flex min-w-0 cursor-pointer items-center gap-2 rounded-sm py-0.5 text-left text-sm text-foreground outline-none transition-surface duration-150 ease-hover hover:bg-accent/40"
-                aria-label={`Status: ${phaseStatusMenuLabel(status)}. Change status`}
-              >
-                <PhaseStatusIcon status={status} className="size-4 shrink-0" />
-                <span className="min-w-0 truncate">{phaseStatusMenuLabel(status)}</span>
-              </button>
-            </PhaseStatusDropdown>
-          </OverviewRow>
-        </div>
-
-        <div className={overviewMetricSectionShell}>
-          <OverviewRow label="Schedule">
-            <div className="flex min-w-0 items-center gap-2">
-              <Checkbox
-                id="phase-status-infer"
-                checked={livePhase.statusIsManual === false}
-                onCheckedChange={(v) =>
-                  updatePhaseDetails(phaseId, { statusIsManual: v !== true })
-                }
-              />
-              <Label htmlFor="phase-status-infer" className="cursor-pointer font-normal text-foreground">
-                Infer Todo/Missed from end date
-              </Label>
-            </div>
-          </OverviewRow>
-        </div>
-
-        <div className={overviewMetricSectionShell}>
-          <OverviewRow label="Priority">
-            <PriorityIcon priority={livePhase.priority} tone="muted" />
-            <select
-              aria-label="Priority"
-              className="min-w-0 cursor-pointer border-0 bg-transparent py-0 text-sm text-foreground outline-none transition-surface duration-150 ease-hover focus-visible:ring-0"
-              value={livePhase.priority}
-              onChange={(e) =>
-                updatePhaseDetails(phaseId, {
-                  priority: e.target.value as Phase['priority'],
-                })
-              }
-            >
-              {PHASE_PRIORITY_ORDER.map((p) => (
-                <option key={p} value={p}>
-                  {phasePriorityLabel(p)}
-                </option>
-              ))}
-            </select>
-          </OverviewRow>
-        </div>
-
-        <div className={overviewMetricSectionShell}>
-          <OverviewRow label="Lead">
-            {leadUser ? (
-              <>
-                <Avatar
-                  className={cn(
-                    'size-6 shrink-0 text-[10px]',
-                    coral ? 'bg-assignee-coral' : 'bg-assignee-blue',
-                  )}
-                >
-                  <AvatarFallback className="rounded-full text-primary-foreground">
-                    {initials(leadUser.name)}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="min-w-0 truncate text-sm">{leadUser.name}</span>
-              </>
-            ) : leadAgent ? (
-              <>
-                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/25 text-primary">
-                  <Sparkles className="size-3.5" aria-hidden />
-                </span>
-                <span className="min-w-0 truncate text-sm">{leadAgent.name}</span>
-              </>
-            ) : (
-              <span className="text-sm text-muted-foreground">Add lead</span>
-            )}
-          </OverviewRow>
-        </div>
-
-        <div className={overviewMetricSectionShell}>
-          <OverviewRow label="Members">
-            <UserPlus className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-            <span className="text-sm text-muted-foreground">Add members</span>
-          </OverviewRow>
-        </div>
-
-        <div className={overviewMetricSectionShell}>
-          <OverviewRow label="Issues">
-            <Layers2 className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-            <span className="text-sm tabular-nums">{livePhase.tasks.length}</span>
-          </OverviewRow>
-        </div>
-
-        <div className={cn(overviewMetricSectionShell, 'space-y-2')}>
-          <OverviewRow label="Allocated">
-            <BudgetAmountField
-              valueCents={livePhase.budgetAllocatedCents}
-              currency={budgetCurrency}
-              ariaLabel="Phase budget allocated"
-              onCommit={(cents) =>
-                updatePhaseDetails(phaseId, {
-                  budgetAllocatedCents: cents ?? undefined,
-                })
-              }
-            />
-          </OverviewRow>
-          <OverviewRow label="Spent">
-            <BudgetAmountField
-              valueCents={livePhase.budgetActualCents}
-              currency={budgetCurrency}
-              ariaLabel="Phase budget spent"
-              onCommit={(cents) =>
-                updatePhaseDetails(phaseId, {
-                  budgetActualCents: cents ?? undefined,
-                })
-              }
-            />
-          </OverviewRow>
-        </div>
-
-        <div className={overviewMetricSectionShell}>
-          <OverviewRow label="Start date">
-            <PhaseDatePickerField
-              value={livePhase.start}
-              ariaLabel="Start date"
-              labelFormat="long"
-              maxDate={livePhase.end}
-              leading={<CalendarPlus className="size-4 shrink-0 text-muted-foreground" aria-hidden />}
-              onChange={(v) => updatePhaseDetails(phaseId, { start: v })}
-            />
-          </OverviewRow>
-        </div>
-
-        <div className={overviewMetricSectionShell}>
-          <OverviewRow label="End date">
-            <PhaseDatePickerField
-              value={livePhase.end}
-              ariaLabel="End date"
-              labelFormat="long"
-              minDate={livePhase.start}
-              leading={<CalendarPlus className="size-4 shrink-0 text-muted-foreground" aria-hidden />}
-              onChange={(v) => updatePhaseDetails(phaseId, { end: v })}
-            />
-          </OverviewRow>
-        </div>
-
-        <div className={overviewMetricSectionShell}>
-          <OverviewRow label="Teams">
-            <Sparkles className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-            <span className="min-w-0 truncate text-sm">{teamAgent?.name ?? '—'}</span>
-          </OverviewRow>
-        </div>
-
-        <div className={overviewMetricSectionShell}>
-          <OverviewRow label="Slack">
-            <MessageSquare className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-            <span className="text-sm text-muted-foreground">Slack channel</span>
-          </OverviewRow>
-        </div>
-
-        <div className={overviewMetricSectionShell}>
-          <OverviewRow label="Labels">
-            <Tag className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-            <span className="text-sm text-muted-foreground">Add label</span>
-          </OverviewRow>
-        </div>
-
-        <div className={overviewSectionShell}>
-          <p className="text-sm font-medium text-foreground">Tasks</p>
-          <ul className="space-y-1">
-            {livePhase.tasks.map((st) => (
-              <li key={st.id}>
-                <label
-                  htmlFor={`checklist-${phaseId}-${st.id}`}
-                  className="flex min-h-9 cursor-pointer items-center gap-3 rounded-md px-1 py-1.5 transition-surface duration-150 ease-hover hover:bg-fill-hover"
-                >
-                  <Checkbox
-                    id={`checklist-${phaseId}-${st.id}`}
-                    checked={st.completed}
-                    onCheckedChange={() => toggleChecklistTask(phaseId, st.id)}
-                  />
-                  <span
-                    className={cn(
-                      'min-w-0 flex-1 text-sm',
-                      st.completed ? 'text-muted-foreground line-through' : 'text-foreground',
-                    )}
-                  >
-                    {st.title}
-                  </span>
-                </label>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className={overviewSectionShell}>
-          <p className="text-sm font-medium text-foreground">
-            Activity
-            <span className="font-normal text-muted-foreground"> · {plan.name}</span>
-          </p>
-          <div>
-            {phaseEvents.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No activity yet.</p>
-            ) : (
-              <>
-                {displayedActivity.map((e) => (
-                  <ActivityItem key={e.id} event={e} workspace={workspace} />
-                ))}
-                {hasMoreActivity ? (
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="pressable h-8 px-2 text-muted-foreground transition-surface duration-150 ease-hover hover:text-foreground"
-                      onClick={() => {
-                        if (activityExpansion === 'all') return
-                        const next = activityExpansion + ACTIVITY_LOAD_MORE_STEP
-                        setActivityExpansion(next >= phaseEvents.length ? 'all' : next)
-                      }}
-                    >
-                      View 10 more
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="pressable h-8 px-2 text-muted-foreground transition-surface duration-150 ease-hover hover:text-foreground"
-                      onClick={() => setActivityExpansion('all')}
-                    >
-                      View all
-                    </Button>
-                  </div>
-                ) : null}
-              </>
-            )}
-          </div>
-        </div>
-
-        <div className="flex items-center justify-end gap-4 pt-4">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="inset-edge-destructive-hover cursor-pointer text-muted-foreground transition-surface duration-150 ease-out hover:text-destructive"
-            onClick={() => setPhaseQuickDialog({ kind: 'delete', phaseId })}
-          >
-            Delete phase
-          </Button>
-        </div>
+        <PhaseDetailPanel planId={planId} phaseId={phaseId} />
       </CenteredPageScroll>
       <PhaseQuickActionDialogs planId={planId} />
     </PageShell>

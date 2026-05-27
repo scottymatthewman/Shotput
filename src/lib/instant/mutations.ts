@@ -31,7 +31,7 @@ function appendActivity(ev: Omit<ActivityEvent, 'id'>) {
 }
 
 function transact(...ops: unknown[]) {
-  if (ops.length === 0) return
+  if (!hasInstantConfig || ops.length === 0) return
   db.transact(ops as Parameters<typeof db.transact>[0])
 }
 
@@ -118,19 +118,20 @@ export function updatePhaseDetails(
     phaseUpdate.budgetActualCents = merged.budgetActualCents
   }
 
-  db.transact(db.tx.phases[phase.id].update(phaseUpdate))
+  transact(db.tx.phases[phase.id].update(phaseUpdate))
 }
 
 export function toggleChecklistTask(phase: Phase, checklistTaskId: string) {
   const tasks = phase.tasks.map((t) =>
     t.id === checklistTaskId ? { ...t, completed: !t.completed } : t,
   )
-  db.transact(db.tx.phases[phase.id].update({ tasksJson: json(tasks) }))
+  transact(db.tx.phases[phase.id].update({ tasksJson: json(tasks) }))
 }
 
 export function deletePhase(phase: Phase) {
-  db.transact(db.tx.phases[phase.id].delete())
-  appendActivity({
+  transact(
+    db.tx.phases[phase.id].delete(),
+    appendActivity({
     timestamp: new Date().toISOString(),
     actorId: CURRENT_USER_ID,
     actorIsAgent: false,
@@ -139,7 +140,8 @@ export function deletePhase(phase: Phase) {
     objectId: phase.id,
     objectLabel: phase.title,
     planId: phase.planId,
-  })
+    }),
+  )
 }
 
 export function buildNewPhaseForPlan(plan: Plan, id: string): Phase {
@@ -169,9 +171,9 @@ export function buildNewPhaseForPlan(plan: Plan, id: string): Phase {
   }
 }
 
-export function createPhaseInPlan(plan: Plan): Phase {
+export function createPhaseInPlan(plan: Plan, overrides?: Partial<Phase>): Phase {
   const id = crypto.randomUUID()
-  const phase = buildNewPhaseForPlan(plan, id)
+  const phase = { ...buildNewPhaseForPlan(plan, id), ...overrides, id, planId: plan.id }
   const sortOrder = plan.phaseIds.length
 
   if (hasInstantConfig) {
@@ -233,17 +235,19 @@ export function deletePlan(
     ...phaseIdsToRemove.map((id) => db.tx.phases[id].delete()),
     db.tx.plans[planId].delete(),
   ]
-  db.transact(ops as Parameters<typeof db.transact>[0])
-  appendActivity({
-    timestamp: new Date().toISOString(),
-    actorId: CURRENT_USER_ID,
-    actorIsAgent: false,
-    verb: 'deleted',
-    objectType: 'plan',
-    objectId: planId,
-    objectLabel: planName,
-    planId,
-  })
+  transact(
+    ...ops,
+    appendActivity({
+      timestamp: new Date().toISOString(),
+      actorId: CURRENT_USER_ID,
+      actorIsAgent: false,
+      verb: 'deleted',
+      objectType: 'plan',
+      objectId: planId,
+      objectLabel: planName,
+      planId,
+    }),
+  )
 }
 
 export function patchPlanOverview(planId: string, patch: PlanOverviewPatch) {
@@ -281,14 +285,14 @@ export function patchPlanOverview(planId: string, patch: PlanOverviewPatch) {
     planPatch.budgetCurrency = patch.budgetCurrency ?? undefined
   }
 
-  db.transact(db.tx.plans[planId].update(planPatch))
+  transact(db.tx.plans[planId].update(planPatch))
 }
 
 export function setPlanNavGlyph(
   planId: string,
   glyph: { iconId?: string; color?: string },
 ) {
-  db.transact(
+  transact(
     db.tx.plans[planId].update({
       ...(glyph.iconId !== undefined ? { navIconId: glyph.iconId } : {}),
       ...(glyph.color !== undefined ? { navColor: glyph.color } : {}),

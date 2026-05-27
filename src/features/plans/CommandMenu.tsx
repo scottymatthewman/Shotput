@@ -21,7 +21,7 @@ export function CommandMenuProvider({ children }: { children: ReactNode }) {
   const selectedPhaseId = usePlansStore((s) => s.selectedPhaseId)
   const timelineViewMode = usePlansStore((s) => s.timelineViewMode)
   const setTimelineViewMode = usePlansStore((s) => s.setTimelineViewMode)
-  const createPhaseInPlan = usePlansStore((s) => s.createPhaseInPlan)
+  const openNewPhaseModal = usePlansStore((s) => s.openNewPhaseModal)
   const toggleSidebarCollapsed = usePlansStore((s) => s.toggleSidebarCollapsed)
   const resetDemo = usePlansStore((s) => s.resetDemo)
   const navigate = useNavigate()
@@ -33,7 +33,7 @@ export function CommandMenuProvider({ children }: { children: ReactNode }) {
         workspace,
         pathname: location.pathname,
         selectedPhaseId,
-        createPhaseInPlan,
+        openNewPhaseModal,
         setTimelineViewMode,
         timelineViewMode,
         toggleSidebarCollapsed,
@@ -47,7 +47,7 @@ export function CommandMenuProvider({ children }: { children: ReactNode }) {
       workspace,
       location.pathname,
       selectedPhaseId,
-      createPhaseInPlan,
+      openNewPhaseModal,
       setTimelineViewMode,
       timelineViewMode,
       toggleSidebarCollapsed,

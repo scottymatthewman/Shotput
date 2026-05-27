@@ -11,11 +11,6 @@ export function InstantBootstrap() {
   useEffect(() => {
     if (seedStarted.current) return
     seedStarted.current = true
-    try {
-      localStorage.removeItem('dance-prototype-v1')
-    } catch {
-      /* ignore */
-    }
     if (!hasInstantConfig) {
       setInstantSeeded(true)
       return

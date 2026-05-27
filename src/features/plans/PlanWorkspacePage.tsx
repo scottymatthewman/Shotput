@@ -1,6 +1,7 @@
 import { PlanBudgetTracker } from '@/features/plans/PlanBudgetTracker'
 import { PageHeader } from '@/layouts/PageHeader'
 import { PageShell } from '@/layouts/PageShell'
+import { PhaseDetailModal } from '@/features/plans/PhaseDetailModal'
 import { PhaseQuickActionDialogs } from '@/features/plans/PhaseQuickActionDialogs'
 import { TimelineViewToggle } from '@/features/plans/TimelineViewToggle'
 import { GanttView } from '@/features/plans/gantt/GanttView'
@@ -8,7 +9,6 @@ import { TimelineTableView } from '@/features/plans/gantt/TimelineTableView'
 import { Button } from '@/components/ui/button'
 import { formatIsoCalendar } from '@/lib/dateDisplay'
 import { comparePhasesByStartThenTitle } from '@/lib/phaseOrdering'
-import { phaseDetailPath } from '@/lib/planRoute'
 import { usePlansStore } from '@/state/store'
 import { ChevronLeft, Plus } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -36,10 +36,9 @@ export function PlanWorkspacePage() {
   const setViewMode = usePlansStore((s) => s.setTimelineViewMode)
   const [tableSelectionCount, setTableSelectionCount] = useState(0)
   const selectedPhaseId = usePlansStore((s) => s.selectedPhaseId)
-  const setSelectedPhaseId = usePlansStore((s) => s.setSelectedPhaseId)
   const focusedPhaseId = usePlansStore((s) => s.focusedPhaseId)
-
-  const createPhaseInPlan = usePlansStore((s) => s.createPhaseInPlan)
+  const openPhaseModal = usePlansStore((s) => s.openPhaseModal)
+  const openNewPhaseModal = usePlansStore((s) => s.openNewPhaseModal)
   const setHoveredPhaseId = usePlansStore((s) => s.setHoveredPhaseId)
   const setPhaseQuickDialog = usePlansStore((s) => s.setPhaseQuickDialog)
 
@@ -53,8 +52,9 @@ export function PlanWorkspacePage() {
 
   useEffect(() => {
     if (!phaseParam || !planId) return
-    navigate(phaseDetailPath(planId, phaseParam), { replace: true })
-  }, [navigate, phaseParam, planId])
+    openPhaseModal(planId, phaseParam)
+    navigate(`/plans/${planId}`, { replace: true })
+  }, [navigate, openPhaseModal, phaseParam, planId])
 
   useEffect(() => {
     return () => {
@@ -70,10 +70,9 @@ export function PlanWorkspacePage() {
   const openPhase = useCallback(
     (id: string | null) => {
       if (!id || !planId) return
-      setSelectedPhaseId(id)
-      navigate(phaseDetailPath(planId, id))
+      openPhaseModal(planId, id)
     },
-    [navigate, planId, setSelectedPhaseId],
+    [openPhaseModal, planId],
   )
 
   if (!planId || !plan) {
@@ -116,10 +115,7 @@ export function PlanWorkspacePage() {
               size="icon"
               aria-label="Add phase"
               title="Add phase"
-              onClick={() => {
-                const id = createPhaseInPlan(planId)
-                if (id) openPhase(id)
-              }}
+              onClick={() => openNewPhaseModal(planId)}
             >
               <Plus className="size-4" aria-hidden />
             </Button>
@@ -161,6 +157,7 @@ export function PlanWorkspacePage() {
           <TimelineViewToggle value={viewMode} onChange={setViewMode} />
         </div>
       </footer>
+      <PhaseDetailModal />
       <PhaseQuickActionDialogs planId={planId} />
     </PageShell>
   )

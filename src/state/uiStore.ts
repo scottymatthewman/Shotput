@@ -41,6 +41,10 @@ export type TimelineViewMode = 'gantt' | 'table'
 
 export type PhaseQuickDialogKind = 'priority' | 'assignee' | 'assigneeOwner' | 'delete'
 
+export type PhaseModalState =
+  | { planId: string; mode: 'create' }
+  | { planId: string; phaseId: string; mode: 'edit'; autoFocusTitle?: boolean }
+
 export type ThemeMode = 'light' | 'dark'
 
 export interface UiStore {
@@ -68,6 +72,14 @@ export interface UiStore {
   toggleSidebarCollapsed: () => void
   selectedPhaseId: string | null
   setSelectedPhaseId: (id: string | null) => void
+  phaseModal: PhaseModalState | null
+  openNewPhaseModal: (planId: string) => void
+  openPhaseModal: (
+    planId: string,
+    phaseId: string,
+    options?: { autoFocusTitle?: boolean },
+  ) => void
+  closePhaseModal: () => void
   undoStack: UndoFrame[]
   redoStack: UndoFrame[]
   pushUndoFrame: (frame: UndoFrame) => void
@@ -115,6 +127,30 @@ export const useUiStore = create<UiStore>()(
         set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
       selectedPhaseId: null,
       setSelectedPhaseId: (id) => set({ selectedPhaseId: id }),
+      phaseModal: null,
+      openNewPhaseModal: (planId) =>
+        set({
+          phaseModal: { planId, mode: 'create' },
+        }),
+      openPhaseModal: (planId, phaseId, options) =>
+        set({
+          phaseModal: {
+            planId,
+            phaseId,
+            mode: 'edit',
+            autoFocusTitle: options?.autoFocusTitle,
+          },
+          selectedPhaseId: phaseId,
+        }),
+      closePhaseModal: () =>
+        set((s) => ({
+          phaseModal: null,
+          selectedPhaseId:
+            s.phaseModal?.mode === 'edit' &&
+            s.selectedPhaseId === s.phaseModal.phaseId
+              ? null
+              : s.selectedPhaseId,
+        })),
       undoStack: [],
       redoStack: [],
       pushUndoFrame: (frame) =>

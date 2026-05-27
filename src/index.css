@@ -147,6 +147,7 @@
   --color-surface-1: var(--dance-surface-1);
   --color-surface-2: var(--dance-surface-2);
   --color-surface-3: var(--dance-surface-3);
+  --color-surface-contrast: var(--dance-surface-contrast);
 
   /* Shadcn-compatible aliases → foundations */
   --color-background: var(--dance-bg);
@@ -368,6 +369,21 @@
   /* Token + opacity modifiers (shared) */
   .inset-edge-strong {
     --inset-edge-color: var(--dance-border-strong);
+  }
+
+  /** Modal panels: inset border + drop shadow (do not pair with shadow-lg — one box-shadow wins). */
+  .dance-modal-panel {
+    --inset-edge-color: var(--dance-border-strong);
+    box-shadow:
+      inset 0 0 0 1px var(--inset-edge-color),
+      0 10px 15px -3px rgb(0 0 0 / 0.1),
+      0 4px 6px -4px rgb(0 0 0 / 0.08);
+  }
+
+  .dark .dance-modal-panel {
+    box-shadow:
+      inset 0 0 0 1px var(--inset-edge-color),
+      0 16px 40px -8px rgb(0 0 0 / 0.5);
   }
 
   .inset-edge-subtle {

@@ -1,6 +1,7 @@
 import { createInitialWorkspace, initialActivityLog } from '@/mock/fixtures'
 import type { ActivityEvent, Plan, Workspace } from '@/types/domain'
-import { db } from '@/lib/instant/db'
+import { db, hasInstantConfig } from '@/lib/instant/db'
+import { useLocalWorkspaceStore } from '@/state/localWorkspaceStore'
 
 function json(value: unknown): string {
   return JSON.stringify(value)
@@ -107,6 +108,7 @@ export function buildWorkspaceTransact(
 }
 
 export function transactAll(ops: unknown[]) {
+  if (!hasInstantConfig || ops.length === 0) return
   db.transact(ops as Parameters<typeof db.transact>[0])
 }
 
@@ -129,7 +131,15 @@ export function restoreWorkspaceSnapshot(
   workspace: Workspace,
   activityLog: ActivityEvent[],
 ) {
-  transactAll(buildWorkspaceTransact(workspace, activityLog))
+  if (hasInstantConfig) {
+    transactAll(buildWorkspaceTransact(workspace, activityLog))
+    return
+  }
+  useLocalWorkspaceStore.getState().setSnapshot({
+    workspace,
+    activityLog,
+    planNavGlyph: useLocalWorkspaceStore.getState().planNavGlyph,
+  })
 }
 
 export function planNavPatchTx(plan: Plan, glyph: { iconId?: string; color?: string }) {

@@ -99,6 +99,8 @@
   --dance-surface-1: var(--palette-neutral-0);
   --dance-surface-2: var(--palette-neutral-50);
   --dance-surface-3: var(--palette-neutral-100);
+  /** Lightest surface in light mode; darkest in dark (white ↔ black anchors). */
+  --dance-surface-contrast: var(--palette-white);
 
   /* Borders — subtle → strong */
   --dance-border-subtle: var(--palette-neutral-100);
@@ -205,10 +207,11 @@
 .dark {
   /* ─── Layer 2: UI foundations (dark) ─── */
 
-  --dance-bg: var(--palette-neutral-900);
-  --dance-surface-1: var(--palette-neutral-800);
-  --dance-surface-2: color-mix(in srgb, var(--palette-neutral-800) 72%, var(--palette-neutral-700) 28%);
+  --dance-bg: var(--palette-neutral-950);
+  --dance-surface-1: var(--palette-neutral-900);
+  --dance-surface-2: var(--palette-neutral-800);
   --dance-surface-3: var(--palette-neutral-700);
+  --dance-surface-contrast: var(--palette-black);
 
   --dance-border-subtle: var(--palette-neutral-800);
   --dance-border-default: var(--palette-neutral-700);

@@ -1,4 +1,5 @@
 import {
+  navEventsIcon,
   navHomeIcon,
   navInboxIcon,
   navPlansIcon,
@@ -181,6 +182,11 @@ export function SidebarNav({
                   to: '/inbox',
                   label: 'Inbox',
                   icon: navInboxIcon,
+                })}
+                {featureNavItem(features.events, {
+                  to: '/events',
+                  label: 'Events',
+                  icon: navEventsIcon,
                 })}
                 {featureNavItem(features.plans, {
                   to: '/plans',

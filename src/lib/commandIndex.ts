@@ -1,5 +1,4 @@
 import { features } from '@/config/features'
-import { phaseDetailPath } from '@/lib/planRoute'
 import type { PlansStoreSlice } from '@/state/plansStore'
 import type { Workspace } from '@/types/domain'
 
@@ -38,7 +37,7 @@ export function buildCommandIndex(input: {
   workspace: Workspace
   pathname: string
   selectedPhaseId: string | null
-  createPhaseInPlan: (timelineId: string) => string | null
+  openNewPhaseModal: (planId: string) => void
   setTimelineViewMode: (m: 'gantt' | 'table') => void
   timelineViewMode: 'gantt' | 'table'
   toggleSidebarCollapsed: () => void
@@ -52,6 +51,9 @@ export function buildCommandIndex(input: {
       : []),
     ...(features.inbox
       ? [{ id: 'nav-inbox', kind: 'nav' as const, label: 'Inbox', keywords: 'inbox messages', to: '/inbox' }]
+      : []),
+    ...(features.events
+      ? [{ id: 'nav-events', kind: 'nav' as const, label: 'Events', keywords: 'events calendar', to: '/events' }]
       : []),
     { id: 'nav-plans', kind: 'nav', label: 'Plans', keywords: 'plan events projects', to: '/plans' },
     ...(features.reports
@@ -94,7 +96,7 @@ export function buildCommandIndex(input: {
       kind: 'task',
       label: t.title,
       keywords: `task ${t.title} ${project?.name ?? ''} ${t.section}`,
-      to: phaseDetailPath(t.planId, t.id),
+      to: `/plans/${t.planId}?phase=${t.id}`,
     })
   }
 
@@ -133,9 +135,7 @@ export function buildCommandIndex(input: {
       label: 'Add phase on timeline',
       keywords: 'create new phase add phase',
       shortcut: 'C',
-      action: () => {
-        input.createPhaseInPlan(timelineId)
-      },
+      action: () => input.openNewPhaseModal(timelineId),
     })
   }
 

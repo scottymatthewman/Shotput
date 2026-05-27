@@ -31,7 +31,10 @@ export function AppShell({ children }: { children?: ReactNode }) {
 
       e.preventDefault()
 
-      if (phaseRoute) {
+      if (state.phaseModal) {
+        state.closePhaseModal()
+        state.setSidebarCollapsed(true)
+      } else if (phaseRoute) {
         navigate(`/plans/${phaseRoute.planId}`)
         state.setSidebarCollapsed(true)
       } else if (state.selectedPhaseId) {

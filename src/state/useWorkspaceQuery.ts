@@ -6,6 +6,7 @@ import {
 import { db, hasInstantConfig } from '@/lib/instant/db'
 import { createInitialWorkspace, initialActivityLog } from '@/mock/fixtures'
 import type { PlanNavGlyph } from '@/lib/planIconRegistry'
+import { useLocalWorkspaceStore } from '@/state/localWorkspaceStore'
 import { useUiStore } from '@/state/uiStore'
 
 const HYDRATE_TIMEOUT_MS = 4_000
@@ -14,6 +15,9 @@ const fixtureFallback = assembleWorkspaceFromInstant(undefined, undefined)
 
 export function useWorkspaceQuery() {
   const instantSeeded = useUiStore((s) => s.instantSeeded)
+  const localWorkspace = useLocalWorkspaceStore((s) => s.workspace)
+  const localActivityLog = useLocalWorkspaceStore((s) => s.activityLog)
+  const localPlanNavGlyph = useLocalWorkspaceStore((s) => s.planNavGlyph)
   const { isLoading, error, data } = db.useQuery(workspaceQuery)
   const [timedOut, setTimedOut] = useState(false)
 
@@ -38,10 +42,20 @@ export function useWorkspaceQuery() {
     }
 
     if (!hasInstantConfig && instantSeeded) {
+      if (!localWorkspace) {
+        return {
+          workspace: null,
+          activityLog: initialActivityLog,
+          planNavGlyph: {} as Record<string, PlanNavGlyph>,
+          isLoading: true,
+          error: undefined,
+          ready: false,
+        }
+      }
       return {
-        workspace: createInitialWorkspace(),
-        activityLog: initialActivityLog,
-        planNavGlyph: fixtureFallback.planNavGlyph,
+        workspace: localWorkspace,
+        activityLog: localActivityLog,
+        planNavGlyph: localPlanNavGlyph,
         isLoading: false,
         error: undefined,
         ready: true,
@@ -68,5 +82,5 @@ export function useWorkspaceQuery() {
       error: error ?? undefined,
       ready: false,
     }
-  }, [data, error, instantSeeded, isLoading, timedOut])
+  }, [data, error, instantSeeded, isLoading, timedOut, localWorkspace, localActivityLog, localPlanNavGlyph])
 }

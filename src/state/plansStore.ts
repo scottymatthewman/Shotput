@@ -2,6 +2,7 @@ import { coerceOrderedPhaseDates } from '@/lib/phaseDateOrder'
 import { addDays, format } from 'date-fns'
 import { useEffect, useLayoutEffect, useMemo } from 'react'
 import * as instantMutations from '@/lib/instant/mutations'
+import { hasInstantConfig } from '@/lib/instant/db'
 import { buildWorkspaceTransact, transactAll } from '@/lib/instant/seed'
 import { createInitialWorkspace, initialActivityLog } from '@/mock/fixtures'
 import type { ActivityEvent, Phase, PhaseStatus, PlanOverviewPatch, Workspace } from '@/types/domain'
@@ -11,6 +12,7 @@ import {
   mergeWorkspaceWithOverlay,
   useOptimisticOverlay,
 } from '@/state/optimisticOverlay'
+import { persistLocalWorkspaceIfNeeded, useLocalWorkspaceStore } from '@/state/localWorkspaceStore'
 import {
   captureUndoFrame,
   CURRENT_USER_ID,
@@ -50,6 +52,14 @@ export interface PlansStoreSlice {
   toggleSidebarCollapsed: () => void
   selectedPhaseId: string | null
   setSelectedPhaseId: (id: string | null) => void
+  phaseModal: import('@/state/uiStore').PhaseModalState | null
+  openNewPhaseModal: (planId: string) => void
+  openPhaseModal: (
+    planId: string,
+    phaseId: string,
+    options?: { autoFocusTitle?: boolean },
+  ) => void
+  closePhaseModal: () => void
   updatePhaseDates: (phaseId: string, start: string, end: string) => void
   nudgePhaseByDays: (phaseId: string, deltaDays: number) => void
   setPhaseStatus: (phaseId: string, status: PhaseStatus) => void
@@ -72,7 +82,10 @@ export interface PlansStoreSlice {
   ) => void
   toggleChecklistTask: (phaseId: string, checklistTaskId: string) => void
   deletePhase: (phaseId: string) => void
-  createPhaseInPlan: (planId: string) => string | null
+  createPhaseInPlan: (
+    planId: string,
+    overrides?: Partial<import('@/types/domain').Phase>,
+  ) => string | null
   undoLastAction: () => boolean
   redoLastAction: () => boolean
   addPlanNote: (planId: string, planName: string, body: string) => void
@@ -101,10 +114,19 @@ function buildSlice(
     activityLog,
   })
 
+  const persistLocal = () => {
+    persistLocalWorkspaceIfNeeded({
+      workspace: snapshot().workspace,
+      activityLog,
+      planNavGlyph,
+    })
+  }
+
   const withUndo = <Args extends unknown[]>(fn: (...args: Args) => void) => {
     return (...args: Args) => {
       ui.pushUndoFrame(captureUndoFrame(snapshot()))
       fn(...args)
+      persistLocal()
     }
   }
 
@@ -138,6 +160,10 @@ function buildSlice(
     toggleSidebarCollapsed: ui.toggleSidebarCollapsed,
     selectedPhaseId: ui.selectedPhaseId,
     setSelectedPhaseId: ui.setSelectedPhaseId,
+    phaseModal: ui.phaseModal,
+    openNewPhaseModal: ui.openNewPhaseModal,
+    openPhaseModal: ui.openPhaseModal,
+    closePhaseModal: ui.closePhaseModal,
 
     updatePhaseDates: withUndo((phaseId: string, start: string, end: string) => {
       const ordered = coerceOrderedPhaseDates(start, end)
@@ -155,6 +181,7 @@ function buildSlice(
       ui.pushUndoFrame(captureUndoFrame(snapshot()))
       overlay.patchPhase(phaseId, { start, end })
       instantMutations.updatePhaseDates(phase, start, end)
+      persistLocal()
     },
     setPhaseStatus: withUndo((phaseId: string, status: PhaseStatus) => {
       const phase = requirePhase(phaseId)
@@ -182,17 +209,21 @@ function buildSlice(
       if (!phase) return
       overlay.removePhase(phaseId)
       instantMutations.deletePhase(phase)
+      if (ui.phaseModal?.mode === 'edit' && ui.phaseModal.phaseId === phaseId) {
+        ui.closePhaseModal()
+      }
       if (ui.selectedPhaseId === phaseId) ui.setSelectedPhaseId(null)
       if (ui.hoveredPhaseId === phaseId) ui.setHoveredPhaseId(null)
       if (ui.focusedPhaseId === phaseId) ui.setFocusedPhaseId(null)
       if (ui.phaseQuickDialog?.phaseId === phaseId) ui.setPhaseQuickDialog(null)
     }),
-    createPhaseInPlan: (planId: string) => {
+    createPhaseInPlan: (planId: string, overrides) => {
       const plan = workspace.plans[planId]
       if (!plan) return null
       ui.pushUndoFrame(captureUndoFrame(snapshot()))
-      const phase = instantMutations.createPhaseInPlan(plan)
+      const phase = instantMutations.createPhaseInPlan(plan, overrides)
       overlay.addPhaseToPlan(phase)
+      persistLocal()
       return phase.id
     },
     undoLastAction: () => ui.undoLastAction(captureUndoFrame(snapshot())),
@@ -222,12 +253,27 @@ function buildSlice(
     resetDemo: () => {
       const w = createInitialWorkspace()
       const log = initialActivityLog
-      transactAll(buildWorkspaceTransact(w, log))
+      if (hasInstantConfig) {
+        transactAll(buildWorkspaceTransact(w, log))
+      } else {
+        useLocalWorkspaceStore.getState().resetToFixtures()
+      }
       overlay.clear()
       ui.clearUndoRedo()
     },
     setPlanNavGlyph: (planId: string, glyph: Partial<PlanNavGlyph>) => {
       instantMutations.setPlanNavGlyph(planId, glyph)
+      if (!hasInstantConfig) {
+        const current = useLocalWorkspaceStore.getState().planNavGlyph
+        persistLocalWorkspaceIfNeeded({
+          workspace: snapshot().workspace,
+          activityLog,
+          planNavGlyph: {
+            ...current,
+            [planId]: { ...current[planId], ...glyph },
+          },
+        })
+      }
     },
   }
 

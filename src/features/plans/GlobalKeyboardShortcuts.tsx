@@ -148,6 +148,11 @@ export function GlobalKeyboardShortcuts() {
           e.preventDefault()
           return
         }
+        if (state.phaseModal) {
+          state.closePhaseModal()
+          e.preventDefault()
+          return
+        }
         const phaseRoute = resolvePhaseDetailRoute(location.pathname, state.workspace)
         if (phaseRoute) {
           navigate(`/plans/${phaseRoute.planId}`)
@@ -281,17 +286,13 @@ export function GlobalKeyboardShortcuts() {
           const focusId = state.focusedPhaseId ?? state.hoveredPhaseId
           if (focusId) {
             e.preventDefault()
-            navigate(phaseDetailPath(timelineRoute.planId, focusId))
+            state.openPhaseModal(timelineRoute.planId, focusId)
           }
           return
         }
         if ((e.key === 'c' || e.key === 'C') && !e.metaKey && !e.ctrlKey && !e.altKey) {
           e.preventDefault()
-          const id = state.createPhaseInPlan(timelineRoute.planId)
-          if (id) {
-            state.setFocusedPhaseId(id)
-            navigate(phaseDetailPath(timelineRoute.planId, id))
-          }
+          state.openNewPhaseModal(timelineRoute.planId)
           return
         }
       }

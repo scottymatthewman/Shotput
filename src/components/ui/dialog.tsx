@@ -39,15 +39,23 @@ function DialogContent({
   className,
   children,
   hideClose,
+  variant = 'card',
   ...props
-}: ComponentProps<typeof DialogPrimitive.Content> & { hideClose?: boolean }) {
+}: ComponentProps<typeof DialogPrimitive.Content> & {
+  hideClose?: boolean
+  /** `surface` — workspace surface-1 panel with combined inset border + elevation (phase modal). */
+  variant?: 'card' | 'surface'
+}) {
   return (
     <DialogPortal>
       <DialogOverlay />
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          'fixed top-1/2 left-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-sm inset-edge-ring inset-edge-ring-full inset-edge-strong bg-card p-6 shadow-lg transition-surface data-[state=closed]:scale-95 data-[state=closed]:opacity-0 data-[state=open]:scale-100 data-[state=open]:opacity-100 motion-reduce:transition-none',
+          'fixed top-1/2 left-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg transition-surface data-[state=closed]:scale-95 data-[state=closed]:opacity-0 data-[state=open]:scale-100 data-[state=open]:opacity-100 motion-reduce:transition-none',
+          variant === 'surface'
+            ? 'dance-modal-panel bg-surface-1 p-6'
+            : 'inset-edge-ring inset-edge-ring-full inset-edge-strong bg-card p-6 shadow-lg',
           className,
         )}
         {...props}
