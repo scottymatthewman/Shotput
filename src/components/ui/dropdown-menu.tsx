@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils'
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
-import { Check, ChevronRight, Circle } from 'lucide-react'
+import { Check, ChevronRight } from 'lucide-react'
 import type { ComponentProps } from 'react'
 
 function DropdownMenu({ ...props }: ComponentProps<typeof DropdownMenuPrimitive.Root>) {
@@ -23,7 +23,7 @@ function DropdownMenuContent({
       <DropdownMenuPrimitive.Content
         {...props}
         className={cn(
-          'z-50 min-w-32 overflow-hidden rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-md',
+          'z-50 min-w-32 overflow-hidden rounded-md inset-edge-ring inset-edge-ring-full bg-popover p-1 text-popover-foreground shadow-md',
           className,
         )}
         sideOffset={sideOffset}
@@ -86,7 +86,7 @@ function DropdownMenuRadioItem({
     >
       <span className="absolute left-2 flex size-3.5 items-center justify-center">
         <DropdownMenuPrimitive.ItemIndicator>
-          <Circle className="size-2 fill-primary" />
+          <span className="size-2 rounded-full bg-primary" aria-hidden />
         </DropdownMenuPrimitive.ItemIndicator>
       </span>
       {children}
@@ -163,7 +163,7 @@ function DropdownMenuSubContent({
   return (
     <DropdownMenuPrimitive.SubContent
       className={cn(
-        'z-50 min-w-32 overflow-hidden rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-md',
+        'z-50 min-w-32 overflow-hidden rounded-md inset-edge-ring inset-edge-ring-full bg-popover p-1 text-popover-foreground shadow-md',
         className,
       )}
       {...props}

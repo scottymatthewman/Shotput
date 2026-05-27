@@ -10,7 +10,7 @@ function TabsList({ className, ...props }: ComponentProps<typeof TabsPrimitive.L
   return (
     <TabsPrimitive.List
       className={cn(
-        'inline-flex min-h-9 items-stretch rounded-md border border-border bg-muted/50 p-1 text-muted-foreground [&>*]:flex [&>*]:h-full [&>*]:min-h-0',
+        'inline-flex min-h-9 items-stretch rounded-md inset-edge-ring inset-edge-ring-full bg-muted/50 p-1 text-muted-foreground [&>*]:flex [&>*]:h-full [&>*]:min-h-0',
         className,
       )}
       {...props}

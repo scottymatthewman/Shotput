@@ -4,40 +4,15 @@ import type {
   Phase,
   PhaseStatus,
   Plan,
+  PlanOverviewPatch,
 } from '@/types/domain'
-import { clampTaskDatesAfterMerge, coerceOrderedTaskDates } from '@/lib/taskDateOrder'
+import { clampPhaseDatesAfterMerge, coerceOrderedPhaseDates } from '@/lib/phaseDateOrder'
 import { normalizePhaseStatus } from '@/lib/phaseStatus'
 import { CURRENT_USER_ID } from '@/state/uiStore'
 import { db, hasInstantConfig } from '@/lib/instant/db'
 
 function json(value: unknown): string {
   return JSON.stringify(value)
-}
-
-function planExpandedForPhaseDates(
-  plan: Plan,
-  phaseStart: string,
-  phaseEnd: string,
-): Partial<Plan> | undefined {
-  const ps = startOfDay(new Date(`${phaseStart}T12:00:00`))
-  const pe = startOfDay(new Date(`${phaseEnd}T12:00:00`))
-  const pls = startOfDay(new Date(`${plan.start}T12:00:00`))
-  const ple = startOfDay(new Date(`${plan.end}T12:00:00`))
-
-  let nextStart = pls
-  let nextEnd = ple
-
-  if (ps < pls) nextStart = addDays(ps, -7)
-  if (pe > ple) nextEnd = addDays(pe, 7)
-
-  if (nextStart.getTime() === pls.getTime() && nextEnd.getTime() === ple.getTime()) {
-    return undefined
-  }
-
-  return {
-    start: format(nextStart, 'yyyy-MM-dd'),
-    end: format(nextEnd, 'yyyy-MM-dd'),
-  }
 }
 
 function appendActivity(ev: Omit<ActivityEvent, 'id'>) {
@@ -61,7 +36,7 @@ function transact(...ops: unknown[]) {
 }
 
 export function updatePhaseDates(phase: Phase, start: string, end: string) {
-  const ordered = coerceOrderedTaskDates(start, end)
+  const ordered = coerceOrderedPhaseDates(start, end)
   if (phase.start === ordered.start && phase.end === ordered.end) return
 
   transact(
@@ -120,7 +95,7 @@ export function updatePhaseDetails(
 ) {
   const merged = { ...phase, ...patch }
   merged.status = normalizePhaseStatus(merged.status)
-  clampTaskDatesAfterMerge(merged, {
+  clampPhaseDatesAfterMerge(merged, {
     start: Object.prototype.hasOwnProperty.call(patch, 'start'),
     end: Object.prototype.hasOwnProperty.call(patch, 'end'),
   })
@@ -172,7 +147,7 @@ export function buildNewPhaseForPlan(plan: Plan, id: string): Phase {
   const planEnd = startOfDay(new Date(`${plan.end}T12:00:00`))
   let spanEnd = addDays(planStart, 2)
   if (spanEnd > planEnd) spanEnd = planEnd
-  const { start, end } = coerceOrderedTaskDates(
+  const { start, end } = coerceOrderedPhaseDates(
     plan.start,
     format(spanEnd, 'yyyy-MM-dd'),
   )
@@ -271,8 +246,6 @@ export function deletePlan(
   })
 }
 
-import type { PlanOverviewPatch } from '@/state/domainStore'
-
 export function patchPlanOverview(planId: string, patch: PlanOverviewPatch) {
   const planPatch: Record<string, string | number | undefined> = {}
   if (patch.name !== undefined) {
@@ -296,7 +269,7 @@ export function patchPlanOverview(planId: string, patch: PlanOverviewPatch) {
     planPatch.teamMemberUserIdsJson = json(patch.teamMemberUserIds)
   }
   if (patch.start !== undefined || patch.end !== undefined) {
-    const ordered = coerceOrderedTaskDates(patch.start ?? '', patch.end ?? '')
+    const ordered = coerceOrderedPhaseDates(patch.start ?? '', patch.end ?? '')
     if (patch.start !== undefined) planPatch.start = ordered.start
     if (patch.end !== undefined) planPatch.end = ordered.end
   }
@@ -322,35 +295,3 @@ export function setPlanNavGlyph(
     }),
   )
 }
-
-export { planExpandedForPhaseDates as timelineExpandedForTaskDates }
-
-/** @deprecated Use updatePhaseDates */
-export const updateTaskDates = updatePhaseDates
-
-/** @deprecated Use setPhaseStatus */
-export const setTaskStatus = setPhaseStatus
-
-/** @deprecated Use updatePhaseDetails */
-export const updateTaskDetails = updatePhaseDetails
-
-/** @deprecated Use toggleChecklistTask */
-export const toggleSubtask = toggleChecklistTask
-
-/** @deprecated Use deletePhase */
-export const deleteTask = deletePhase
-
-/** @deprecated Use createPhaseInPlan */
-export const createTaskInTimeline = createPhaseInPlan
-
-/** @deprecated Use addPlanNote */
-export const addTimelineEventNote = addPlanNote
-
-/** @deprecated Use deletePlan */
-export const deleteEvent = deletePlan
-
-/** @deprecated Use patchPlanOverview */
-export const patchEventOverview = patchPlanOverview
-
-/** @deprecated Use setPlanNavGlyph */
-export const setEventNavGlyph = setPlanNavGlyph

@@ -4,27 +4,30 @@ export function resolvePlanWorkspaceRoute(
   pathname: string,
   workspace: Workspace,
 ): { planId: string } | null {
-  const m = pathname.match(/^\/plan\/([^/]+)\/?$/)
+  const m = pathname.match(/^\/plans\/([^/]+)\/?$/)
   if (!m?.[1]) return null
   const planId = m[1]
   if (!workspace.plans[planId]) return null
   return { planId }
 }
 
-/** @deprecated Use resolvePlanWorkspaceRoute */
 export function resolvePlanId(workspace: Workspace, planId: string): string | undefined {
   return workspace.plans[planId] ? planId : undefined
 }
 
-/** @deprecated Use resolvePlanWorkspaceRoute */
-export function resolveEventPlannerRoute(
-  pathname: string,
-  workspace: Workspace,
-): { eventId: string; timelineId: string } | null {
-  const route = resolvePlanWorkspaceRoute(pathname, workspace)
-  if (!route) return null
-  return { eventId: route.planId, timelineId: route.planId }
+export function phaseDetailPath(planId: string, phaseId: string) {
+  return `/plans/${planId}/phases/${phaseId}`
 }
 
-/** @deprecated Use resolvePlanId */
-export const getPlannerTimelineIdForEvent = resolvePlanId
+export function resolvePhaseDetailRoute(
+  pathname: string,
+  workspace: Workspace,
+): { planId: string; phaseId: string } | null {
+  const m = pathname.match(/^\/plans\/([^/]+)\/phases\/([^/]+)\/?$/)
+  if (!m?.[1] || !m[2]) return null
+  const planId = m[1]
+  const phaseId = m[2]
+  const phase = workspace.phases[phaseId]
+  if (!phase || phase.planId !== planId) return null
+  return { planId, phaseId }
+}

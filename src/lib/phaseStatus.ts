@@ -58,12 +58,3 @@ export function getEffectivePhaseStatus(phase: Phase, now: Date = new Date()): P
   }
   return 'todo'
 }
-
-/** @deprecated Use normalizePhaseStatus */
-export const normalizeTaskStatus = normalizePhaseStatus
-
-/** @deprecated Use getEffectivePhaseStatus */
-export const getEffectiveTaskStatus = getEffectivePhaseStatus
-
-/** @deprecated Use isPhaseStatusManual */
-export const isTaskStatusManual = isPhaseStatusManual

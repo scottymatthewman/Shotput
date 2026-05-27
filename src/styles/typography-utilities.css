@@ -1,0 +1,22 @@
+/**
+ * Typography utilities — load after Tailwind (see index.css).
+ * Gen Interface JP lacks OpenType numeric features; without these overrides,
+ * tabular-nums etc. trigger per-digit fallback fonts across the app.
+ */
+
+@layer utilities {
+  .tabular-nums,
+  .lining-nums,
+  .oldstyle-nums,
+  .proportional-nums,
+  .slashed-zero,
+  .ordinal {
+    --tw-numeric-spacing: initial;
+    --tw-numeric-figure: initial;
+    --tw-slashed-zero: initial;
+    --tw-ordinal: initial;
+    --tw-numeric-fraction: initial;
+    font-variant-numeric: normal;
+    font-feature-settings: normal;
+  }
+}

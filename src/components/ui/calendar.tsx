@@ -38,12 +38,12 @@ function Calendar({
         ),
         button_previous: cn(
           buttonVariants({ variant: 'outline', size: 'icon' }),
-          'size-7 shrink-0 border-border bg-card p-0 text-foreground transition-surface duration-150 ease-hover hover:bg-muted/50 [&_svg]:size-4',
+          'size-7 shrink-0 bg-card p-0 text-foreground transition-surface duration-150 ease-hover hover:bg-muted/50 [&_svg]:size-4',
           defaults.button_previous,
         ),
         button_next: cn(
           buttonVariants({ variant: 'outline', size: 'icon' }),
-          'size-7 shrink-0 border-border bg-card p-0 text-foreground transition-surface duration-150 ease-hover hover:bg-muted/50 [&_svg]:size-4',
+          'size-7 shrink-0 bg-card p-0 text-foreground transition-surface duration-150 ease-hover hover:bg-muted/50 [&_svg]:size-4',
           defaults.button_next,
         ),
         month_grid: cn('mt-1 w-full border-collapse', defaults.month_grid),

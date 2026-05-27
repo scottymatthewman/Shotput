@@ -1,13 +1,14 @@
 import { AppBootSkeleton } from '@/components/AppBootSkeleton'
+import { ThemeSync } from '@/components/ThemeSync'
 import { InstantBootstrap } from '@/state/instantBootstrap'
-import { useDomainStore } from '@/state/domainStore'
 import { useUiStore } from '@/state/uiStore'
+import { useWorkspaceQuery } from '@/state/useWorkspaceQuery'
 import { useEffect, useState, type ReactNode } from 'react'
 
-/** Gate first paint until UI persist hydrates and domain store is ready. */
+/** Gate first paint until UI persist hydrates and workspace is ready. */
 export function AppBootGate({ children }: { children: ReactNode }) {
   const [uiHydrated, setUiHydrated] = useState(() => useUiStore.persist.hasHydrated())
-  const domainHydrated = useDomainStore((s) => s.hydrated)
+  const { ready } = useWorkspaceQuery()
 
   useEffect(() => {
     if (useUiStore.persist.hasHydrated()) {
@@ -17,12 +18,13 @@ export function AppBootGate({ children }: { children: ReactNode }) {
     return useUiStore.persist.onFinishHydration(() => setUiHydrated(true))
   }, [])
 
-  const ready = uiHydrated && domainHydrated
+  const bootReady = uiHydrated && ready
 
   return (
     <>
+      <ThemeSync />
       <InstantBootstrap />
-      {!ready ? <AppBootSkeleton /> : children}
+      {!bootReady ? <AppBootSkeleton /> : children}
     </>
   )
 }

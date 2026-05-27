@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 import type { SVGProps } from 'react'
 
-/** Julip urgent priority — `--color-coral` by default; paths use `currentColor`. */
+/** Urgent priority — `--color-coral` (red status) by default; paths use `currentColor`. */
 export function UrgentPriorityGlyph({ className, ...rest }: SVGProps<SVGSVGElement>) {
   return (
     <svg

@@ -1,0 +1,147 @@
+/**
+ * App typography — single source of truth.
+ *
+ * To change the app font:
+ * 1. Update --dance-font-family-name and --dance-font-file-base below.
+ * 2. Replace files in public/fonts/ (match filenames or update @font-face src paths).
+ * 3. Keep the literal font-family in each @font-face in sync with --dance-font-family-name.
+ * 4. Sync index.html boot @font-face / font-family to match.
+ *
+ * Numeric utility overrides (tabular-nums, etc.): typography-utilities.css
+ */
+
+:root {
+  --dance-font-family-name: 'Gen Interface JP';
+  --dance-font-family-fallback: ui-sans-serif, system-ui, sans-serif;
+  --dance-font-family: var(--dance-font-family-name), var(--dance-font-family-fallback);
+  --dance-font-file-base: '/fonts/gen-interface-jp';
+}
+
+/* font-family literal must match --dance-font-family-name */
+@font-face {
+  font-family: 'Gen Interface JP';
+  font-style: normal;
+  font-weight: 100;
+  font-display: swap;
+  src: url('/fonts/gen-interface-jp/GenInterfaceJP-Thin.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Gen Interface JP';
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+  src: url('/fonts/gen-interface-jp/GenInterfaceJP-ExtraLight.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Gen Interface JP';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/fonts/gen-interface-jp/GenInterfaceJP-Light.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Gen Interface JP';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/gen-interface-jp/GenInterfaceJP-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Gen Interface JP';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/gen-interface-jp/GenInterfaceJP-Medium.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Gen Interface JP';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/gen-interface-jp/GenInterfaceJP-SemiBold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Gen Interface JP';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/gen-interface-jp/GenInterfaceJP-Bold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Gen Interface JP';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fonts/gen-interface-jp/GenInterfaceJP-ExtraBold.ttf') format('truetype');
+}
+
+@layer base {
+  html {
+    font-family: var(--dance-font-family);
+  }
+
+  body,
+  #root {
+    font-family: var(--dance-font-family);
+  }
+
+  :where(
+    button,
+    input,
+    select,
+    textarea,
+    optgroup,
+    kbd,
+    code,
+    pre,
+    samp,
+    table,
+    th,
+    td,
+    label,
+    legend,
+    p,
+    span,
+    a,
+    li,
+    dt,
+    dd,
+    figcaption,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    small,
+    strong,
+    em,
+    blockquote,
+    [role='menu'],
+    [role='menuitem'],
+    [role='dialog'],
+    [role='listbox'],
+    [role='option'],
+    [role='tab'],
+    [role='tabpanel'],
+    [role='tooltip'],
+    [cmdk-root],
+    [cmdk-input],
+    [cmdk-item],
+    [cmdk-group-heading]
+  ) {
+    font-family: inherit;
+  }
+
+  /* Portals (Radix, etc.) mount on body; reinforce when a wrapper sets its own stack */
+  :where([data-radix-portal], [data-radix-popper-content-wrapper]) {
+    font-family: var(--dance-font-family);
+  }
+}

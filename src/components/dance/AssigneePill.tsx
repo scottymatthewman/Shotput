@@ -1,7 +1,7 @@
-import { ganttBarStackRingByStatus } from '@/components/dance/ganttBarTaskTokens'
+import { ganttBarStackRingByStatus } from '@/features/plans/gantt/ganttBarPhaseTokens'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { getEffectiveTaskStatus } from '@/lib/taskStatus'
+import { getEffectivePhaseStatus } from '@/lib/phaseStatus'
 import { cn } from '@/lib/utils'
 import type { Agent, Phase, User, Workspace } from '@/types/domain'
 import { Plus, Sparkles } from 'lucide-react'
@@ -32,7 +32,7 @@ export function AssigneePill({
           <TooltipTrigger asChild>
             <span
               className={cn(
-                'inline-flex max-w-40 items-center gap-1 rounded-full border border-primary/50 bg-primary/10 py-1 pl-1 pr-[10px] text-xs text-primary',
+                'inline-flex max-w-40 items-center gap-1 rounded-full inset-edge-ring inset-edge-ring-full inset-edge-primary-soft bg-primary/10 py-1 pl-1 pr-[10px] text-xs text-primary',
                 className,
               )}
             >
@@ -52,7 +52,7 @@ export function AssigneePill({
   return (
     <span
       className={cn(
-        'inline-flex max-w-36 items-center gap-1.5 rounded-full border border-border bg-card py-1 pl-1 pr-[10px] text-xs',
+        'inline-flex max-w-36 items-center gap-1.5 rounded-full inset-edge-ring inset-edge-ring-full bg-card py-1 pl-1 pr-[10px] text-xs',
         className,
       )}
     >
@@ -97,7 +97,7 @@ export function AssigneeAvatarStack({
 
   const visible = entries.slice(0, maxVisible)
   const overflow = entries.length - visible.length
-  const eff = getEffectiveTaskStatus(phase)
+  const eff = getEffectivePhaseStatus(phase)
   const ring = ganttBarStackRingByStatus[eff] ?? ganttBarStackRingByStatus.todo
 
   return (
@@ -110,7 +110,7 @@ export function AssigneeAvatarStack({
           className={cn(
             'relative z-[1] flex size-5 shrink-0 items-center justify-center rounded-full ring-2',
             ring,
-            onDarkBackground ? 'bg-white/20 text-white' : 'bg-muted text-muted-foreground',
+            onDarkBackground ? 'bg-[var(--dance-assignee-on-bar-bg)] text-[var(--dance-assignee-on-bar-fg)]' : 'bg-muted text-muted-foreground',
           )}
           style={{ marginLeft: visible.length === 0 ? 0 : -4 }}
           title={`${overflow} more`}
@@ -139,7 +139,7 @@ function StackAvatar({
           <TooltipTrigger asChild>
             <span
               className={cn(
-                'relative z-[1] flex size-5 shrink-0 items-center justify-center rounded-full bg-white/25 ring-2',
+                'relative z-[1] flex size-5 shrink-0 items-center justify-center rounded-full bg-[var(--dance-assignee-on-bar-bg)] ring-2',
                 ringClass,
               )}
               style={style}

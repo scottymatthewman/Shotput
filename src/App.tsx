@@ -1,57 +1,61 @@
-import { NavigationDebugProbe } from '@/components/dev/NavigationDebugProbe'
 import { AppBootSkeleton } from '@/components/AppBootSkeleton'
+import { AgentationDevTools } from '@/components/dev/AgentationDevTools'
 import { AppShell } from '@/layouts/AppShell'
 import { Suspense, lazy, type ReactNode } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useParams } from 'react-router-dom'
-import { Agentation } from 'agentation'
 
-const HomePage = lazy(() =>
-  import('@/pages/HomePage').then((m) => ({ default: m.HomePage })),
+const PlanIndexPage = lazy(() =>
+  import('@/features/plans/PlanIndexPage').then((m) => ({ default: m.PlanIndexPage })),
 )
-const WorkspaceChatPage = lazy(() =>
-  import('@/pages/WorkspaceChatPage').then((m) => ({ default: m.WorkspaceChatPage })),
+const PlanOverviewPage = lazy(() =>
+  import('@/features/plans/PlanOverviewPage').then((m) => ({ default: m.PlanOverviewPage })),
 )
-const FindIndustryEventsPage = lazy(() =>
-  import('@/pages/FindIndustryEventsPage').then((m) => ({ default: m.FindIndustryEventsPage })),
+const PlanWorkspacePage = lazy(() =>
+  import('@/features/plans/PlanWorkspacePage').then((m) => ({ default: m.PlanWorkspacePage })),
 )
-const FindIndustryEventDetailPage = lazy(() =>
-  import('@/pages/FindIndustryEventDetailPage').then((m) => ({
-    default: m.FindIndustryEventDetailPage,
-  })),
-)
-const EventIndexPage = lazy(() =>
-  import('@/pages/EventIndexPage').then((m) => ({ default: m.EventIndexPage })),
-)
-const EventOverviewPage = lazy(() =>
-  import('@/pages/EventOverviewPage').then((m) => ({ default: m.EventOverviewPage })),
-)
-const TimelineWorkspacePage = lazy(() =>
-  import('@/pages/TimelineWorkspacePage').then((m) => ({ default: m.TimelineWorkspacePage })),
-)
-const ReportPlaceholderPage = lazy(() =>
-  import('@/pages/ReportPlaceholderPage').then((m) => ({ default: m.ReportPlaceholderPage })),
+const PhaseDetailPage = lazy(() =>
+  import('@/features/plans/PhaseDetailPage').then((m) => ({ default: m.PhaseDetailPage })),
 )
 const SettingsPage = lazy(() =>
-  import('@/pages/SettingsPage').then((m) => ({ default: m.SettingsPage })),
+  import('@/features/settings/SettingsPage').then((m) => ({ default: m.SettingsPage })),
+)
+const TypographyComparePage = lazy(() =>
+  import('@/features/dev/TypographyComparePage').then((m) => ({
+    default: m.TypographyComparePage,
+  })),
 )
 
 function LegacyProjectToPlanRedirect() {
   const { projectId } = useParams<{ projectId: string }>()
-  return <Navigate to={`/plan/${projectId}`} replace />
+  return <Navigate to={`/plans/${projectId}`} replace />
 }
 
 function LegacyEventsListRedirect() {
-  return <Navigate to="/plan" replace />
+  return <Navigate to="/plans" replace />
 }
 
 function LegacyPlanOverviewRedirect() {
   const { eventId } = useParams<{ eventId: string }>()
-  return <Navigate to={`/plan/${eventId}/overview`} replace />
+  return <Navigate to={`/plans/${eventId}/overview`} replace />
 }
 
 function LegacyPlanWorkspaceRedirect() {
   const { eventId } = useParams<{ eventId: string }>()
-  return <Navigate to={`/plan/${eventId}`} replace />
+  return <Navigate to={`/plans/${eventId}`} replace />
+}
+
+function LegacyPlanIndexRedirect() {
+  return <Navigate to="/plans" replace />
+}
+
+function LegacyPlanWorkspaceFromPlanPathRedirect() {
+  const { planId } = useParams<{ planId: string }>()
+  return <Navigate to={`/plans/${planId}`} replace />
+}
+
+function LegacyPlanOverviewFromPlanPathRedirect() {
+  const { planId } = useParams<{ planId: string }>()
+  return <Navigate to={`/plans/${planId}/overview`} replace />
 }
 
 function LazyPage({ children }: { children: ReactNode }) {
@@ -62,73 +66,45 @@ export default function App() {
   return (
     <>
       <BrowserRouter>
-        {import.meta.env.DEV ? <NavigationDebugProbe /> : null}
         <Routes>
           <Route element={<AppShell />}>
+            <Route path="/" element={<Navigate to="/plans" replace />} />
             <Route
-              path="/"
+              path="/plans"
               element={
                 <LazyPage>
-                  <HomePage />
+                  <PlanIndexPage />
                 </LazyPage>
               }
             />
             <Route
-              path="/chat"
+              path="/plans/:planId/overview"
               element={
                 <LazyPage>
-                  <WorkspaceChatPage />
+                  <PlanOverviewPage />
                 </LazyPage>
               }
             />
             <Route
-              path="/find"
+              path="/plans/:planId/phases/:phaseId"
               element={
                 <LazyPage>
-                  <FindIndustryEventsPage />
+                  <PhaseDetailPage />
                 </LazyPage>
               }
             />
             <Route
-              path="/find/industry-events/:catalogEventId"
+              path="/plans/:planId"
               element={
                 <LazyPage>
-                  <FindIndustryEventDetailPage />
+                  <PlanWorkspacePage />
                 </LazyPage>
               }
             />
-            <Route
-              path="/plan"
-              element={
-                <LazyPage>
-                  <EventIndexPage />
-                </LazyPage>
-              }
-            />
-            <Route
-              path="/plan/:planId/overview"
-              element={
-                <LazyPage>
-                  <EventOverviewPage />
-                </LazyPage>
-              }
-            />
-            <Route
-              path="/plan/:planId"
-              element={
-                <LazyPage>
-                  <TimelineWorkspacePage />
-                </LazyPage>
-              }
-            />
-            <Route
-              path="/report"
-              element={
-                <LazyPage>
-                  <ReportPlaceholderPage />
-                </LazyPage>
-              }
-            />
+
+            <Route path="/plan" element={<LegacyPlanIndexRedirect />} />
+            <Route path="/plan/:planId/overview" element={<LegacyPlanOverviewFromPlanPathRedirect />} />
+            <Route path="/plan/:planId" element={<LegacyPlanWorkspaceFromPlanPathRedirect />} />
 
             <Route path="/events" element={<LegacyEventsListRedirect />} />
             <Route path="/events/:eventId/overview" element={<LegacyPlanOverviewRedirect />} />
@@ -146,18 +122,21 @@ export default function App() {
                 </LazyPage>
               }
             />
+            {import.meta.env.DEV ? (
+              <Route
+                path="/dev/typography"
+                element={
+                  <LazyPage>
+                    <TypographyComparePage />
+                  </LazyPage>
+                }
+              />
+            ) : null}
           </Route>
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<Navigate to="/plans" replace />} />
         </Routes>
       </BrowserRouter>
-      {process.env.NODE_ENV === 'development' && (
-        <Agentation
-          endpoint="http://localhost:4747"
-          onSessionCreated={(sessionId) => {
-            console.log('Session started:', sessionId)
-          }}
-        />
-      )}
+      {import.meta.env.DEV ? <AgentationDevTools /> : null}
     </>
   )
 }

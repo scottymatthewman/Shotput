@@ -1,4 +1,6 @@
-import type { DanceStoreSlice } from '@/state/useDanceStore'
+import { features } from '@/config/features'
+import { phaseDetailPath } from '@/lib/planRoute'
+import type { PlansStoreSlice } from '@/state/plansStore'
 import type { Workspace } from '@/types/domain'
 
 const RECENT_KEY = 'dance-command-recent'
@@ -45,12 +47,27 @@ export function buildCommandIndex(input: {
 }): { recent: CommandItem[]; navigation: CommandItem[]; actions: CommandItem[]; index: CommandItem[] } {
   const { workspace } = input
   const navigation: CommandItem[] = [
-    { id: 'nav-home', kind: 'nav', label: 'Home', keywords: 'home dashboard', to: '/' },
-    { id: 'nav-chat', kind: 'nav', label: 'Chat', keywords: 'chat workspace', to: '/chat' },
-    { id: 'nav-find', kind: 'nav', label: 'Find industry events', keywords: 'find discover', to: '/find' },
-    { id: 'nav-plan', kind: 'nav', label: 'Plan index', keywords: 'plan events projects', to: '/plan' },
-    { id: 'nav-settings', kind: 'nav', label: 'Settings', keywords: 'settings preferences', to: '/settings' },
+    ...(features.home
+      ? [{ id: 'nav-home', kind: 'nav' as const, label: 'Home', keywords: 'home dashboard', to: '/' }]
+      : []),
+    ...(features.inbox
+      ? [{ id: 'nav-inbox', kind: 'nav' as const, label: 'Inbox', keywords: 'inbox messages', to: '/inbox' }]
+      : []),
+    { id: 'nav-plans', kind: 'nav', label: 'Plans', keywords: 'plan events projects', to: '/plans' },
+    ...(features.reports
+      ? [{ id: 'nav-reports', kind: 'nav' as const, label: 'Reports', keywords: 'reports analytics', to: '/reports' }]
+      : []),
   ]
+
+  if (features.settings) {
+    navigation.push({
+      id: 'nav-settings',
+      kind: 'nav',
+      label: 'Settings',
+      keywords: 'settings preferences',
+      to: '/settings',
+    })
+  }
 
   for (const p of Object.values(workspace.plans)) {
     navigation.push({
@@ -58,14 +75,14 @@ export function buildCommandIndex(input: {
       kind: 'event',
       label: p.name,
       keywords: `event project ${p.name}`,
-      to: `/plan/${p.id}`,
+      to: `/plans/${p.id}`,
     })
     navigation.push({
       id: `event-overview-${p.id}`,
       kind: 'event',
       label: `${p.name} overview`,
       keywords: `overview ${p.name}`,
-      to: `/plan/${p.id}/overview`,
+      to: `/plans/${p.id}/overview`,
     })
   }
 
@@ -77,7 +94,7 @@ export function buildCommandIndex(input: {
       kind: 'task',
       label: t.title,
       keywords: `task ${t.title} ${project?.name ?? ''} ${t.section}`,
-      to: `/plan/${t.planId}?phase=${t.id}`,
+      to: phaseDetailPath(t.planId, t.id),
     })
   }
 
@@ -130,7 +147,7 @@ export function buildCommandIndex(input: {
           id: 'action-task-status',
           kind: 'action',
           label: `Change status: ${task.title}`,
-          keywords: 'status task sheet',
+          keywords: 'status phase detail',
           shortcut: 'S',
           action: undefined,
         },
@@ -155,22 +172,22 @@ export function buildCommandIndex(input: {
   return { recent, navigation, actions, index }
 }
 
-export function taskTargetId(state: Pick<DanceStoreSlice, 'focusedPhaseId' | 'hoveredPhaseId' | 'selectedPhaseId'>) {
+export function phaseTargetId(state: Pick<PlansStoreSlice, 'focusedPhaseId' | 'hoveredPhaseId' | 'selectedPhaseId'>) {
   return state.focusedPhaseId ?? state.hoveredPhaseId ?? state.selectedPhaseId
 }
 
-export function orderedTaskIdsForTimeline(workspace: Workspace, timelineId: string): string[] {
-  const tl = workspace.plans[timelineId]
-  return tl?.phaseIds ?? []
+export function orderedPhaseIdsForPlan(workspace: Workspace, planId: string): string[] {
+  const plan = workspace.plans[planId]
+  return plan?.phaseIds ?? []
 }
 
-export function stepTaskFocus(
+export function stepPhaseFocus(
   workspace: Workspace,
-  timelineId: string,
+  planId: string,
   currentId: string | null,
   direction: 1 | -1,
 ): string | null {
-  const ids = orderedTaskIdsForTimeline(workspace, timelineId)
+  const ids = orderedPhaseIdsForPlan(workspace, planId)
   if (ids.length === 0) return null
   if (!currentId) return direction === 1 ? ids[0]! : ids[ids.length - 1]!
   const idx = ids.indexOf(currentId)

@@ -1,0 +1,79 @@
+---
+description: Dance color system — UI foundations, light/dark, Gantt and chrome
+alwaysApply: true
+---
+
+# Color system (Dance)
+
+Source of truth: `src/styles/colors.css`. Agent-readable overview + when-to-use: `DESIGN.md` §2. Tailwind utilities in `src/index.css` (`@theme` + component classes).
+
+## Three layers
+
+1. **Primitives** (`--palette-*`) — raw palette. **`--palette-white`** / **`--palette-black`** alias neutral-0 / neutral-950. Never use hex in components.
+2. **UI foundations** (`--dance-bg`, `--dance-surface-*`, `--dance-border-*`, `--dance-text-*`, `--dance-fill-*`, `--dance-frost-surface`, `--dance-progress-*`) — structural UI. Prefer Tailwind utilities.
+
+**Light ↔ dark:** when a spec says “white @ 90%” or “black”, define `--dance-*` in `:root` + `.dark` (white↔black inversion) — never hardcode `bg-white` / `bg-black` on themed surfaces.
+3. **Feature** (`--dance-gantt-*`, `--dance-phase-*`, `--dance-chrome-*`) — timeline/phase presentation only.
+
+Light values on `:root`; dark overrides in `.dark`. Default theme is **light** (`uiStore.theme`).
+
+## Surfaces (when to use)
+
+| Utility | Use |
+|---------|-----|
+| `bg-background` | App shell, sidebar, content panel backdrop (**bg**) |
+| `bg-surface-1` | Workspace card, primary content, Gantt bars, cards, table body rows |
+| `bg-surface-2` | Subtle bands — table headers, section chrome (neutral-50 light) |
+| `bg-surface-3` | Inset wells — inputs, metric cards, muted panels (neutral-100 light) |
+
+Legacy aliases still work: `bg-content` / `bg-card` / `bg-gantt-canvas` → surface-1; `bg-muted` / `bg-input` → surface-3; `bg-popover` → surface-1 (elevated via shadow).
+
+## Borders → inset edges
+
+Structural edges use **inset shadow** (not `border`) so they read on any fill:
+
+| Utility | Use |
+|---------|-----|
+| `inset-edge-ring` + `inset-edge-ring-full` | Cards, inputs, buttons, popovers — `inset 0 0 0 1px` on the element |
+| `inset-edge` + `inset-edge-full` | Layered surfaces (Gantt bars) — shadow on `::after` overlay |
+| `inset-edge-ring-b` / `inset-edge-b` | Single-edge dividers |
+| `inset-edge-strong` | Dialogs, sheets (was `border-border-strong`) |
+| `inset-edge-soft` | Muted containers (was `border-border/50`) |
+| `inset-edge-hover` | Interactive edge (was `hover:border-border-hover`) |
+| `inset-edge-chrome` + `inset-edge-chrome-hover` | Toolbar outline controls |
+| `bg-frost-surface` | Frosted panels (white 90% light → black 90% dark) + `backdrop-blur` |
+| `bg-progress-track` / `bg-progress-fill` | Progress bars (neutral-200 / black light → neutral-800 / white dark) |
+
+When the user specifies **white @ opacity** or **black** for UI chrome, add or use a `--dance-*` token with `:root` + `.dark` overrides — do not hardcode `bg-white` / `bg-black` in components.
+
+## Do this
+
+- **Text**: `text-foreground`, `text-muted-foreground`, `text-on-canvas` (workspace alias).
+- **Hover fills**: `bg-fill-hover`, `bg-fill-selected`, `bg-accent/40` for menus/rows.
+- **Toolbar on page headers**: `text-chrome-fg`, `pageChrome` button variants.
+- **Status**: `text-status-*` on icons/labels only — not structural borders.
+- **Gantt bars**: `GANTT_BAR_SURFACE_CLASS` — `inset-edge` overlay + hover.
+- **New tokens**: primitive → `--dance-*` in `colors.css` → `@theme` → utility → `DESIGN.md` table.
+- **Never** put `shadow-none` on elements that use `inset-edge-ring*` — it clears the inset “border”.
+
+## Avoid this
+
+- Raw hex, `--palette-*`, `text-white`, scattered `dark:` pairs.
+- Status colors on Gantt bar borders or app chrome.
+- Duplicating feature colors in TS — extend `colors.css`.
+
+## Quick reference
+
+```tsx
+// App shell
+className="bg-background"              // bg
+className="bg-surface-1 inset-edge-ring inset-edge-ring-full"   // workspace card
+
+// Interactive edge
+className="inset-edge-ring inset-edge-ring-full inset-edge-hover transition-surface duration-150 ease-hover"
+
+// Row hover
+className="hover:bg-fill-hover"
+```
+
+Boot skeleton in `index.html` mirrors `--dance-bg` / `--dance-surface-1` until CSS loads.

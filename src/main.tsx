@@ -1,6 +1,5 @@
 import { StrictMode, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
-import '@fontsource-variable/inter'
 import './index.css'
 import { AppBootGate } from '@/components/AppBootGate'
 import { AppBootSkeleton } from '@/components/AppBootSkeleton'

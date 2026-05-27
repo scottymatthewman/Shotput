@@ -86,16 +86,12 @@ export function computePlanBudgetRollup(plan: Plan, workspace: Workspace): PlanB
 
 export function planBudgetStatusLabel(rollup: PlanBudgetRollup): string | null {
   if (rollup.ceilingCents == null) return null
-  const { currency, actualCents, ceilingCents, remainingCents } = rollup
+  const { currency, actualCents, ceilingCents } = rollup
   const spent = formatBudgetCentsCompact(actualCents, currency)
   const ceiling = formatBudgetCentsCompact(ceilingCents, currency)
   if (rollup.overSpent) {
     const over = formatBudgetCentsCompact(actualCents - ceilingCents, currency)
     return `${spent} / ${ceiling} · ${over} over`
-  }
-  if (remainingCents != null && remainingCents >= 0) {
-    const remaining = formatBudgetCentsCompact(remainingCents, currency)
-    return `${spent} / ${ceiling} · ${remaining} left`
   }
   return `${spent} / ${ceiling}`
 }

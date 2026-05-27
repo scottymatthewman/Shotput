@@ -1,4 +1,6 @@
 @import 'tailwindcss';
+@import './styles/colors.css';
+@import './styles/typography.css';
 
 /* Radix Presence only defers unmount for CSS animations (not transitions). */
 @keyframes dance-sheet-in-right {
@@ -56,47 +58,154 @@
 }
 
 @theme {
-  /* Dance dark palette */
-  /** App chrome (shell, inputs): slightly lifted vs gantt canvas for depth. */
-  --color-background: #121212;
-  --color-foreground: #e0e0e0;
-  --color-card: #1a1a1a;
-  --color-card-foreground: #e0e0e0;
-  --color-popover: #1a1a1a;
-  --color-popover-foreground: #e0e0e0;
-  --color-muted: #141414;
-  --color-muted-foreground: #757575;
-  --color-border: #2a2a2a;
-  --color-input: #2a2a2a;
-  /* Focus rings — 1px via utilities (`ring-1`); keep separate from primary brand accent */
-  --color-ring: #ffffff;
-  --color-primary: #ffffff;
-  --color-primary-foreground: #0d0d0d;
-  --color-secondary: #1a1a1a;
-  --color-secondary-foreground: #e0e0e0;
-  --color-accent: rgba(255, 255, 255, 0.12);
-  --color-accent-foreground: #ffffff;
-  --color-destructive: #ff6b6b;
-  --color-destructive-foreground: #0d0d0d;
-  --color-agent: #ffffff;
-  --color-assignee-blue: #5c6bc0;
-  /** Missed / blocked accent — same hue as Gantt `CORAL` in `ganttBarTaskTokens.ts`. */
-  --color-coral: #ff886a;
-  --color-assignee-coral: var(--color-coral);
+  --font-sans: var(--dance-font-family);
+  --font-mono: var(--dance-font-family);
+  --font-serif: var(--dance-font-family);
 
-  /** Gantt / timeline chart pit — sticky date fade and scroller share this so transparent heels don’t flash a mismatched tone. */
-  --color-gantt-canvas: #0d0d0d;
+  /* ─── Layer 1: Palette utilities (bg-neutral-100, text-red-500, etc.) ─── */
+  --color-neutral-0: var(--palette-neutral-0);
+  --color-neutral-50: var(--palette-neutral-50);
+  --color-neutral-100: var(--palette-neutral-100);
+  --color-neutral-200: var(--palette-neutral-200);
+  --color-neutral-300: var(--palette-neutral-300);
+  --color-neutral-400: var(--palette-neutral-400);
+  --color-neutral-500: var(--palette-neutral-500);
+  --color-neutral-600: var(--palette-neutral-600);
+  --color-neutral-700: var(--palette-neutral-700);
+  --color-neutral-800: var(--palette-neutral-800);
+  --color-neutral-900: var(--palette-neutral-900);
+  --color-neutral-950: var(--palette-neutral-950);
+  --color-white: var(--palette-white);
+  --color-black: var(--palette-black);
+  --color-frost-surface: var(--dance-frost-surface);
+  --color-surface-frost: var(--dance-surface-frost);
+  --color-progress-track: var(--dance-progress-track);
+  --color-progress-fill: var(--dance-progress-fill);
 
-  /* Gantt task bar surfaces (status-driven; typography uses foreground + drop-shadow where needed). */
-  --color-task-bar-todo: #383838;
-  --color-task-bar-progress: #e7ff97;
-  --color-task-bar-done: #383838;
-  --color-task-bar-missed: color-mix(in srgb, var(--color-coral) 32%, var(--color-gantt-canvas));
-  --color-task-bar-missed-foreground: #f0e8e6;
+  --color-red-50: var(--palette-red-50);
+  --color-red-100: var(--palette-red-100);
+  --color-red-200: var(--palette-red-200);
+  --color-red-300: var(--palette-red-300);
+  --color-red-400: var(--palette-red-400);
+  --color-red-500: var(--palette-red-500);
+  --color-red-600: var(--palette-red-600);
+  --color-red-700: var(--palette-red-700);
+  --color-red-800: var(--palette-red-800);
+  --color-red-900: var(--palette-red-900);
+  --color-red-950: var(--palette-red-950);
+
+  --color-yellow-50: var(--palette-yellow-50);
+  --color-yellow-100: var(--palette-yellow-100);
+  --color-yellow-200: var(--palette-yellow-200);
+  --color-yellow-300: var(--palette-yellow-300);
+  --color-yellow-400: var(--palette-yellow-400);
+  --color-yellow-500: var(--palette-yellow-500);
+  --color-yellow-600: var(--palette-yellow-600);
+  --color-yellow-700: var(--palette-yellow-700);
+  --color-yellow-800: var(--palette-yellow-800);
+  --color-yellow-900: var(--palette-yellow-900);
+  --color-yellow-950: var(--palette-yellow-950);
+
+  --color-blue-50: var(--palette-blue-50);
+  --color-blue-100: var(--palette-blue-100);
+  --color-blue-200: var(--palette-blue-200);
+  --color-blue-300: var(--palette-blue-300);
+  --color-blue-400: var(--palette-blue-400);
+  --color-blue-500: var(--palette-blue-500);
+  --color-blue-600: var(--palette-blue-600);
+  --color-blue-700: var(--palette-blue-700);
+  --color-blue-800: var(--palette-blue-800);
+  --color-blue-900: var(--palette-blue-900);
+  --color-blue-950: var(--palette-blue-950);
+
+  --color-green-50: var(--palette-green-50);
+  --color-green-100: var(--palette-green-100);
+  --color-green-200: var(--palette-green-200);
+  --color-green-300: var(--palette-green-300);
+  --color-green-400: var(--palette-green-400);
+  --color-green-500: var(--palette-green-500);
+  --color-green-600: var(--palette-green-600);
+  --color-green-700: var(--palette-green-700);
+  --color-green-800: var(--palette-green-800);
+  --color-green-900: var(--palette-green-900);
+  --color-green-950: var(--palette-green-950);
+
+  --color-purple-50: var(--palette-purple-50);
+  --color-purple-100: var(--palette-purple-100);
+  --color-purple-200: var(--palette-purple-200);
+  --color-purple-300: var(--palette-purple-300);
+  --color-purple-400: var(--palette-purple-400);
+  --color-purple-500: var(--palette-purple-500);
+  --color-purple-600: var(--palette-purple-600);
+  --color-purple-700: var(--palette-purple-700);
+  --color-purple-800: var(--palette-purple-800);
+  --color-purple-900: var(--palette-purple-900);
+  --color-purple-950: var(--palette-purple-950);
+
+  /* ─── UI foundations → Tailwind utilities ─── */
+  --color-bg: var(--dance-bg);
+  --color-surface-1: var(--dance-surface-1);
+  --color-surface-2: var(--dance-surface-2);
+  --color-surface-3: var(--dance-surface-3);
+
+  /* Shadcn-compatible aliases → foundations */
+  --color-background: var(--dance-bg);
+  --color-content: var(--dance-surface-1);
+  --color-foreground: var(--dance-text-primary);
+  --color-card: var(--dance-surface-1);
+  --color-card-foreground: var(--dance-text-primary);
+  --color-popover: var(--dance-surface-overlay);
+  --color-popover-foreground: var(--dance-text-primary);
+  --color-muted: var(--dance-surface-3);
+  --color-muted-foreground: var(--dance-text-secondary);
+  --color-border: var(--dance-border-default);
+  --color-border-subtle: var(--dance-border-subtle);
+  --color-border-hover: var(--dance-border-hover);
+  --color-border-strong: var(--dance-border-strong);
+  --color-input: var(--dance-surface-3);
+  --color-ring: var(--dance-border-focus);
+  --color-fill-hover: var(--dance-fill-hover);
+  --color-fill-selected: var(--dance-fill-selected);
+  --color-primary: var(--dance-interactive-primary);
+  --color-primary-foreground: var(--dance-interactive-primary-fg);
+  --color-secondary: var(--dance-surface-muted);
+  --color-secondary-foreground: var(--dance-text-primary);
+  --color-accent: var(--dance-interactive-accent);
+  --color-accent-foreground: var(--dance-interactive-accent-fg);
+  --color-destructive: var(--dance-interactive-destructive);
+  --color-destructive-foreground: var(--dance-interactive-destructive-fg);
+
+  /* ─── Domain semantics (use these in feature UI) ─── */
+  --color-gantt-canvas: var(--dance-surface-1);
+  --color-nav-hover: var(--dance-interactive-nav-hover);
+  --color-on-canvas: var(--dance-text-on-canvas);
+  --color-on-canvas-muted: var(--dance-text-on-canvas-muted);
+  --color-chrome-fg: var(--dance-chrome-fg);
+  --color-chrome-fg-hover: var(--dance-chrome-fg-hover);
+  --color-chrome-border: var(--dance-chrome-border);
+  --color-chrome-border-hover: var(--dance-chrome-border-hover);
+
+  --color-agent: var(--dance-status-agent);
+  --color-assignee-blue: var(--dance-status-assignee);
+  /* Legacy alias — blocked/urgent now uses red from the palette */
+  --color-coral: var(--dance-status-blocked);
+  --color-assignee-coral: var(--dance-status-blocked);
+
+  --color-status-neutral: var(--dance-status-neutral);
+  --color-status-todo: var(--dance-status-todo);
+  --color-status-progress: var(--dance-status-progress);
+  --color-status-review: var(--dance-status-review);
+  --color-status-blocked: var(--dance-status-blocked);
+  --color-status-done: var(--dance-status-done);
+
+  --color-phase-todo-fg: var(--dance-phase-todo-fg);
+  --color-phase-in-progress-fg: var(--dance-phase-in-progress-fg);
+  --color-phase-in-review-fg: var(--dance-phase-in-review-fg);
+  --color-phase-blocked-fg: var(--dance-phase-blocked-fg);
+  --color-phase-done-fg: var(--dance-phase-done-fg);
 
   /*
    * Radius scale — outermost anchor is `--radius-lg` (1rem). Medium / small step down by 0.25rem.
-   * Nested tokens: inner = max(0, outer − padding); pair with rounded-md or rounded-lg + matching p-*.
    */
   --radius-lg: 1rem;
   --radius-md: calc(var(--radius-lg) - 0.25rem);
@@ -112,7 +221,6 @@
 
   /*
    * Motion — product-wide defaults (animations.dev-style curves).
-   * Enter/exit & feedback: ease-out. On-screen morph: ease-in-out. Subtle hover tint: ease-hover.
    */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.86, 0, 0.07, 1);
@@ -121,7 +229,6 @@
   --default-transition-duration: 180ms;
   --default-transition-timing-function: var(--ease-out);
 
-  /* Sheet / drawer — paired with Radix Presence (must use animation, not transition). */
   --animate-dance-sheet-in-right: dance-sheet-in-right 250ms var(--ease-out) both;
   --animate-dance-sheet-out-right: dance-sheet-out-right 250ms var(--ease-out) both;
   --animate-dance-sheet-in-left: dance-sheet-in-left 250ms var(--ease-out) both;
@@ -136,24 +243,17 @@
   }
 
   body {
-    @apply min-h-dvh bg-background font-sans text-foreground antialiased;
-    font-family:
-      Inter,
-      ui-sans-serif,
-      system-ui,
-      sans-serif;
+    @apply min-h-dvh bg-background text-foreground antialiased;
   }
 }
 
 @layer components {
-  /*
-   * GPU-friendly surface transitions — use on buttons, tabs, cards, list rows.
-   */
   .transition-surface {
     transition-property:
       color,
       background-color,
       border-color,
+      box-shadow,
       outline-color,
       text-decoration-color,
       fill,
@@ -165,9 +265,6 @@
     transition-timing-function: var(--ease-out);
   }
 
-  /*
-   * Hairline keyboard focus — real 1px outline (Tailwind `ring-*` uses box-shadow and reads thicker).
-   */
   .dance-focus-ring {
     outline: none;
   }
@@ -177,9 +274,6 @@
     outline-offset: 2px;
   }
 
-  /*
-   * Tactile press — use with .transition-surface; only adds :active transform (no transition-property).
-   */
   .pressable:active {
     transform: scale(0.99);
   }
@@ -188,6 +282,286 @@
     .pressable:active {
       transform: none;
     }
+  }
+
+  /*
+   * Inset shadow edges — 1px “border” on any fill (replaces structural border-*).
+   * `--inset-edge-color` drives both ring-on-self and overlay variants.
+   */
+  .inset-edge-ring {
+    --inset-edge-color: var(--dance-border-default);
+    border: none;
+    transition-property: box-shadow;
+    transition-duration: var(--default-transition-duration);
+    transition-timing-function: var(--ease-hover);
+  }
+
+  .inset-edge-ring-full {
+    /* Spread follows border-radius (unlike separate x/y 1px shadows on curves). */
+    box-shadow: inset 0 0 0 1px var(--inset-edge-color);
+  }
+
+  .inset-edge-ring-t {
+    box-shadow: inset 0 1px 0 0 var(--inset-edge-color);
+  }
+
+  .inset-edge-ring-b {
+    box-shadow: inset 0 -1px 0 0 var(--inset-edge-color);
+  }
+
+  .inset-edge-ring-l {
+    box-shadow: inset 1px 0 0 0 var(--inset-edge-color);
+  }
+
+  .inset-edge-ring-r {
+    box-shadow: inset -1px 0 0 0 var(--inset-edge-color);
+  }
+
+  /* Overlay variant — edge paints above inner layers (e.g. Gantt bar fill). */
+  .inset-edge {
+    position: relative;
+    --inset-edge-color: var(--dance-border-default);
+  }
+
+  .inset-edge::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    border-radius: inherit;
+    pointer-events: none;
+    transition-property: box-shadow;
+    transition-duration: var(--default-transition-duration);
+    transition-timing-function: var(--ease-hover);
+  }
+
+  .inset-edge-full::after {
+    box-shadow: inset 0 0 0 1px var(--inset-edge-color);
+  }
+
+  .inset-edge-t::after {
+    box-shadow: inset 0 1px 0 0 var(--inset-edge-color);
+  }
+
+  .inset-edge-b::after {
+    box-shadow: inset 0 -1px 0 0 var(--inset-edge-color);
+  }
+
+  .inset-edge-l::after {
+    box-shadow: inset 1px 0 0 0 var(--inset-edge-color);
+  }
+
+  .inset-edge-r::after {
+    box-shadow: inset -1px 0 0 0 var(--inset-edge-color);
+  }
+
+  /* Token + opacity modifiers (shared) */
+  .inset-edge-strong {
+    --inset-edge-color: var(--dance-border-strong);
+  }
+
+  .inset-edge-subtle {
+    --inset-edge-color: var(--dance-border-subtle);
+  }
+
+  .inset-edge-soft {
+    --inset-edge-color: rgb(from var(--dance-border-default) r g b / 0.5);
+  }
+
+  .inset-edge-softer {
+    --inset-edge-color: rgb(from var(--dance-border-default) r g b / 0.6);
+  }
+
+  .inset-edge-soft70 {
+    --inset-edge-color: rgb(from var(--dance-border-default) r g b / 0.7);
+  }
+
+  .inset-edge-soft80 {
+    --inset-edge-color: rgb(from var(--dance-border-default) r g b / 0.8);
+  }
+
+  .inset-edge-chrome {
+    --inset-edge-color: var(--dance-chrome-border);
+  }
+
+  .inset-edge-primary-soft {
+    --inset-edge-color: rgb(from var(--color-primary) r g b / 0.5);
+  }
+
+  .inset-edge-none {
+    --inset-edge-color: transparent;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .inset-edge-hover:hover {
+      --inset-edge-color: var(--dance-border-hover);
+    }
+
+    .inset-edge-chrome-hover:hover {
+      --inset-edge-color: var(--dance-chrome-border-hover);
+    }
+
+    .inset-edge-destructive-hover:hover {
+      --inset-edge-color: rgb(from var(--dance-status-blocked) r g b / 0.4);
+    }
+  }
+
+  .last\:inset-edge-ring-b-none:last-child {
+    box-shadow: none;
+  }
+
+  @media (min-width: 768px) {
+    .md\:inset-edge-ring-b-none::after {
+      box-shadow: none;
+    }
+
+    .md\:inset-edge-b-none::after {
+      box-shadow: none;
+    }
+  }
+
+  /*
+   * Semantic badges — edge color follows fill family.
+   * Neutral fills use --dance-border-default; colored fills set --badge-edge-color.
+   * Use Badge variant="status". Do not combine with inset-edge-ring (resets edge to grey).
+   */
+  .semantic-badge,
+  .phase-badge,
+  .plan-badge-healthy,
+  .plan-badge-at-risk,
+  .plan-badge-paused {
+    --badge-edge-color: var(--dance-border-default);
+    border: none;
+    box-shadow: inset 0 0 0 1px var(--badge-edge-color);
+    font-weight: 400;
+    transition-property: box-shadow;
+    transition-duration: var(--default-transition-duration);
+    transition-timing-function: var(--ease-hover);
+  }
+
+  .phase-badge-todo {
+    --badge-edge-color: var(--dance-phase-todo-border);
+    background-color: var(--dance-phase-todo-bg);
+    color: var(--dance-phase-todo-fg);
+  }
+
+  .phase-badge-in-progress {
+    --badge-edge-color: var(--dance-phase-in-progress-border);
+    background-color: var(--dance-phase-in-progress-bg);
+    color: var(--dance-phase-in-progress-fg);
+  }
+
+  .phase-badge-in-review {
+    --badge-edge-color: var(--dance-phase-in-review-border);
+    background-color: var(--dance-phase-in-review-bg);
+    color: var(--dance-phase-in-review-fg);
+  }
+
+  .phase-badge-blocked {
+    --badge-edge-color: var(--dance-phase-blocked-border);
+    background-color: var(--dance-phase-blocked-bg);
+    color: var(--dance-phase-blocked-fg);
+  }
+
+  .phase-badge-done {
+    --badge-edge-color: var(--dance-phase-done-border);
+    background-color: var(--dance-phase-done-bg);
+    color: var(--dance-phase-done-fg);
+  }
+
+  .plan-badge-healthy {
+    --badge-edge-color: rgb(from var(--color-primary) r g b / 0.4);
+    background-color: rgb(from var(--color-primary) r g b / 0.15);
+    color: var(--color-primary);
+  }
+
+  .plan-badge-at-risk {
+    --badge-edge-color: rgb(from var(--color-destructive) r g b / 0.4);
+    background-color: rgb(from var(--color-destructive) r g b / 0.15);
+    color: var(--color-destructive);
+  }
+
+  .plan-badge-paused {
+    background-color: var(--dance-surface-2);
+    color: var(--dance-text-secondary);
+  }
+
+  .timeline-phase-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    display: inline-grid;
+    place-content: center;
+    width: 1rem;
+    height: 1rem;
+    margin: 0;
+    flex-shrink: 0;
+    border-radius: 4px;
+    border: 1px solid var(--dance-border-default);
+    background-color: var(--dance-surface-1);
+    color: var(--color-primary-foreground);
+    cursor: pointer;
+    transition-property: border-color, background-color;
+    transition-duration: var(--default-transition-duration);
+    transition-timing-function: var(--ease-hover);
+  }
+
+  .timeline-phase-checkbox::after {
+    content: '';
+    width: 0.5625rem;
+    height: 0.3125rem;
+    border: solid currentColor;
+    border-width: 0 0 2px 2px;
+    transform: rotate(-45deg) scale(0);
+    transform-origin: center;
+    transition: transform 150ms var(--ease-out);
+  }
+
+  .timeline-phase-checkbox:checked {
+    border-color: var(--color-primary);
+    background-color: var(--color-primary);
+  }
+
+  .timeline-phase-checkbox:checked::after {
+    transform: rotate(-45deg) scale(1);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .timeline-phase-checkbox:hover:not(:checked) {
+      border-color: var(--palette-neutral-400);
+    }
+
+    .dark .timeline-phase-checkbox:hover:not(:checked) {
+      border-color: var(--palette-neutral-600);
+    }
+  }
+
+  /* Panel chrome — clip children; keep inset edge above scrolling fills */
+  .inset-edge-panel {
+    position: relative;
+    overflow: clip;
+    isolation: isolate;
+  }
+
+  .inset-edge-panel.inset-edge::after {
+    z-index: 50;
+  }
+
+  /* Gantt bar — frosted surface-1 (matches workspace card) */
+  .gantt-bar-surface {
+    overflow: hidden;
+  }
+
+  .gantt-bar-fill {
+    border-radius: inherit;
+    background-color: var(--dance-surface-frost);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .gantt-resize-pill {
+    background-color: var(--dance-gantt-scrubber);
+    box-shadow: 0 1px 2px rgb(from var(--dance-gantt-highlight) r g b / 0.18);
+    outline: 1px solid var(--dance-chrome-border);
   }
 }
 
@@ -200,3 +574,5 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+@import './styles/typography-utilities.css';

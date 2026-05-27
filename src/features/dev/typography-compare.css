@@ -1,0 +1,13 @@
+.font-compare-gen {
+  font-family: var(--dance-font-family);
+}
+
+.font-compare-inter {
+  font-family: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Let Inter use real tabular figures where the utility is applied */
+.font-compare-inter .tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: normal;
+}

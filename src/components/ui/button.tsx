@@ -11,22 +11,22 @@ const buttonVariants = cva(
       variant: {
         default: 'bg-primary text-primary-foreground hover:bg-primary/90',
         secondary:
-          'border border-border bg-secondary text-secondary-foreground hover:bg-muted',
+          'inset-edge-ring inset-edge-ring-full bg-secondary text-secondary-foreground hover:bg-muted',
         ghost: 'hover:bg-accent/30 hover:text-accent-foreground',
         outline:
-          'border border-border bg-transparent hover:bg-muted/80',
+          'inset-edge-ring inset-edge-ring-full bg-transparent hover:bg-muted/80',
         destructive:
-          'border border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/90',
+          'bg-destructive text-destructive-foreground hover:bg-destructive/90',
         link: 'active:scale-100 text-primary underline-offset-4 hover:underline',
         /**
          * Back / ancillary control on tinted `PageHeader` rows (timeline workspace).
          * Pair with `size="icon"`; important sizing wins over icon dimensions in merge.
          */
         pageChrome:
-          '!h-8 !max-h-8 !min-h-8 !w-8 !max-w-8 !min-w-8 shrink-0 border-0 bg-transparent px-0 text-white/60 shadow-none transition-surface duration-150 ease-hover hover:bg-transparent hover:text-white active:bg-transparent [&_svg]:!size-5',
+          '!h-8 !max-h-8 !min-h-8 !w-8 !max-w-8 !min-w-8 shrink-0 border-0 bg-transparent px-0 text-chrome-fg shadow-none transition-surface duration-150 ease-hover hover:bg-transparent hover:text-chrome-fg-hover active:bg-transparent [&_svg]:!size-5',
         /** Primary toolbar action beside `pageChrome` (slightly larger hit target). */
         pageChromeLg:
-          '!h-10 !max-h-10 !min-h-10 !w-10 !max-w-10 !min-w-10 shrink-0 border-0 bg-transparent px-0 text-white/60 shadow-none transition-surface duration-150 ease-hover hover:bg-transparent hover:text-white active:bg-transparent',
+          '!h-10 !max-h-10 !min-h-10 !w-10 !max-w-10 !min-w-10 shrink-0 border-0 bg-transparent px-0 text-chrome-fg shadow-none transition-surface duration-150 ease-hover hover:bg-transparent hover:text-chrome-fg-hover active:bg-transparent',
       },
       size: {
         default: 'h-9 px-4 py-2',

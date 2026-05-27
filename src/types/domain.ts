@@ -81,6 +81,19 @@ export interface Plan {
   budgetCurrency?: string
 }
 
+export interface PlanOverviewPatch {
+  name?: string
+  description?: string
+  location?: string
+  start?: string
+  end?: string
+  status?: Plan['status']
+  externalRecord?: ExternalCrmRecord | null
+  teamMemberUserIds?: string[]
+  budgetCents?: number | null
+  budgetCurrency?: string | null
+}
+
 export interface Workspace {
   id: string
   name: string
@@ -115,9 +128,3 @@ export interface ActivityEvent {
   planId?: string
   payload?: Record<string, unknown>
 }
-
-/** @deprecated Use PhaseStatus */
-export type TaskStatus = PhaseStatus
-
-/** @deprecated Use PlanStatus */
-export type TimelineStatus = PlanStatus

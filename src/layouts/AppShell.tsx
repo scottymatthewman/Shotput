@@ -1,21 +1,20 @@
 import { SidebarNav } from '@/components/dance/SidebarNav'
-import { CommandMenuProvider } from '@/components/dance/CommandMenu'
-import { GlobalKeyboardShortcuts } from '@/components/dance/GlobalKeyboardShortcuts'
-import { useDanceStore, requestTaskSheetAnimatedClose } from '@/state/store'
+import { CommandMenuProvider } from '@/features/plans/CommandMenu'
+import { GlobalKeyboardShortcuts } from '@/features/plans/GlobalKeyboardShortcuts'
+import { features } from '@/config/features'
+import { resolvePhaseDetailRoute } from '@/lib/planRoute'
+import { usePlansStore } from '@/state/store'
 import { selectSidebarNav } from '@/state/selectors'
-import { useEffect, useMemo, type ReactNode } from 'react'
-import { Link, Outlet, useParams } from 'react-router-dom'
-import { useShallow } from 'zustand/react/shallow'
+import { useEffect, type ReactNode } from 'react'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 
 export function AppShell({ children }: { children?: ReactNode }) {
-  const { name: workspaceName, plans } = useDanceStore(
-    useShallow((s) => selectSidebarNav(s)),
-  )
-  const setCommandOpen = useDanceStore((s) => s.setCommandOpen)
-  const sidebarCollapsed = useDanceStore((s) => s.sidebarCollapsed)
-  const toggleSidebarCollapsed = useDanceStore((s) => s.toggleSidebarCollapsed)
-  const { planId, eventId: legacyEventId } = useParams<{ planId?: string; eventId?: string }>()
-  const currentPlanId = planId ?? legacyEventId
+  const workspaceName = usePlansStore((s) => selectSidebarNav(s).name)
+  const setCommandOpen = usePlansStore((s) => s.setCommandOpen)
+  const sidebarCollapsed = usePlansStore((s) => s.sidebarCollapsed)
+  const toggleSidebarCollapsed = usePlansStore((s) => s.toggleSidebarCollapsed)
+  const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -25,25 +24,26 @@ export function AppShell({ children }: { children?: ReactNode }) {
       const target = e.target as HTMLElement | null
       const inEditable = target?.closest('input, textarea, [contenteditable="true"]')
 
-      const { selectedPhaseId, setSidebarCollapsed, toggleSidebarCollapsed: toggleSidebar } =
-        useDanceStore.getState()
+      const state = usePlansStore.getState()
+      const phaseRoute = resolvePhaseDetailRoute(location.pathname, state.workspace)
 
-      if (!selectedPhaseId && inEditable) return
+      if (!phaseRoute && !state.selectedPhaseId && inEditable) return
 
       e.preventDefault()
 
-      if (selectedPhaseId) {
-        requestTaskSheetAnimatedClose()
-        setSidebarCollapsed(true)
+      if (phaseRoute) {
+        navigate(`/plans/${phaseRoute.planId}`)
+        state.setSidebarCollapsed(true)
+      } else if (state.selectedPhaseId) {
+        state.setSelectedPhaseId(null)
+        state.setSidebarCollapsed(true)
       } else {
-        toggleSidebar()
+        toggleSidebarCollapsed()
       }
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
-  }, [])
-
-  const plansList = useMemo(() => Object.values(plans), [plans])
+  }, [location.pathname, navigate, toggleSidebarCollapsed])
 
   return (
     <CommandMenuProvider>
@@ -59,32 +59,38 @@ export function AppShell({ children }: { children?: ReactNode }) {
       >
         <SidebarNav
           workspaceName={workspaceName}
-          plans={plansList}
-          currentEventId={currentPlanId}
           collapsed={sidebarCollapsed}
           onToggleCollapsed={toggleSidebarCollapsed}
           className="min-h-0"
         />
         <div
-          className="flex min-h-0 min-w-0 flex-1 flex-col border-b border-border p-3 md:border-b-0 md:pl-0"
+          className="flex min-h-0 min-w-0 flex-1 flex-col inset-edge inset-edge-b bg-background p-3 md:inset-edge-b-none md:pl-0"
           data-app-content=""
         >
-          <div className="flex items-center gap-3 border-b border-border py-2 md:hidden">
-            <Link to="/" className="text-sm font-semibold text-foreground transition-surface duration-150 ease-hover hover:text-primary">
+          <div className="flex items-center gap-3 inset-edge inset-edge-b py-2 md:hidden">
+            <Link
+              to="/plans"
+              className="text-sm font-semibold text-foreground transition-surface duration-150 ease-hover hover:text-primary"
+            >
               Dance
             </Link>
-            <Link to="/find" className="text-xs text-muted-foreground transition-surface duration-150 ease-hover hover:text-foreground">
-              Find
+            <Link
+              to="/plans"
+              className="text-xs text-muted-foreground transition-surface duration-150 ease-hover hover:text-foreground"
+            >
+              Plans
             </Link>
-            <Link to="/plan" className="text-xs text-muted-foreground transition-surface duration-150 ease-hover hover:text-foreground">
-              Plan
-            </Link>
-            <Link to="/settings" className="text-xs text-muted-foreground transition-surface duration-150 ease-hover hover:text-foreground">
-              Settings
-            </Link>
+            {features.settings ? (
+              <Link
+                to="/settings"
+                className="text-xs text-muted-foreground transition-surface duration-150 ease-hover hover:text-foreground"
+              >
+                Settings
+              </Link>
+            ) : null}
             <span className="text-xs text-muted-foreground">Press / to search</span>
           </div>
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-border bg-gantt-canvas">
+          <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-clip rounded-xl inset-edge inset-edge-full inset-edge-panel bg-surface-1">
             {children ?? <Outlet />}
           </div>
         </div>

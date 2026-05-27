@@ -3,7 +3,7 @@ import type { ActivityEvent, Workspace } from '@/types/domain'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { restoreWorkspaceSnapshot } from '@/lib/instant/seed'
-import { useDomainStore } from '@/state/domainStore'
+import { useOptimisticOverlay } from '@/state/optimisticOverlay'
 
 export const STORAGE_KEY = 'dance-ui-v2'
 export const LEGACY_STORAGE_KEY = 'dance-ui-v1'
@@ -41,7 +41,12 @@ export type TimelineViewMode = 'gantt' | 'table'
 
 export type PhaseQuickDialogKind = 'priority' | 'assignee' | 'assigneeOwner' | 'delete'
 
+export type ThemeMode = 'light' | 'dark'
+
 export interface UiStore {
+  theme: ThemeMode
+  setTheme: (theme: ThemeMode) => void
+  toggleTheme: () => void
   timelineViewMode: TimelineViewMode
   setTimelineViewMode: (m: TimelineViewMode) => void
   hoveredPhaseId: string | null
@@ -76,6 +81,10 @@ export interface UiStore {
 export const useUiStore = create<UiStore>()(
   persist(
     (set, get) => ({
+      theme: 'light',
+      setTheme: (theme) => set({ theme }),
+      toggleTheme: () =>
+        set((s) => ({ theme: s.theme === 'dark' ? 'light' : 'dark' })),
       timelineViewMode: 'gantt',
       setTimelineViewMode: (m) =>
         set({
@@ -118,7 +127,7 @@ export const useUiStore = create<UiStore>()(
         if (undoStack.length === 0) return false
         const frame = undoStack[undoStack.length - 1]!
         restoreWorkspaceSnapshot(frame.workspace, frame.activityLog)
-        useDomainStore.getState().replaceWorkspace(frame.workspace, frame.activityLog)
+        useOptimisticOverlay.getState().clear()
         set({
           undoStack: undoStack.slice(0, -1),
           redoStack: [...redoStack, captureUndoFrame(current)],
@@ -130,7 +139,7 @@ export const useUiStore = create<UiStore>()(
         if (redoStack.length === 0) return false
         const frame = redoStack[redoStack.length - 1]!
         restoreWorkspaceSnapshot(frame.workspace, frame.activityLog)
-        useDomainStore.getState().replaceWorkspace(frame.workspace, frame.activityLog)
+        useOptimisticOverlay.getState().clear()
         set({
           redoStack: redoStack.slice(0, -1),
           undoStack: trimUndoStack(undoStack, captureUndoFrame(current)),
@@ -145,33 +154,14 @@ export const useUiStore = create<UiStore>()(
       name: STORAGE_KEY,
       storage: createJSONStorage(() => localStorage),
       partialize: (s) => ({
+        theme: s.theme,
         timelineViewMode: s.timelineViewMode,
         sidebarCollapsed: s.sidebarCollapsed,
       }),
-      version: 2,
+      version: 3,
     },
   ),
 )
-
-let phaseSheetAnimatedCloseHandler: (() => void) | null = null
-
-export function registerPhaseSheetAnimatedCloseHandler(handler: (() => void) | null) {
-  phaseSheetAnimatedCloseHandler = handler
-}
-
-export function requestPhaseSheetAnimatedClose() {
-  if (phaseSheetAnimatedCloseHandler) {
-    phaseSheetAnimatedCloseHandler()
-  } else {
-    useUiStore.getState().setSelectedPhaseId(null)
-  }
-}
-
-/** @deprecated Use registerPhaseSheetAnimatedCloseHandler */
-export const registerTaskSheetAnimatedCloseHandler = registerPhaseSheetAnimatedCloseHandler
-
-/** @deprecated Use requestPhaseSheetAnimatedClose */
-export const requestTaskSheetAnimatedClose = requestPhaseSheetAnimatedClose
 
 export function getDefaultUndoSnapshot(): UndoFrame {
   return {

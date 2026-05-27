@@ -46,7 +46,7 @@ export function ActivityItem({
   return (
     <article
       className={cn(
-        'border-b border-border px-3 py-2.5 text-sm transition-surface duration-150 ease-hover last:border-b-0 hover:bg-muted/40',
+        'inset-edge-ring inset-edge-ring-b px-3 py-2.5 text-sm transition-surface duration-150 ease-hover last:inset-edge-ring-b-none hover:bg-muted/40',
         className,
       )}
     >

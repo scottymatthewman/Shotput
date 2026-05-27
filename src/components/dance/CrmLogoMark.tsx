@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 
 /** Attio brand color — abstract mark evokes CRM record rows (distinct from bundled trademark artwork). */
-const ATTIO_PURPLE = '#6366F1'
+const ATTIO_PURPLE = 'var(--palette-purple-600)'
 
 /**
  * Tiny provider mark beside linked CRM rows (prototype).
