@@ -20,21 +20,12 @@ import {
   type GanttDragKind,
   type GanttGesture,
 } from '@/features/plans/gantt/ganttDrag'
+import { computeGanttTimelineRange } from '@/features/plans/gantt/ganttTimelineRange'
 import { getEffectivePhaseStatus, normalizePhaseStatus } from '@/lib/phaseStatus'
 import { cn } from '@/lib/utils'
 import { usePlansStore } from '@/state/store'
 import type { Phase, Workspace } from '@/types/domain'
-import {
-  addDays,
-  differenceInCalendarDays,
-  eachWeekOfInterval,
-  endOfWeek,
-  format,
-  max as dfMax,
-  min as dfMin,
-  startOfDay,
-  startOfWeek,
-} from 'date-fns'
+import { addDays, differenceInCalendarDays, format, startOfDay } from 'date-fns'
 import {
   memo,
   useCallback,
@@ -49,12 +40,6 @@ const PX_PER_DAY = 22
 const MIN_ZOOM = 0.35
 const MAX_ZOOM = 2.5
 const GANTT_DRAG_THRESHOLD_PX = 8
-
-function weekFullyOutsideProject(weekStart: Date, projFirst: Date, projLast: Date): boolean {
-  const ws = startOfDay(weekStart)
-  const we = startOfDay(addDays(ws, 6))
-  return we < projFirst || ws > projLast
-}
 
 /** e.g. "May 1 - 7" same month, or "May 31 - Jun 6" across months. */
 function formatWeekRangeLabel(weekStart: Date) {
@@ -88,32 +73,15 @@ export function GanttView({
   onSelectPhaseRef.current = onSelectPhase
   const plan = workspace.plans[planId]
 
-  const { min, max, ticks } = useMemo(() => {
-    if (plan) {
-      const start = startOfDay(new Date(`${plan.start}T12:00:00`))
-      const end = startOfDay(new Date(`${plan.end}T12:00:00`))
-      const from = startOfWeek(start, { weekStartsOn: 1 })
-      const to = endOfWeek(end, { weekStartsOn: 1 })
-      const weeks = eachWeekOfInterval({ start: from, end: to }, { weekStartsOn: 1 })
-      return { min: from, max: to, ticks: weeks }
-    }
-    const dates = phases.flatMap((p) => [new Date(p.start), new Date(p.end)])
-    const start = dfMin(dates) ?? new Date()
-    const end = dfMax(dates) ?? new Date()
-    const from = startOfWeek(start, { weekStartsOn: 1 })
-    const to = endOfWeek(end, { weekStartsOn: 1 })
-    const weeks = eachWeekOfInterval({ start: from, end: to }, { weekStartsOn: 1 })
-    return { min: from, max: to, ticks: weeks }
-  }, [phases, plan])
+  const [gesture, setGesture] = useState<GanttGesture | null>(null)
+  const [previewDayDelta, setPreviewDayDelta] = useState(0)
+
+  const { min, max, ticks } = useMemo(
+    () => computeGanttTimelineRange(phases, plan, gesture, previewDayDelta),
+    [phases, plan, gesture, previewDayDelta],
+  )
 
   const totalDaysH = Math.max(1, differenceInCalendarDays(max, min) + 1)
-
-  const projectBounds = useMemo(() => {
-    if (!plan) return null
-    const projFirst = startOfDay(new Date(`${plan.start}T12:00:00`))
-    const projLast = startOfDay(new Date(`${plan.end}T12:00:00`))
-    return { projFirst, projLast }
-  }, [plan])
 
   const today = startOfDay(new Date())
   const todayOffsetDays = differenceInCalendarDays(today, min)
@@ -141,6 +109,18 @@ export function GanttView({
     return () => ro.disconnect()
   }, [])
 
+  /** Keep bars visually stable when the chart grows to the left (earlier min). */
+  useEffect(() => {
+    const el = scrollRef.current
+    const prevMin = prevChartMinRef.current
+    prevChartMinRef.current = min
+    if (!el || min >= prevMin) return
+    const daysEarlier = differenceInCalendarDays(prevMin, min)
+    if (daysEarlier > 0) {
+      el.scrollLeft += daysEarlier * PX_PER_DAY * zoom
+    }
+  }, [min, zoom])
+
   useEffect(() => {
     setZoom((z) => Number(Math.min(MAX_ZOOM, Math.max(zoomMinEffective, z)).toFixed(3)))
   }, [zoomMinEffective])
@@ -161,9 +141,8 @@ export function GanttView({
     return () => el.removeEventListener('wheel', onWheel)
   }, [zoomMinEffective])
 
-  const [gesture, setGesture] = useState<GanttGesture | null>(null)
-  const [previewDayDelta, setPreviewDayDelta] = useState(0)
   const gestureRef = useRef<GanttGesture | null>(null)
+  const prevChartMinRef = useRef(min)
   const captureElRef = useRef<HTMLElement | null>(null)
   const totalDaysHRef = useRef(totalDaysH)
   totalDaysHRef.current = totalDaysH
@@ -302,23 +281,15 @@ export function GanttView({
                 className="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(to_bottom,var(--color-surface-1)_0%,var(--color-surface-1)_75%,transparent_100%)]"
                 aria-hidden
               />
-              {ticks.map((w) => {
-                const outside =
-                  projectBounds &&
-                  weekFullyOutsideProject(w, projectBounds.projFirst, projectBounds.projLast)
-                return (
-                  <div
-                    key={w.toISOString()}
-                    className={cn(
-                      'relative z-10 flex shrink-0 items-center justify-center px-1 py-2 text-center text-xs leading-snug text-muted-foreground',
-                      outside && 'text-muted-foreground/70',
-                    )}
-                    style={{ width: `${(7 / totalDaysH) * 100}%` }}
-                  >
-                    {formatWeekRangeLabel(w)}
-                  </div>
-                )
-              })}
+              {ticks.map((w) => (
+                <div
+                  key={w.toISOString()}
+                  className="relative z-10 flex shrink-0 items-center justify-center px-1 py-2 text-center text-xs leading-snug text-muted-foreground"
+                  style={{ width: `${(7 / totalDaysH) * 100}%` }}
+                >
+                  {formatWeekRangeLabel(w)}
+                </div>
+              ))}
             </div>
           </div>
 
