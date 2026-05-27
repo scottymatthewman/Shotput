@@ -38,24 +38,27 @@ function DialogOverlay({
 function DialogContent({
   className,
   children,
+  hideClose,
   ...props
-}: ComponentProps<typeof DialogPrimitive.Content>) {
+}: ComponentProps<typeof DialogPrimitive.Content> & { hideClose?: boolean }) {
   return (
     <DialogPortal>
       <DialogOverlay />
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          'fixed top-1/2 left-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 inset-edge-ring inset-edge-ring-full inset-edge-strong bg-card p-6 shadow-lg transition-surface data-[state=closed]:scale-95 data-[state=closed]:opacity-0 data-[state=open]:scale-100 data-[state=open]:opacity-100 motion-reduce:transition-none sm:rounded-lg',
+          'fixed top-1/2 left-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-sm inset-edge-ring inset-edge-ring-full inset-edge-strong bg-card p-6 shadow-lg transition-surface data-[state=closed]:scale-95 data-[state=closed]:opacity-0 data-[state=open]:scale-100 data-[state=open]:opacity-100 motion-reduce:transition-none',
           className,
         )}
         {...props}
       >
         {children}
-        <DialogPrimitive.Close className="pressable dance-focus-ring absolute top-4 right-4 rounded-sm opacity-70 transition-surface duration-150 ease-hover hover:opacity-100 disabled:pointer-events-none">
-          <X className="size-4" />
-          <span className="sr-only">Close</span>
-        </DialogPrimitive.Close>
+        {hideClose ? null : (
+          <DialogPrimitive.Close className="pressable dance-focus-ring absolute top-4 right-4 rounded-sm opacity-70 transition-surface duration-150 ease-hover hover:opacity-100 disabled:pointer-events-none">
+            <X className="size-4" />
+            <span className="sr-only">Close</span>
+          </DialogPrimitive.Close>
+        )}
       </DialogPrimitive.Content>
     </DialogPortal>
   )

@@ -242,8 +242,18 @@
     @apply border-border;
   }
 
+  html {
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
   body {
-    @apply min-h-dvh bg-background text-foreground antialiased;
+    @apply h-dvh max-h-dvh min-h-0 overflow-hidden overscroll-none bg-background text-foreground antialiased;
+  }
+
+  #root {
+    @apply flex h-dvh max-h-dvh min-h-0 w-full flex-col overflow-hidden overscroll-none;
   }
 }
 

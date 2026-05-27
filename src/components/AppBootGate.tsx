@@ -24,7 +24,9 @@ export function AppBootGate({ children }: { children: ReactNode }) {
     <>
       <ThemeSync />
       <InstantBootstrap />
-      {!bootReady ? <AppBootSkeleton /> : children}
+      <div className="flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden overscroll-none">
+        {!bootReady ? <AppBootSkeleton /> : children}
+      </div>
     </>
   )
 }

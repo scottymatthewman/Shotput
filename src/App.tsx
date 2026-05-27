@@ -19,11 +19,6 @@ const PhaseDetailPage = lazy(() =>
 const SettingsPage = lazy(() =>
   import('@/features/settings/SettingsPage').then((m) => ({ default: m.SettingsPage })),
 )
-const TypographyComparePage = lazy(() =>
-  import('@/features/dev/TypographyComparePage').then((m) => ({
-    default: m.TypographyComparePage,
-  })),
-)
 
 function LegacyProjectToPlanRedirect() {
   const { projectId } = useParams<{ projectId: string }>()
@@ -64,7 +59,7 @@ function LazyPage({ children }: { children: ReactNode }) {
 
 export default function App() {
   return (
-    <>
+    <div className="flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden">
       <BrowserRouter>
         <Routes>
           <Route element={<AppShell />}>
@@ -122,21 +117,11 @@ export default function App() {
                 </LazyPage>
               }
             />
-            {import.meta.env.DEV ? (
-              <Route
-                path="/dev/typography"
-                element={
-                  <LazyPage>
-                    <TypographyComparePage />
-                  </LazyPage>
-                }
-              />
-            ) : null}
           </Route>
           <Route path="*" element={<Navigate to="/plans" replace />} />
         </Routes>
       </BrowserRouter>
       {import.meta.env.DEV ? <AgentationDevTools /> : null}
-    </>
+    </div>
   )
 }

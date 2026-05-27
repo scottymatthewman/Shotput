@@ -3,7 +3,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 /** Skeleton shell matching AppShell layout while UI / Instant hydrate. */
 export function AppBootSkeleton() {
   return (
-    <div className="flex h-dvh w-dvw min-h-0 overflow-hidden bg-background p-0">
+    <div className="flex h-full min-h-0 w-full overflow-hidden overscroll-none bg-background p-0">
       <aside className="hidden w-[244px] shrink-0 flex-col gap-3 inset-edge inset-edge-r p-3 md:flex">
         <Skeleton className="h-8 w-24" />
         <Skeleton className="h-9 w-full" />

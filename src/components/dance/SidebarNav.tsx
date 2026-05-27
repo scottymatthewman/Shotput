@@ -1,32 +1,84 @@
 import {
-  SidebarNavStandardItem,
-  SidebarNavStubItem,
-} from '@/components/nav/SidebarNavItem'
-import { sidebarNavRow } from '@/components/nav/sidebarNavStyles'
+  navHomeIcon,
+  navInboxIcon,
+  navPlansIcon,
+  navReportsIcon,
+  navSettingsIcon,
+  navSidebarIcon,
+  type SidebarNavIcon,
+} from '@/components/nav/navIcons'
+import { SidebarNavItem } from '@/components/nav/SidebarNavItem'
+import { sidebarNavDensity } from '@/components/nav/sidebarNavStyles'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { features } from '@/config/features'
 import { cn } from '@/lib/utils'
-import {
-  BarChart3,
-  Home,
-  Inbox,
-  LogOut,
-  PanelLeft,
-  PanelRight,
-  Rows3,
-  Search,
-  Settings,
-  Type,
-} from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { CURRENT_USER_ID, usePlansStore } from '@/state/store'
 
 export {
   SidebarNavDropdownItem,
   SidebarNavNestedItem,
   SidebarNavStandardItem,
   SidebarNavStubItem,
+  SidebarNavItem,
 } from '@/components/nav/SidebarNavItem'
+
+function workspaceInitial(name: string) {
+  const t = name.trim()
+  return t ? t.charAt(0).toUpperCase() : '—'
+}
+
+function userInitials(name: string) {
+  const parts = name.trim().split(/\s+/)
+  if (parts.length === 0) return '—'
+  if (parts.length === 1) return parts[0]!.slice(0, 2).toUpperCase()
+  return `${parts[0]!.charAt(0)}${parts[parts.length - 1]!.charAt(0)}`.toUpperCase()
+}
+
+function WorkspaceMark({ name, className }: { name: string; className?: string }) {
+  return (
+    <div
+      className={cn(
+        'flex size-[40px] shrink-0 items-center justify-center rounded-sm',
+        'inset-edge-ring inset-edge-ring-full bg-surface-3',
+        'text-sm font-semibold text-foreground',
+        className,
+      )}
+      aria-hidden
+    >
+      {workspaceInitial(name)}
+    </div>
+  )
+}
+
+const collapseButtonClass = cn(
+  'size-7 shrink-0 border-0 bg-transparent text-muted-foreground shadow-none',
+  'transition-surface duration-150 ease-hover',
+  'hover:!bg-transparent hover:!text-foreground active:!bg-transparent',
+)
+
+function featureNavItem(
+  enabled: boolean,
+  props: {
+    to: string
+    label: string
+    icon: SidebarNavIcon
+    end?: boolean
+  },
+) {
+  if (enabled) {
+    return (
+      <SidebarNavItem
+        variant="link"
+        to={props.to}
+        label={props.label}
+        icon={props.icon}
+        end={props.end}
+      />
+    )
+  }
+  return <SidebarNavItem variant="stub" label={props.label} icon={props.icon} />
+}
 
 export function SidebarNav({
   workspaceName,
@@ -39,19 +91,21 @@ export function SidebarNav({
   onToggleCollapsed: () => void
   className?: string
 }) {
-  const navigate = useNavigate()
+  const me = usePlansStore((s) => s.workspace.users[CURRENT_USER_ID])
 
   return (
     <aside
       className={cn(
-        'relative hidden h-full shrink-0 overflow-hidden bg-background transition-[width] duration-300 ease-out motion-reduce:transition-none md:flex',
+        'relative hidden h-full shrink-0 overflow-hidden overscroll-contain bg-background transition-[width] duration-300 ease-out motion-reduce:transition-none md:flex',
         collapsed ? 'w-14' : 'w-[260px]',
         className,
       )}
     >
       <div
         className={cn(
-          'absolute inset-0 z-[1] flex flex-col items-center py-3 transition-opacity duration-300 ease-out motion-reduce:transition-none',
+          'absolute inset-0 z-[1] flex flex-col items-center',
+          sidebarNavDensity.gutter,
+          'transition-opacity duration-300 ease-out motion-reduce:transition-none',
           collapsed ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0',
         )}
         aria-hidden={!collapsed}
@@ -61,127 +115,109 @@ export function SidebarNav({
           type="button"
           variant="ghost"
           size="icon"
-          className="size-9 shrink-0"
+          className={collapseButtonClass}
           onClick={onToggleCollapsed}
           aria-label="Expand sidebar"
           title="Expand sidebar (⌘.)"
         >
-          <PanelRight className="size-5 text-muted-foreground" />
+          {navSidebarIcon({
+            className: cn(sidebarNavDensity.icon, '-scale-x-100'),
+            'aria-hidden': true,
+          })}
         </Button>
-        <div className="mt-4 flex size-9 items-center justify-center rounded-md bg-primary/20 text-xs font-bold text-primary">
-          F
-        </div>
+        <WorkspaceMark name={workspaceName} className="mt-6" />
       </div>
 
       <div
         className={cn(
-          'flex h-full min-h-0 w-[260px] flex-col transition-opacity duration-300 ease-out motion-reduce:transition-none',
+          'flex h-full min-h-0 w-[260px] flex-col',
+          sidebarNavDensity.gutter,
+          'transition-opacity duration-300 ease-out motion-reduce:transition-none',
           collapsed ? 'pointer-events-none opacity-0' : 'opacity-100',
         )}
         aria-hidden={collapsed}
         inert={collapsed}
       >
-        <div className="flex items-center gap-2 px-3 pt-4 pb-4">
-          <div className="flex min-w-0 flex-1 items-center gap-3">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-primary/20 text-sm font-bold text-primary">
-              F
+        <div className={cn('flex shrink-0 flex-col', sidebarNavDensity.sectionGap)}>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex min-w-0 flex-1 items-center gap-3">
+              <WorkspaceMark name={workspaceName} />
+              <p className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
+                {workspaceName}
+              </p>
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-foreground">Dance</p>
-              <p className="truncate text-xs text-muted-foreground">{workspaceName}</p>
-            </div>
-          </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="size-9 shrink-0 text-muted-foreground"
-            onClick={onToggleCollapsed}
-            aria-label="Collapse sidebar"
-            title="Collapse sidebar (⌘.)"
-          >
-            <PanelLeft className="size-5" />
-          </Button>
-        </div>
-
-        <div className="mt-2 px-4">
-          <button
-            type="button"
-            className={cn(
-              sidebarNavRow.standard.root,
-              sidebarNavRow.standard.inactive,
-              'dance-focus-ring w-full cursor-pointer text-left outline-none',
-            )}
-            data-search-trigger
-          >
-            <Search className={sidebarNavRow.standard.icon} aria-hidden />
-            <span className="min-w-0 flex-1 truncate">Search</span>
-            <kbd className="pointer-events-none shrink-0 rounded inset-edge-ring inset-edge-ring-full bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
-              /
-            </kbd>
-          </button>
-          <div className="my-4 inset-edge-ring inset-edge-ring-t" role="separator" />
-        </div>
-
-        <ScrollArea className="min-h-0 flex-1">
-          <div className="px-4 pb-4">
-            <nav className="flex flex-col gap-1" aria-label="Primary">
-              {features.home ? (
-                <SidebarNavStandardItem to="/" end label="Home" icon={Home} />
-              ) : (
-                <SidebarNavStubItem label="Home" icon={Home} />
-              )}
-              {features.inbox ? (
-                <SidebarNavStandardItem to="/inbox" label="Inbox" icon={Inbox} />
-              ) : (
-                <SidebarNavStubItem label="Inbox" icon={Inbox} />
-              )}
-              {features.plans ? (
-                <SidebarNavStandardItem to="/plans" label="Plans" icon={Rows3} />
-              ) : (
-                <SidebarNavStubItem label="Plans" icon={Rows3} />
-              )}
-              {features.reports ? (
-                <SidebarNavStandardItem to="/reports" label="Reports" icon={BarChart3} />
-              ) : (
-                <SidebarNavStubItem label="Reports" icon={BarChart3} />
-              )}
-              {import.meta.env.DEV ? (
-                <SidebarNavStandardItem
-                  to="/dev/typography"
-                  label="Font compare"
-                  icon={Type}
-                />
-              ) : null}
-            </nav>
-          </div>
-        </ScrollArea>
-
-        <div className="mt-auto shrink-0 px-4 pt-2 pb-4">
-          <div className="mb-2 inset-edge-ring inset-edge-ring-t" role="separator" />
-          <nav className="flex flex-col gap-1" aria-label="Account">
-            <button
+            <Button
               type="button"
-              className={cn(
-                sidebarNavRow.standard.root,
-                sidebarNavRow.standard.inactive,
-                'dance-focus-ring w-full cursor-pointer text-left outline-none',
-              )}
-              onClick={() => navigate('/')}
+              variant="ghost"
+              size="icon"
+              className={collapseButtonClass}
+              onClick={onToggleCollapsed}
+              aria-label="Collapse sidebar"
+              title="Collapse sidebar (⌘.)"
             >
-              <LogOut className={cn(sidebarNavRow.standard.icon)} aria-hidden />
-              <span className="min-w-0 flex-1 truncate">Log out</span>
-            </button>
-            {features.settings ? (
-              <SidebarNavStandardItem to="/settings" label="Settings" icon={Settings} />
-            ) : (
-              <SidebarNavStubItem label="Settings" icon={Settings} />
-            )}
-            <div className="px-0 py-1">
-              <p className="text-[10px] tabular-nums text-muted-foreground">v{__APP_VERSION__}</p>
-            </div>
+              {navSidebarIcon({ className: sidebarNavDensity.icon, 'aria-hidden': true })}
+            </Button>
+          </div>
+
+          <nav
+            className={cn('flex flex-col', sidebarNavDensity.blockGap)}
+            aria-label="Sidebar"
+          >
+            <SidebarNavItem variant="search" />
+
+            <ScrollArea className="max-h-[min(60vh,28rem)] min-h-0 overscroll-contain">
+              <div
+                className={cn('flex flex-col', sidebarNavDensity.listGap)}
+                role="group"
+                aria-label="Primary"
+              >
+                {featureNavItem(features.home, {
+                  to: '/',
+                  label: 'Home',
+                  icon: navHomeIcon,
+                  end: true,
+                })}
+                {featureNavItem(features.inbox, {
+                  to: '/inbox',
+                  label: 'Inbox',
+                  icon: navInboxIcon,
+                })}
+                {featureNavItem(features.plans, {
+                  to: '/plans',
+                  label: 'Plans',
+                  icon: navPlansIcon,
+                })}
+                {featureNavItem(features.reports, {
+                  to: '/reports',
+                  label: 'Reports',
+                  icon: navReportsIcon,
+                })}
+              </div>
+            </ScrollArea>
           </nav>
         </div>
+
+        <nav
+          className={cn(
+            'mt-auto flex shrink-0 flex-col pt-6',
+            sidebarNavDensity.listGap,
+          )}
+          aria-label="Account"
+        >
+          <SidebarNavItem
+            variant="user"
+            to="/settings"
+            label={me?.name ?? 'Account'}
+            avatarUrl={me?.avatarUrl}
+            initials={me?.name ? userInitials(me.name) : '—'}
+          />
+          {featureNavItem(features.settings, {
+            to: '/settings',
+            label: 'Settings',
+            icon: navSettingsIcon,
+          })}
+          <SidebarNavItem variant="meta" label={`v${__APP_VERSION__}`} />
+        </nav>
       </div>
     </aside>
   )

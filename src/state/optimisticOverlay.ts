@@ -33,6 +33,17 @@ function planPatchSatisfied(plan: Plan, patch: PlanOverviewPatch): boolean {
   return true
 }
 
+function applyPhasePatch(phase: Phase, patch: Partial<Phase>): Phase {
+  const next = { ...phase, ...patch }
+  if ('budgetAllocatedCents' in patch && patch.budgetAllocatedCents == null) {
+    delete next.budgetAllocatedCents
+  }
+  if ('budgetActualCents' in patch && patch.budgetActualCents == null) {
+    delete next.budgetActualCents
+  }
+  return next
+}
+
 export const useOptimisticOverlay = create<OptimisticOverlayState>()(
   immer((set) => ({
     phasePatches: {},
@@ -129,13 +140,7 @@ export function mergeWorkspaceWithOverlay(
   for (const [id, patch] of Object.entries(overlay.phasePatches)) {
     const phase = merged.phases[id]
     if (phase) {
-      Object.assign(phase, patch)
-      if ('budgetAllocatedCents' in patch && patch.budgetAllocatedCents == null) {
-        delete phase.budgetAllocatedCents
-      }
-      if ('budgetActualCents' in patch && patch.budgetActualCents == null) {
-        delete phase.budgetActualCents
-      }
+      merged.phases[id] = applyPhasePatch(phase, patch)
     }
   }
 
@@ -150,7 +155,8 @@ export function mergeWorkspaceWithOverlay(
   }
 
   for (const phase of Object.values(overlay.addedPhases)) {
-    merged.phases[phase.id] = phase
+    const patch = overlay.phasePatches[phase.id]
+    merged.phases[phase.id] = patch ? applyPhasePatch(phase, patch) : phase
     const plan = merged.plans[phase.planId]
     if (plan && !plan.phaseIds.includes(phase.id)) {
       plan.phaseIds.push(phase.id)
@@ -178,9 +184,13 @@ export function getOverlayPhase(
   phaseId: string,
 ): Phase | undefined {
   if (overlay.removedPhaseIds.includes(phaseId)) return undefined
-  if (overlay.addedPhases[phaseId]) return overlay.addedPhases[phaseId]
+  const added = overlay.addedPhases[phaseId]
+  if (added) {
+    const patch = overlay.phasePatches[phaseId]
+    return patch ? applyPhasePatch(added, patch) : added
+  }
   const base = workspace.phases[phaseId]
   if (!base) return undefined
   const patch = overlay.phasePatches[phaseId]
-  return patch ? { ...base, ...patch } : base
+  return patch ? applyPhasePatch(base, patch) : base
 }

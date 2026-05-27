@@ -1,77 +1,158 @@
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import type { SidebarNavIcon } from '@/components/nav/navIcons'
+import { navSearchIcon } from '@/components/nav/navIcons'
+import { availableNavToneActive, sidebarNavItem } from '@/components/nav/sidebarNavStyles'
 import { cn } from '@/lib/utils'
-import { ChevronDown, type LucideIcon } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { NavLink } from 'react-router-dom'
-import { sidebarNavDensity, sidebarNavRow, type SidebarNavRowVariant } from '@/components/nav/sidebarNavStyles'
 
-export type SidebarNavLinkRowProps = {
+type SidebarNavItemClassName = { className?: string }
+
+type SidebarNavRouteItemBase = SidebarNavItemClassName & {
   to: string
-  end?: boolean
   label: string
-  icon?: LucideIcon
-  /** Merged with `NavLink` `isActive` (e.g. highlight plan while its workspace is open). */
-  activeWhen?: boolean
-  variant: SidebarNavRowVariant
+  end?: boolean
   trailing?: ReactNode
-  className?: string
 }
 
-function SidebarNavLinkRow({
-  to,
-  end,
-  label,
-  icon: Icon,
-  activeWhen,
+export type SidebarNavLinkItemProps = SidebarNavRouteItemBase & {
+  variant: 'link' | 'nested'
+  icon: SidebarNavIcon
+}
+
+export type SidebarNavUserItemProps = SidebarNavRouteItemBase & {
+  variant: 'user'
+  avatarUrl?: string
+  initials: string
+}
+
+export type SidebarNavStubItemProps = SidebarNavItemClassName & {
+  variant: 'stub'
+  label: string
+  icon: SidebarNavIcon
+}
+
+export type SidebarNavSearchItemProps = SidebarNavItemClassName & {
+  variant: 'search'
+}
+
+export type SidebarNavMetaItemProps = SidebarNavItemClassName & {
+  variant: 'meta'
+  label: string
+}
+
+export type SidebarNavItemProps =
+  | SidebarNavLinkItemProps
+  | SidebarNavUserItemProps
+  | SidebarNavStubItemProps
+  | SidebarNavSearchItemProps
+  | SidebarNavMetaItemProps
+
+function SidebarNavLinkItem({
   variant,
+  to,
+  label,
+  end,
   trailing,
   className,
-}: SidebarNavLinkRowProps) {
-  const cfg = sidebarNavRow[variant]
+  icon: Icon,
+}: SidebarNavLinkItemProps) {
+  const cfg = sidebarNavItem[variant]
   return (
     <NavLink
       to={to}
       end={end}
       className={({ isActive }) =>
-        cn(cfg.root, isActive || activeWhen ? cfg.active : cfg.inactive, className)
+        cn(cfg.root, isActive ? availableNavToneActive : cfg.tone, className)
       }
     >
-      {({ isActive }) => {
-        const active = isActive || activeWhen
-        return (
-          <>
-            {Icon ? <Icon className={cn(cfg.icon, active && 'text-nav-hover')} /> : null}
-            <span className="min-w-0 flex-1 truncate">{label}</span>
-            {trailing}
-          </>
-        )
-      }}
+      <Icon className={cfg.icon} aria-hidden />
+      <span className="min-w-0 flex-1 truncate">{label}</span>
+      {trailing}
     </NavLink>
   )
 }
 
-export type SidebarNavStandardItemProps = Omit<SidebarNavLinkRowProps, 'variant' | 'trailing'> & {
-  icon: LucideIcon
+/** Sidebar nav row — one component, variant-driven (link, search, user, stub, meta, nested). */
+export function SidebarNavItem(props: SidebarNavItemProps) {
+  const { className } = props
+
+  if (props.variant === 'search') {
+    const cfg = sidebarNavItem.search
+    const SearchIcon = navSearchIcon
+    return (
+      <button
+        type="button"
+        className={cn(cfg.root, className)}
+        data-search-trigger
+      >
+        <span className={cfg.leading}>
+          <SearchIcon className={cfg.icon} aria-hidden />
+          <span className="min-w-0 truncate">Search</span>
+        </span>
+        <kbd className={cfg.kbd}>/</kbd>
+      </button>
+    )
+  }
+
+  if (props.variant === 'stub') {
+    const cfg = sidebarNavItem.stub
+    const Icon = props.icon
+    return (
+      <div className={cn(cfg.root, cfg.tone, className)} aria-disabled="true">
+        <Icon className={cfg.icon} aria-hidden />
+        <span className="min-w-0 flex-1 truncate font-medium">{props.label}</span>
+        <span className={cfg.soon}>Soon</span>
+      </div>
+    )
+  }
+
+  if (props.variant === 'meta') {
+    return <p className={cn(sidebarNavItem.meta.root, className)}>{props.label}</p>
+  }
+
+  if (props.variant === 'user') {
+    const cfg = sidebarNavItem.user
+    return (
+      <NavLink to={props.to} end={props.end} className={cn(cfg.root, className)}>
+        <Avatar className={cn('size-[18px] rounded-full', cfg.avatar)}>
+          {props.avatarUrl ? <AvatarImage src={props.avatarUrl} alt="" /> : null}
+          <AvatarFallback className="rounded-full bg-surface-3 text-[9px] font-medium text-muted-foreground">
+            {props.initials}
+          </AvatarFallback>
+        </Avatar>
+        <span className={cfg.label}>{props.label}</span>
+        {props.trailing}
+      </NavLink>
+    )
+  }
+
+  return <SidebarNavLinkItem {...props} />
 }
 
-/** Primary sidebar row with leading icon + label. */
+/** @deprecated Prefer `<SidebarNavItem variant="link" />`. */
+export type SidebarNavStandardItemProps = Omit<SidebarNavLinkItemProps, 'variant'>
+
 export function SidebarNavStandardItem({ icon, ...props }: SidebarNavStandardItemProps) {
-  return <SidebarNavLinkRow variant="standard" icon={icon} {...props} />
+  return <SidebarNavItem variant="link" icon={icon} {...props} />
 }
 
 export type SidebarNavDropdownItemProps = Omit<SidebarNavStandardItemProps, 'trailing'> & {
-  /** Defaults to disclosure chevron; replace when wiring real menus. */
   trailing?: ReactNode
 }
 
-/** Same chrome as SidebarNavStandardItem with a trailing affordance for expand / menu. */
 export function SidebarNavDropdownItem({ trailing, ...props }: SidebarNavDropdownItemProps) {
   return (
-    <SidebarNavLinkRow
-      variant="standard"
+    <SidebarNavItem
+      variant="link"
       trailing={
         trailing ?? (
           <ChevronDown
-            className={cn(sidebarNavDensity.icon, 'shrink-0 text-muted-foreground transition-surface motion-reduce:transition-none group-hover:text-nav-hover')}
+            className={cn(
+              sidebarNavItem.link.icon,
+              'transition-surface motion-reduce:transition-none',
+            )}
             aria-hidden
           />
         )
@@ -81,31 +162,17 @@ export function SidebarNavDropdownItem({ trailing, ...props }: SidebarNavDropdow
   )
 }
 
-export type SidebarNavNestedItemProps = Omit<SidebarNavLinkRowProps, 'variant'>
+export type SidebarNavNestedItemProps = Omit<SidebarNavLinkItemProps, 'variant'>
 
-/** Indented child route row; optional icon uses nested scale. */
 export function SidebarNavNestedItem(props: SidebarNavNestedItemProps) {
-  return <SidebarNavLinkRow variant="nested" {...props} />
+  return <SidebarNavItem variant="nested" {...props} />
 }
 
+/** @deprecated Prefer `<SidebarNavItem variant="stub" />`. */
 export function SidebarNavStubItem({
   label,
-  icon: Icon,
+  icon,
   className,
-}: {
-  label: string
-  icon: LucideIcon
-  className?: string
-}) {
-  const cfg = sidebarNavRow.standard
-  return (
-    <div
-      className={cn(cfg.root, cfg.inactive, 'cursor-default opacity-50', className)}
-      aria-disabled="true"
-    >
-      <Icon className={cfg.icon} aria-hidden />
-      <span className="min-w-0 flex-1 truncate">{label}</span>
-      <span className="shrink-0 text-[10px] text-muted-foreground">Soon</span>
-    </div>
-  )
+}: Omit<SidebarNavStubItemProps, 'variant'>) {
+  return <SidebarNavItem variant="stub" label={label} icon={icon} className={className} />
 }

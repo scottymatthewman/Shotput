@@ -70,7 +70,16 @@ function taskPrimaryOwner(workspace: Workspace, phase: Phase): { user?: User; ag
   return {}
 }
 
-const headTh = 'px-3 py-2 text-left text-xs font-medium text-muted-foreground'
+/** Row height — matches body `py-2` + `size-7` (28px) controls (44px total). */
+const TABLE_ROW_H = 'h-11'
+const tableCellBase = cn('box-border align-middle', TABLE_ROW_H, 'py-0')
+
+const headTh = cn(
+  tableCellBase,
+  'px-3 text-left text-xs font-medium text-muted-foreground',
+)
+
+const bodyTd = tableCellBase
 
 /**
  * Checkbox column uses `PAGE_HEADER_LEADING_ALIGN_CLASS` so control center matches PageHeader back button.
@@ -114,15 +123,24 @@ const dateColStyle: CSSProperties = {
 }
 
 /** Icon-only columns: keep `<th>` as table-cell; center control with an inner flex (flex on `<th>` stacks/breaks layout). */
-const narrowIconControlTh =
-  'box-border overflow-hidden px-0.5 py-2 align-middle text-center text-xs font-medium text-muted-foreground'
+const narrowIconControlTh = cn(
+  tableCellBase,
+  'overflow-hidden px-0.5 text-center text-xs font-medium text-muted-foreground',
+)
+
+/** Same control height as body priority/status buttons (`size-7`). */
+const TABLE_HEADER_CONTROL_H = 'h-7'
 
 /** Fill `<th>`; label start, sort icon end (priority column uses icon-only, centered). No hover chrome. */
-const sortHeaderButtonClass =
-  '-mx-1 flex h-full min-h-8 w-full min-w-0 cursor-pointer items-center justify-between gap-2 rounded-md px-1 py-0.5 text-left outline-none transition-surface duration-150 pressable dance-focus-ring'
+const sortHeaderButtonClass = cn(
+  '-mx-1 flex w-full min-w-0 cursor-pointer items-center justify-between gap-2 rounded-md px-1 text-left outline-none transition-surface duration-150 pressable dance-focus-ring',
+  TABLE_HEADER_CONTROL_H,
+)
 
-const prioritySortHeaderButtonClass =
-  '-mx-0.5 inline-flex h-full min-h-7 w-auto max-w-full shrink-0 cursor-pointer items-center justify-center rounded-md px-0.5 outline-none transition-surface duration-150 pressable dance-focus-ring'
+const prioritySortHeaderButtonClass = cn(
+  '-mx-0.5 inline-flex w-auto max-w-full shrink-0 cursor-pointer items-center justify-center rounded-md px-0.5 outline-none transition-surface duration-150 pressable dance-focus-ring',
+  TABLE_HEADER_CONTROL_H,
+)
 
 const timelineCheckboxClass =
   'timeline-phase-checkbox focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50'
@@ -290,14 +308,19 @@ export function TimelineTableView({
               <th
                 scope="col"
                 className={cn(
-                  'box-border overflow-hidden py-2 text-left text-xs font-medium text-muted-foreground',
+                  headTh,
+                  'overflow-hidden text-left',
                   PAGE_HEADER_LEADING_ALIGN_CLASS,
                   'pr-2',
                 )}
                 style={checkboxColStyle}
               >
                 <span className="sr-only">Select rows</span>
-                <div data-phase-row-action className="flex justify-start" onClick={(e) => e.stopPropagation()}>
+                <div
+                  data-phase-row-action
+                  className="flex h-full items-center justify-start"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <input
                     type="checkbox"
                     ref={selectAllRef}
@@ -310,7 +333,7 @@ export function TimelineTableView({
                 </div>
               </th>
               <th scope="col" className={narrowIconControlTh} style={narrowIconColumnStyle}>
-                <div className="flex justify-center">
+                <div className="flex h-full items-center justify-center">
                   <button
                     type="button"
                     title="Priority"
@@ -350,7 +373,7 @@ export function TimelineTableView({
                 </div>
               </th>
               <th scope="col" className={narrowIconControlTh} style={narrowIconColumnStyle}>
-                <div className="flex justify-center">
+                <div className="flex h-full items-center justify-center">
                   <button
                     type="button"
                     title="Status"
@@ -431,7 +454,7 @@ export function TimelineTableView({
                 className={cn(headTh, 'min-w-0 overflow-hidden')}
                 style={ownerColStyle}
               >
-                <span className="block w-full min-w-0 truncate">Owner</span>
+                <span className="flex h-full min-w-0 items-center truncate">Owner</span>
               </th>
               <th
                 scope="col"
@@ -542,14 +565,15 @@ export function TimelineTableView({
                 >
                   <td
                     className={cn(
-                      'box-border overflow-hidden py-2 pr-2 align-middle',
+                      bodyTd,
+                      'overflow-hidden pr-2',
                       PAGE_HEADER_LEADING_ALIGN_CLASS,
                     )}
                     style={checkboxColStyle}
                     data-phase-row-action
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <div className="flex justify-start">
+                    <div className="flex h-full items-center justify-start">
                       <input
                         type="checkbox"
                         checked={isChecked}
@@ -560,12 +584,12 @@ export function TimelineTableView({
                     </div>
                   </td>
                   <td
-                    className="box-border overflow-hidden px-0.5 py-2 align-middle text-muted-foreground"
+                    className={cn(bodyTd, 'overflow-hidden px-0.5 text-muted-foreground')}
                     style={narrowIconColumnStyle}
                     data-phase-row-action
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <div className="flex justify-center">
+                    <div className="flex h-full items-center justify-center">
                       <PhasePriorityDropdown
                         phaseId={task.id}
                         currentPriority={live.priority}
@@ -582,12 +606,12 @@ export function TimelineTableView({
                     </div>
                   </td>
                   <td
-                    className="box-border overflow-hidden px-0.5 py-2 align-middle text-muted-foreground"
+                    className={cn(bodyTd, 'overflow-hidden px-0.5 text-muted-foreground')}
                     style={narrowIconColumnStyle}
                     data-phase-row-action
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <div className="flex justify-center">
+                    <div className="flex h-full items-center justify-center">
                       <PhaseStatusDropdown phaseId={task.id} currentStatus={eff} hotkeyOpensDropdown>
                         <button
                           type="button"
@@ -600,11 +624,11 @@ export function TimelineTableView({
                       </PhaseStatusDropdown>
                     </div>
                   </td>
-                  <td className="max-w-0 px-3 py-2 font-medium text-foreground">
+                  <td className={cn(bodyTd, 'max-w-0 px-3 font-medium text-foreground')}>
                     <span className="block truncate">{live.title}</span>
                   </td>
                   <td
-                    className="max-w-0 overflow-hidden px-2 py-2 align-middle"
+                    className={cn(bodyTd, 'max-w-0 overflow-hidden px-2')}
                     style={ownerColStyle}
                   >
                     <button
@@ -637,7 +661,7 @@ export function TimelineTableView({
                     </button>
                   </td>
                   <td
-                    className="px-2 py-2 align-middle"
+                    className={cn(bodyTd, 'px-2')}
                     style={dateColStyle}
                     data-phase-row-action
                     onClick={(e) => e.stopPropagation()}
@@ -653,7 +677,7 @@ export function TimelineTableView({
                     />
                   </td>
                   <td
-                    className="px-2 py-2 align-middle"
+                    className={cn(bodyTd, 'px-2')}
                     style={dateColStyle}
                     data-phase-row-action
                     onClick={(e) => e.stopPropagation()}

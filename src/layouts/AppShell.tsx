@@ -49,7 +49,7 @@ export function AppShell({ children }: { children?: ReactNode }) {
     <CommandMenuProvider>
       <GlobalKeyboardShortcuts />
       <div
-        className="flex h-dvh w-dvw min-h-0 overflow-hidden bg-background"
+        className="flex h-full min-h-0 w-full max-w-full overflow-hidden overscroll-none bg-background"
         onPointerDownCapture={(e) => {
           const t = e.target as HTMLElement
           if (t.closest?.('[data-search-trigger]')) {
