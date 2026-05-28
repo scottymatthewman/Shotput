@@ -50,6 +50,9 @@ export interface PlansStoreSlice {
   sidebarCollapsed: boolean
   setSidebarCollapsed: (v: boolean) => void
   toggleSidebarCollapsed: () => void
+  agentChatOpen: boolean
+  setAgentChatOpen: (v: boolean) => void
+  toggleAgentChatOpen: () => void
   selectedPhaseId: string | null
   setSelectedPhaseId: (id: string | null) => void
   phaseModal: import('@/state/uiStore').PhaseModalState | null
@@ -158,6 +161,9 @@ function buildSlice(
     sidebarCollapsed: ui.sidebarCollapsed,
     setSidebarCollapsed: ui.setSidebarCollapsed,
     toggleSidebarCollapsed: ui.toggleSidebarCollapsed,
+    agentChatOpen: ui.agentChatOpen,
+    setAgentChatOpen: ui.setAgentChatOpen,
+    toggleAgentChatOpen: ui.toggleAgentChatOpen,
     selectedPhaseId: ui.selectedPhaseId,
     setSelectedPhaseId: ui.setSelectedPhaseId,
     phaseModal: ui.phaseModal,

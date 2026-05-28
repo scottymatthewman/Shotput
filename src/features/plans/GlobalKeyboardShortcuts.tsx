@@ -373,6 +373,7 @@ export function GlobalKeyboardShortcuts() {
             <ShortcutRow keys={['⌘', '⇧', 'Z']} description="Redo" />
             <ShortcutRow keys={['Esc']} description="Close menu, dialog, or leave phase detail / overview" />
             <ShortcutRow keys={['⌘', '.']} description="Toggle sidebar / leave phase detail" />
+            <ShortcutRow keys={['⌘', '/']} description="Toggle agent chat" />
             <ShortcutRow keys={['⌘', '⇧', 'C']} description="Copy task link or page URL" />
           </ShortcutSection>
           <ShortcutSection title="Timeline workspace">

@@ -1,11 +1,21 @@
+import addSvg from '@/assets/NavIcons/Add.svg?raw'
+import agentSvg from '@/assets/NavIcons/Agent.svg?raw'
+import chatActiveSvg from '@/assets/NavIcons/Chat-Active.svg?raw'
+import chatInactiveSvg from '@/assets/NavIcons/Chat-Inactive.svg?raw'
+import closeSvg from '@/assets/NavIcons/Close.svg?raw'
 import eventsSvg from '@/assets/NavIcons/Events.svg?raw'
+import historySvg from '@/assets/NavIcons/History.svg?raw'
 import homeSvg from '@/assets/NavIcons/Home.svg?raw'
 import inboxSvg from '@/assets/NavIcons/Inbox.svg?raw'
 import plansSvg from '@/assets/NavIcons/Plans.svg?raw'
 import reportsSvg from '@/assets/NavIcons/Reports.svg?raw'
 import searchSvg from '@/assets/NavIcons/Search.svg?raw'
+import sendSvg from '@/assets/NavIcons/Send.svg?raw'
 import settingsSvg from '@/assets/NavIcons/Settings.svg?raw'
 import sidebarSvg from '@/assets/NavIcons/Sidebar.svg?raw'
+import suggestedSendSvg from '@/assets/NavIcons/SuggestedSend.svg?raw'
+import tableSvg from '@/assets/NavIcons/Table.svg?raw'
+import timelineSvg from '@/assets/NavIcons/Timeline.svg?raw'
 import { cn } from '@/lib/utils'
 import type { ReactNode } from 'react'
 
@@ -25,6 +35,16 @@ export type NavIconId =
   | 'search'
   | 'sidebar'
   | 'events'
+  | 'chatActive'
+  | 'chatInactive'
+  | 'history'
+  | 'agent'
+  | 'suggestedSend'
+  | 'send'
+  | 'timeline'
+  | 'table'
+  | 'close'
+  | 'add'
 
 function themeNavAssetSvg(raw: string): string {
   return raw
@@ -41,6 +61,16 @@ const byIdHtml: Record<NavIconId, string> = {
   search: themeNavAssetSvg(searchSvg),
   sidebar: themeNavAssetSvg(sidebarSvg),
   events: themeNavAssetSvg(eventsSvg),
+  chatActive: themeNavAssetSvg(chatActiveSvg),
+  chatInactive: themeNavAssetSvg(chatInactiveSvg),
+  history: themeNavAssetSvg(historySvg),
+  agent: themeNavAssetSvg(agentSvg),
+  suggestedSend: themeNavAssetSvg(suggestedSendSvg),
+  send: themeNavAssetSvg(sendSvg),
+  timeline: themeNavAssetSvg(timelineSvg),
+  table: themeNavAssetSvg(tableSvg),
+  close: themeNavAssetSvg(closeSvg),
+  add: themeNavAssetSvg(addSvg),
 }
 
 function escapeSvgClassAttr(value: string): string {
@@ -85,3 +115,13 @@ export const navSettingsIcon = createNavIcon('settings')
 export const navSearchIcon = createNavIcon('search')
 export const navSidebarIcon = createNavIcon('sidebar')
 export const navEventsIcon = createNavIcon('events')
+export const navChatActiveIcon = createNavIcon('chatActive')
+export const navChatInactiveIcon = createNavIcon('chatInactive')
+export const navHistoryIcon = createNavIcon('history')
+export const navAgentIcon = createNavIcon('agent')
+export const navSuggestedSendIcon = createNavIcon('suggestedSend')
+export const navSendIcon = createNavIcon('send')
+export const navTimelineIcon = createNavIcon('timeline')
+export const navTableIcon = createNavIcon('table')
+export const navCloseIcon = createNavIcon('close')
+export const navAddIcon = createNavIcon('add')

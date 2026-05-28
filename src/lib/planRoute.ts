@@ -15,6 +15,16 @@ export function resolvePlanId(workspace: Workspace, planId: string): string | un
   return workspace.plans[planId] ? planId : undefined
 }
 
+/** Active plan from any `/plans/:planId/...` route. */
+export function resolveActivePlanId(
+  pathname: string,
+  workspace: Workspace,
+): string | null {
+  const m = pathname.match(/^\/plans\/([^/]+)/)
+  if (!m?.[1]) return null
+  return workspace.plans[m[1]] ? m[1] : null
+}
+
 export function phaseDetailPath(planId: string, phaseId: string) {
   return `/plans/${planId}/phases/${phaseId}`
 }

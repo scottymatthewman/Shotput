@@ -589,6 +589,38 @@
     box-shadow: 0 1px 2px rgb(from var(--dance-gantt-highlight) r g b / 0.18);
     outline: 1px solid var(--dance-chrome-border);
   }
+
+  /** App shell — column tracks set inline via --shell-top-cols / --shell-main-cols */
+  .shell-top-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .shell-top-grid > * {
+    min-width: 0;
+  }
+
+  .shell-main-grid {
+    display: grid;
+    min-height: 0;
+    flex: 1 1 0%;
+    grid-template-columns: 1fr;
+  }
+
+  @media (width >= 48rem) {
+    .shell-top-grid {
+      grid-template-columns: var(--shell-top-cols);
+    }
+
+    .shell-main-grid {
+      grid-template-columns: var(--shell-main-cols);
+    }
+
+    .shell-grid-animate.shell-top-grid,
+    .shell-grid-animate.shell-main-grid {
+      transition: grid-template-columns 300ms var(--ease-in-out);
+    }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
