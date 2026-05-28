@@ -27,6 +27,24 @@ export function PlanBudgetTracker({ plan, workspace, planId, className }: PlanBu
 
   return (
     <div className={cn('flex min-w-0 max-w-md flex-col items-start gap-1.5', className)}>
+      {progressPct != null ? (
+        <div
+          className="h-1 w-32 max-w-full overflow-hidden rounded-full bg-progress-track"
+          role="progressbar"
+          aria-valuenow={Math.round(progressPct)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="Budget spent"
+        >
+          <div
+            className={cn(
+              'h-full rounded-full transition-[width] duration-200 ease-out motion-reduce:transition-none',
+              rollup.overSpent ? 'bg-destructive' : 'bg-progress-fill',
+            )}
+            style={{ width: `${progressPct}%` }}
+          />
+        </div>
+      ) : null}
       <div className="flex min-w-0 flex-wrap items-center justify-start gap-x-2 gap-y-0.5 text-xs">
         {statusLabel ? (
           <span
@@ -50,24 +68,6 @@ export function PlanBudgetTracker({ plan, workspace, planId, className }: PlanBu
           </Link>
         )}
       </div>
-      {progressPct != null ? (
-        <div
-          className="h-1 w-32 max-w-full overflow-hidden rounded-full bg-progress-track"
-          role="progressbar"
-          aria-valuenow={Math.round(progressPct)}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label="Budget spent"
-        >
-          <div
-            className={cn(
-              'h-full rounded-full transition-[width] duration-200 ease-out motion-reduce:transition-none',
-              rollup.overSpent ? 'bg-destructive' : 'bg-progress-fill',
-            )}
-            style={{ width: `${progressPct}%` }}
-          />
-        </div>
-      ) : null}
     </div>
   )
 }

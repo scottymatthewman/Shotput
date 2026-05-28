@@ -41,6 +41,8 @@ export function buildCommandIndex(input: {
   setTimelineViewMode: (m: 'gantt' | 'table') => void
   timelineViewMode: 'gantt' | 'table'
   toggleSidebarCollapsed: () => void
+  toggleAgentChatOpen: () => void
+  agentChatOpen: boolean
   resetDemo: () => void
   resolveTimelineId: () => string | null
 }): { recent: CommandItem[]; navigation: CommandItem[]; actions: CommandItem[]; index: CommandItem[] } {
@@ -118,6 +120,13 @@ export function buildCommandIndex(input: {
       keywords: 'sidebar collapse',
       shortcut: '⌘.',
       action: () => input.toggleSidebarCollapsed(),
+    },
+    {
+      id: 'action-toggle-agent-chat',
+      kind: 'action',
+      label: input.agentChatOpen ? 'Hide agent chat' : 'Show agent chat',
+      keywords: 'agent chat assistant',
+      action: () => input.toggleAgentChatOpen(),
     },
     {
       id: 'action-reset',

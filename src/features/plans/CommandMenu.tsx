@@ -23,6 +23,8 @@ export function CommandMenuProvider({ children }: { children: ReactNode }) {
   const setTimelineViewMode = usePlansStore((s) => s.setTimelineViewMode)
   const openNewPhaseModal = usePlansStore((s) => s.openNewPhaseModal)
   const toggleSidebarCollapsed = usePlansStore((s) => s.toggleSidebarCollapsed)
+  const toggleAgentChatOpen = usePlansStore((s) => s.toggleAgentChatOpen)
+  const agentChatOpen = usePlansStore((s) => s.agentChatOpen)
   const resetDemo = usePlansStore((s) => s.resetDemo)
   const navigate = useNavigate()
   const location = useLocation()
@@ -37,6 +39,8 @@ export function CommandMenuProvider({ children }: { children: ReactNode }) {
         setTimelineViewMode,
         timelineViewMode,
         toggleSidebarCollapsed,
+        toggleAgentChatOpen,
+        agentChatOpen,
         resetDemo,
         resolveTimelineId: () => {
           const route = resolvePlanWorkspaceRoute(location.pathname, workspace)
@@ -51,6 +55,8 @@ export function CommandMenuProvider({ children }: { children: ReactNode }) {
       setTimelineViewMode,
       timelineViewMode,
       toggleSidebarCollapsed,
+      toggleAgentChatOpen,
+      agentChatOpen,
       resetDemo,
     ],
   )

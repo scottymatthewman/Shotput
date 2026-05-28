@@ -70,6 +70,9 @@ export interface UiStore {
   sidebarCollapsed: boolean
   setSidebarCollapsed: (v: boolean) => void
   toggleSidebarCollapsed: () => void
+  agentChatOpen: boolean
+  setAgentChatOpen: (v: boolean) => void
+  toggleAgentChatOpen: () => void
   selectedPhaseId: string | null
   setSelectedPhaseId: (id: string | null) => void
   phaseModal: PhaseModalState | null
@@ -125,6 +128,9 @@ export const useUiStore = create<UiStore>()(
       setSidebarCollapsed: (v) => set({ sidebarCollapsed: v }),
       toggleSidebarCollapsed: () =>
         set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
+      agentChatOpen: false,
+      setAgentChatOpen: (v) => set({ agentChatOpen: v }),
+      toggleAgentChatOpen: () => set((s) => ({ agentChatOpen: !s.agentChatOpen })),
       selectedPhaseId: null,
       setSelectedPhaseId: (id) => set({ selectedPhaseId: id }),
       phaseModal: null,
@@ -193,8 +199,9 @@ export const useUiStore = create<UiStore>()(
         theme: s.theme,
         timelineViewMode: s.timelineViewMode,
         sidebarCollapsed: s.sidebarCollapsed,
+        agentChatOpen: s.agentChatOpen,
       }),
-      version: 3,
+      version: 4,
     },
   ),
 )
