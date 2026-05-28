@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import {
   assembleWorkspaceFromInstant,
   workspaceQuery,
+  type WorkspaceQueryResult,
 } from '@/lib/instant/assembleWorkspace'
 import { db, hasInstantConfig } from '@/lib/instant/db'
 import { createInitialWorkspace, initialActivityLog } from '@/mock/fixtures'
@@ -28,7 +29,10 @@ export function useWorkspaceQuery() {
   }, [instantSeeded])
 
   return useMemo(() => {
-    const assembled = assembleWorkspaceFromInstant(data?.workspaces, data?.activityEvents)
+    const assembled = assembleWorkspaceFromInstant(
+      data?.workspaces as WorkspaceQueryResult['workspaces'] | undefined,
+      data?.activityEvents as WorkspaceQueryResult['activityEvents'] | undefined,
+    )
 
     if (assembled.workspace) {
       return {
