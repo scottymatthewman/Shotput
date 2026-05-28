@@ -11,7 +11,7 @@ import { SidebarNavItem } from '@/components/nav/SidebarNavItem'
 import { sidebarNavDensity } from '@/components/nav/sidebarNavStyles'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { features } from '@/config/features'
-import { SHELL_TOP_PADDING_CLASS } from '@/layouts/shellLayout'
+import { SHELL_SIDEBAR_NAV_TOP_PADDING_CLASS } from '@/layouts/shellLayout'
 import { cn } from '@/lib/utils'
 import { CURRENT_USER_ID, usePlansStore } from '@/state/store'
 
@@ -62,7 +62,7 @@ export function SidebarNav({ className }: { className?: string }) {
       className={cn(
         'flex h-full min-h-0 w-full flex-col overflow-hidden overscroll-contain bg-background',
         sidebarNavDensity.gutter,
-        cn('pb-3', SHELL_TOP_PADDING_CLASS),
+        cn('pb-3', SHELL_SIDEBAR_NAV_TOP_PADDING_CLASS),
         className,
       )}
     >

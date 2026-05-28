@@ -13,7 +13,7 @@ const tabChipClass = cn(
 )
 
 const tabAddClass = cn(
-  'flex size-9 shrink-0 items-center justify-center rounded-sm',
+  'flex size-8 shrink-0 items-center justify-center rounded-sm px-0',
   'inset-edge-ring inset-edge-ring-full bg-surface-2',
   'text-muted-foreground transition-surface pressable duration-150 ease-hover',
   'hover:text-foreground',

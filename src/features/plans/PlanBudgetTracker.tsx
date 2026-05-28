@@ -45,7 +45,7 @@ export function PlanBudgetTracker({ plan, workspace, planId, className }: PlanBu
           />
         </div>
       ) : null}
-      <div className="flex min-w-0 flex-wrap items-center justify-start gap-x-2 gap-y-0.5 text-xs">
+      <div className="flex min-w-0 flex-wrap items-center justify-start gap-x-2 gap-y-0.5 text-sm">
         {statusLabel ? (
           <span
             className={cn(

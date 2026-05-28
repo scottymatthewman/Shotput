@@ -7,7 +7,11 @@ import { cn } from '@/lib/utils'
  * the header’s left edge. Table checkbox column uses `PAGE_HEADER_LEADING_ALIGN_CLASS`.
  */
 export const PAGE_HEADER_INSET_X_PX = 16
+/** Matches `pageHeaderRootClass` vertical inset (`py-3`). */
+export const PAGE_HEADER_INSET_Y_PX = 12
 export const PAGE_HEADER_LEADING_CONTROL_PX = 32
+export const PAGE_HEADER_LEADING_CENTER_Y_PX =
+  PAGE_HEADER_INSET_Y_PX + PAGE_HEADER_LEADING_CONTROL_PX / 2
 export const PAGE_HEADER_LEADING_CENTER_PX =
   PAGE_HEADER_INSET_X_PX + PAGE_HEADER_LEADING_CONTROL_PX / 2
 

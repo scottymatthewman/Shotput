@@ -69,8 +69,8 @@ export function TimelineViewToggle({
           onClick={() => onChange(id)}
           className={cn(
             'relative z-10 pressable dance-focus-ring inline-flex h-8 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-full px-4 text-xs font-medium outline-none',
-            'text-foreground transition-opacity duration-200 ease-out motion-reduce:transition-none',
-            value !== id && 'opacity-50',
+            'text-foreground transition-surface duration-150 ease-hover motion-reduce:transition-none',
+            value === id ? 'opacity-100' : 'opacity-50 hover:opacity-100',
           )}
         >
           {icon({ className: cn(sidebarNavDensity.icon, 'text-foreground'), 'aria-hidden': true })}
