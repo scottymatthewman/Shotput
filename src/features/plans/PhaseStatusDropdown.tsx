@@ -1,30 +1,32 @@
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { useGanttCollisionBoundary } from '@/features/plans/gantt/GanttCollisionBoundaryContext'
+  BloomDropdown,
+  BloomDropdownMenuLabel,
+  BloomDropdownRadioRow,
+  bloomPlacementFromRadix,
+} from '@/components/ui/bloom-menu'
 import {
   armTimelineRowClickSuppression,
   phaseStatusMenuLabel,
 } from '@/components/dance/phaseStatusMenu'
-import { cn } from '@/lib/utils'
 import { usePlansStore } from '@/state/store'
 import type { PhaseStatus } from '@/types/domain'
-import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
-import { Check } from 'lucide-react'
 import { cloneElement, isValidElement, useCallback, useEffect, useState, type ReactElement } from 'react'
 
-const statuses: PhaseStatus[] = ['todo', 'in_progress', 'in_review', 'blocked', 'done']
+const statuses: PhaseStatus[] = [
+  'backlog',
+  'todo',
+  'in_progress',
+  'in_review',
+  'blocked',
+  'done',
+]
 
 function triggerWithRowAction(stopRowNavigate: boolean, trigger: ReactElement): ReactElement {
   if (!stopRowNavigate || !isValidElement(trigger)) return trigger
   return cloneElement(trigger, { 'data-phase-row-action': '' } as Partial<HTMLElement>)
 }
 
-/** Optional popper placement for the status menu (Radix: flips `side` when colliding). */
+/** Optional popper placement for the status menu (maps to Bloom `direction` / `anchor`). */
 export type PhaseStatusMenuPlacement = {
   side?: 'top' | 'right' | 'bottom' | 'left'
   align?: 'start' | 'center' | 'end'
@@ -44,7 +46,7 @@ export function PhaseStatusDropdown({
 }: {
   phaseId: string
   currentStatus: PhaseStatus
-  /** Typically a button; receives Radix trigger props via `asChild`. */
+  /** Typically a button; Bloom measures it for the morph animation. */
   children: ReactElement
   modal?: boolean
   /** When true, merge `data-phase-row-action` onto the trigger so row/card click handlers ignore status UI. */
@@ -55,8 +57,6 @@ export function PhaseStatusDropdown({
   const setPhaseStatus = usePlansStore((s) => s.setPhaseStatus)
   const pendingGanttTaskId = usePlansStore((s) => s.pendingGanttStatusMenuPhaseId)
   const clearPendingGanttStatusMenu = usePlansStore((s) => s.clearPendingGanttStatusMenu)
-  const ganttCollisionBoundary = useGanttCollisionBoundary()
-
   const [open, setOpen] = useState(false)
 
   const handleOpenChange = useCallback(
@@ -96,54 +96,29 @@ export function PhaseStatusDropdown({
     return () => document.removeEventListener('keydown', onKeyDown, true)
   }, [open, phaseId, setPhaseStatus])
 
-  const ganttPopperCollision =
-    hotkeyOpensDropdown && ganttCollisionBoundary
-      ? { collisionBoundary: ganttCollisionBoundary, collisionPadding: 8 }
-      : {}
-
   return (
-    <DropdownMenu modal={modal} open={open} onOpenChange={handleOpenChange}>
-      <DropdownMenuTrigger asChild>
-        {triggerWithRowAction(stopParentRowNavigate, children)}
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="start"
-        sideOffset={4}
-        {...menuPlacement}
-        {...ganttPopperCollision}
-        className="min-w-[12rem]"
-        onCloseAutoFocus={(e) => e.preventDefault()}
-      >
-        <DropdownMenuLabel className="font-normal text-muted-foreground">Status</DropdownMenuLabel>
-        <DropdownMenuRadioGroup
-          value={currentStatus}
-          onValueChange={(v) => {
-            setPhaseStatus(phaseId, v as PhaseStatus)
+    <BloomDropdown
+      open={open}
+      onOpenChange={handleOpenChange}
+      modal={modal}
+      placement={bloomPlacementFromRadix(menuPlacement)}
+      menuWidth={192}
+      trigger={triggerWithRowAction(stopParentRowNavigate, children)}
+    >
+      <BloomDropdownMenuLabel>Status</BloomDropdownMenuLabel>
+      {statuses.map((s, i) => (
+        <BloomDropdownRadioRow
+          key={s}
+          selected={currentStatus === s}
+          shortcut={String(i + 1)}
+          onSelect={() => {
+            setPhaseStatus(phaseId, s)
             armTimelineRowClickSuppression()
           }}
         >
-          {statuses.map((s, i) => (
-            <DropdownMenuPrimitive.RadioItem
-              key={s}
-              value={s}
-              className={cn(
-                'relative flex cursor-default select-none items-center gap-2 rounded-[var(--radius-nested-md-p1)] py-1.5 pl-2 pr-2 text-sm outline-none transition-surface duration-150',
-                'focus:bg-accent/40 data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-              )}
-            >
-              <span className="w-6 shrink-0 text-center text-xs font-medium tabular-nums text-muted-foreground">
-                {i + 1}
-              </span>
-              <span className="min-w-0 flex-1">{phaseStatusMenuLabel(s)}</span>
-              <span className="flex size-4 shrink-0 items-center justify-center" aria-hidden>
-                <DropdownMenuPrimitive.ItemIndicator>
-                  <Check className="size-3.5 text-primary" strokeWidth={2.5} />
-                </DropdownMenuPrimitive.ItemIndicator>
-              </span>
-            </DropdownMenuPrimitive.RadioItem>
-          ))}
-        </DropdownMenuRadioGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          {phaseStatusMenuLabel(s)}
+        </BloomDropdownRadioRow>
+      ))}
+    </BloomDropdown>
   )
 }

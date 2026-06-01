@@ -14,6 +14,7 @@ export function armTimelineRowClickSuppression(durationMs = 400) {
 
 export function phaseStatusMenuLabel(status: string) {
   const m: Record<PhaseStatus, string> = {
+    backlog: 'Backlog',
     todo: 'Todo',
     in_progress: 'In progress',
     in_review: 'In review',

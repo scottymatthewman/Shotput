@@ -5,7 +5,17 @@ import * as instantMutations from '@/lib/instant/mutations'
 import { hasInstantConfig } from '@/lib/instant/db'
 import { buildWorkspaceTransact, transactAll } from '@/lib/instant/seed'
 import { createInitialWorkspace, initialActivityLog } from '@/mock/fixtures'
-import type { ActivityEvent, Phase, PhaseStatus, PlanOverviewPatch, Workspace } from '@/types/domain'
+import type {
+  ActivityEvent,
+  Phase,
+  PhaseProperties,
+  PhaseStatus,
+  PlanOverviewPatch,
+  PlanType,
+  Workspace,
+} from '@/types/domain'
+import type { CreatePlanInput } from '@/lib/instant/mutations'
+import { mergePhaseProperties } from '@/lib/phaseProperties'
 import type { PlanNavGlyph } from '@/lib/planIconRegistry'
 import {
   getOverlayPhase,
@@ -57,11 +67,6 @@ export interface PlansStoreSlice {
   setSelectedPhaseId: (id: string | null) => void
   phaseModal: import('@/state/uiStore').PhaseModalState | null
   openNewPhaseModal: (planId: string) => void
-  openPhaseModal: (
-    planId: string,
-    phaseId: string,
-    options?: { autoFocusTitle?: boolean },
-  ) => void
   closePhaseModal: () => void
   updatePhaseDates: (phaseId: string, start: string, end: string) => void
   nudgePhaseByDays: (phaseId: string, deltaDays: number) => void
@@ -76,18 +81,27 @@ export interface PlansStoreSlice {
         | 'start'
         | 'end'
         | 'priority'
+        | 'phaseKind'
+        | 'hardStop'
+        | 'dependencyIds'
         | 'assigneeUserIds'
         | 'statusIsManual'
         | 'budgetAllocatedCents'
         | 'budgetActualCents'
+        | 'properties'
       >
     >,
   ) => void
+  updatePhaseProperties: (phaseId: string, patch: PhaseProperties) => void
   toggleChecklistTask: (phaseId: string, checklistTaskId: string) => void
   deletePhase: (phaseId: string) => void
   createPhaseInPlan: (
     planId: string,
     overrides?: Partial<import('@/types/domain').Phase>,
+  ) => string | null
+  createPlanFromTemplate: (
+    planType: PlanType,
+    input: CreatePlanInput,
   ) => string | null
   undoLastAction: () => boolean
   redoLastAction: () => boolean
@@ -106,7 +120,11 @@ function buildSlice(
   baseWorkspace: Workspace,
   activityLog: ActivityEvent[],
   planNavGlyph: Record<string, PlanNavGlyph>,
-  instant: { isLoading: boolean; error: { message: string } | undefined },
+  instant: {
+    isLoading: boolean
+    error: { message: string } | undefined
+    workspaceReady: boolean
+  },
   ui: ReturnType<typeof useUiStore.getState>,
   overlay: ReturnType<typeof useOptimisticOverlay.getState>,
 ): PlansStoreSlice {
@@ -168,7 +186,6 @@ function buildSlice(
     setSelectedPhaseId: ui.setSelectedPhaseId,
     phaseModal: ui.phaseModal,
     openNewPhaseModal: ui.openNewPhaseModal,
-    openPhaseModal: ui.openPhaseModal,
     closePhaseModal: ui.closePhaseModal,
 
     updatePhaseDates: withUndo((phaseId: string, start: string, end: string) => {
@@ -201,6 +218,13 @@ function buildSlice(
       overlay.patchPhase(phaseId, patch)
       instantMutations.updatePhaseDetails(phase, patch)
     }),
+    updatePhaseProperties: withUndo((phaseId: string, patch) => {
+      const phase = requirePhase(phaseId)
+      if (!phase) return
+      const properties = mergePhaseProperties(phase.properties, patch)
+      overlay.patchPhase(phaseId, { properties })
+      instantMutations.updatePhaseProperties(phase, patch)
+    }),
     toggleChecklistTask: withUndo((phaseId: string, checklistTaskId: string) => {
       const phase = requirePhase(phaseId)
       if (!phase) return
@@ -215,9 +239,6 @@ function buildSlice(
       if (!phase) return
       overlay.removePhase(phaseId)
       instantMutations.deletePhase(phase)
-      if (ui.phaseModal?.mode === 'edit' && ui.phaseModal.phaseId === phaseId) {
-        ui.closePhaseModal()
-      }
       if (ui.selectedPhaseId === phaseId) ui.setSelectedPhaseId(null)
       if (ui.hoveredPhaseId === phaseId) ui.setHoveredPhaseId(null)
       if (ui.focusedPhaseId === phaseId) ui.setFocusedPhaseId(null)
@@ -232,6 +253,19 @@ function buildSlice(
       persistLocal()
       return phase.id
     },
+    createPlanFromTemplate: (planType, input) => {
+      ui.pushUndoFrame(captureUndoFrame(snapshot()))
+      const { plan, phases } = instantMutations.buildPlanFromTemplate(planType, input)
+
+      useOptimisticOverlay.getState().addPlanWithPhases(plan, phases)
+      persistLocal()
+
+      if (hasInstantConfig && instant.workspaceReady) {
+        instantMutations.transactPlanFromTemplate(baseWorkspace.id, plan, phases)
+      }
+
+      return plan.id
+    },
     undoLastAction: () => ui.undoLastAction(captureUndoFrame(snapshot())),
     redoLastAction: () => ui.redoLastAction(captureUndoFrame(snapshot())),
     addPlanNote: withUndo((planId: string, planName: string, body: string) => {
@@ -240,14 +274,15 @@ function buildSlice(
     deletePlan: withUndo((planId: string) => {
       const plan = workspace.plans[planId]
       if (!plan) return
-      const phaseIdsToRemove = new Set<string>()
+      const phaseIdsToRemove: string[] = []
       for (const phase of Object.values(workspace.phases)) {
         if (phase.planId === planId) {
-          phaseIdsToRemove.add(phase.id)
+          phaseIdsToRemove.push(phase.id)
         }
       }
-      instantMutations.deletePlan(planId, plan.name, [...phaseIdsToRemove])
-      if (ui.selectedPhaseId && phaseIdsToRemove.has(ui.selectedPhaseId)) {
+      useOptimisticOverlay.getState().removePlan(planId, phaseIdsToRemove)
+      instantMutations.deletePlan(planId, plan.name, phaseIdsToRemove)
+      if (ui.selectedPhaseId && phaseIdsToRemove.includes(ui.selectedPhaseId)) {
         ui.setSelectedPhaseId(null)
       }
     }),
@@ -295,9 +330,11 @@ export function usePlansStore<T>(selector: (s: PlansStoreSlice) => T): T {
   const activityLog = query.ready ? query.activityLog : initialActivityLog
 
   useEffect(() => {
-    if (query.workspace) {
-      useOptimisticOverlay.getState().pruneAgainst(query.workspace)
-    }
+    if (!query.workspace) return
+    const id = window.setTimeout(() => {
+      useOptimisticOverlay.getState().pruneAgainst(query.workspace!)
+    }, 0)
+    return () => window.clearTimeout(id)
   }, [query.workspace])
 
   const slice = useMemo(
@@ -306,11 +343,25 @@ export function usePlansStore<T>(selector: (s: PlansStoreSlice) => T): T {
         baseWorkspace,
         activityLog,
         query.planNavGlyph,
-        { isLoading: query.isLoading, error: query.error },
+        {
+          isLoading: query.isLoading,
+          error: query.error,
+          workspaceReady: query.ready && Boolean(query.workspace),
+        },
         ui,
         overlayState,
       ),
-    [baseWorkspace, activityLog, query.planNavGlyph, query.isLoading, query.error, ui, overlayState],
+    [
+      baseWorkspace,
+      activityLog,
+      query.planNavGlyph,
+      query.isLoading,
+      query.error,
+      query.ready,
+      query.workspace,
+      ui,
+      overlayState,
+    ],
   )
 
   useLayoutEffect(() => {
@@ -328,7 +379,7 @@ usePlansStore.getState = (): PlansStoreSlice => {
     loadingPlaceholder,
     initialActivityLog,
     {},
-    { isLoading: true, error: undefined },
+    { isLoading: true, error: undefined, workspaceReady: false },
     ui,
     overlay,
   )

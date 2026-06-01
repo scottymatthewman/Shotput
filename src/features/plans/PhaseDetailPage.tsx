@@ -1,14 +1,16 @@
+import { PhaseDetailHeaderMenu } from '@/features/plans/PhaseDetailHeaderMenu'
 import { PhaseDetailPanel } from '@/features/plans/PhaseDetailPanel'
 import { PhaseQuickActionDialogs } from '@/features/plans/PhaseQuickActionDialogs'
+import { usePhaseDetailDialKit } from '@/features/plans/usePhaseDetailDialKit'
 import { CenteredPageScroll } from '@/layouts/CenteredPageScroll'
 import { PageHeader } from '@/layouts/PageHeader'
 import { PageShell } from '@/layouts/PageShell'
 import { Button } from '@/components/ui/button'
-import { phaseDetailPath } from '@/lib/planRoute'
+import { phaseDetailPath, type PhaseDetailLocationState } from '@/lib/planRoute'
 import { usePlansStore } from '@/state/store'
 import { ChevronLeft } from 'lucide-react'
 import { useEffect } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 
 export function PhaseDetailPage() {
   const { planId: planIdParam, phaseId, eventId: legacyEventId } = useParams<{
@@ -18,9 +20,14 @@ export function PhaseDetailPage() {
   }>()
   const planId = planIdParam ?? legacyEventId
   const navigate = useNavigate()
+  const location = useLocation()
+  const autoFocusTitle = Boolean(
+    (location.state as PhaseDetailLocationState | null)?.autoFocusTitle,
+  )
 
   const workspace = usePlansStore((s) => s.workspace)
   const setSelectedPhaseId = usePlansStore((s) => s.setSelectedPhaseId)
+  const dial = usePhaseDetailDialKit()
 
   const phase = phaseId ? workspace.phases[phaseId] : undefined
   const plan = planId ? workspace.plans[planId] : undefined
@@ -53,7 +60,7 @@ export function PhaseDetailPage() {
   }
 
   return (
-    <PageShell>
+    <PageShell className="overflow-visible">
       <PageHeader
         title="Phase"
         description={plan.name}
@@ -65,9 +72,23 @@ export function PhaseDetailPage() {
             </Button>
           </Link>
         }
+        actions={<PhaseDetailHeaderMenu phaseId={phaseId} />}
       />
-      <CenteredPageScroll columnClassName="gap-2">
-        <PhaseDetailPanel planId={planId} phaseId={phaseId} />
+      <CenteredPageScroll
+        layout={{
+          maxWidth: dial.maxWidth,
+          scrollPadding: dial.scrollPadding,
+          columnGap: dial.columnGap,
+          columnPaddingTop: dial.columnPaddingTop,
+          columnPaddingBottom: dial.columnPaddingBottom,
+        }}
+      >
+        <PhaseDetailPanel
+          planId={planId}
+          phaseId={phaseId}
+          autoFocusTitle={autoFocusTitle}
+          dialLayout={dial}
+        />
       </CenteredPageScroll>
       <PhaseQuickActionDialogs planId={planId} />
     </PageShell>

@@ -13,6 +13,7 @@ import {
 } from '@/layouts/shellLayout'
 import { CommandMenuProvider } from '@/features/plans/CommandMenu'
 import { GlobalKeyboardShortcuts } from '@/features/plans/GlobalKeyboardShortcuts'
+import { NewPlanDialog } from '@/features/plans/NewPlanDialog'
 import { features } from '@/config/features'
 import { resolvePhaseDetailRoute } from '@/lib/planRoute'
 import { cn } from '@/lib/utils'
@@ -100,6 +101,7 @@ export function AppShell({ children }: { children?: ReactNode }) {
   return (
     <CommandMenuProvider>
       <GlobalKeyboardShortcuts />
+      <NewPlanDialog />
       <div
         className="flex h-full min-h-0 w-full max-w-full flex-col overflow-hidden overscroll-none bg-background"
         onPointerDownCapture={(e) => {
@@ -122,6 +124,14 @@ export function AppShell({ children }: { children?: ReactNode }) {
           >
             Plans
           </Link>
+          {features.inbox ? (
+            <Link
+              to="/inbox"
+              className="text-xs text-muted-foreground transition-surface duration-150 ease-hover hover:text-foreground"
+            >
+              Inbox
+            </Link>
+          ) : null}
           {features.settings ? (
             <Link
               to="/settings"

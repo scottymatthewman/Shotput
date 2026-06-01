@@ -29,6 +29,10 @@ export function phaseDetailPath(planId: string, phaseId: string) {
   return `/plans/${planId}/phases/${phaseId}`
 }
 
+export type PhaseDetailLocationState = {
+  autoFocusTitle?: boolean
+}
+
 export function resolvePhaseDetailRoute(
   pathname: string,
   workspace: Workspace,

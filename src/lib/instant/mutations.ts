@@ -1,12 +1,17 @@
 import { addDays, format, startOfDay } from 'date-fns'
+import { PLAN_TEMPLATE_RECIPES } from '@/config/planTemplates'
 import type {
   ActivityEvent,
   Phase,
+  PhaseProperties,
   PhaseStatus,
   Plan,
   PlanOverviewPatch,
+  PlanType,
 } from '@/types/domain'
 import { clampPhaseDatesAfterMerge, coerceOrderedPhaseDates } from '@/lib/phaseDateOrder'
+import { phaseToInstantUpdate } from '@/lib/instant/phaseEntity'
+import { mergePhaseProperties } from '@/lib/phaseProperties'
 import { normalizePhaseStatus } from '@/lib/phaseStatus'
 import { CURRENT_USER_ID } from '@/state/uiStore'
 import { db, hasInstantConfig } from '@/lib/instant/db'
@@ -86,10 +91,14 @@ export function updatePhaseDetails(
       | 'start'
       | 'end'
       | 'priority'
+      | 'phaseKind'
+      | 'hardStop'
+      | 'dependencyIds'
       | 'assigneeUserIds'
       | 'statusIsManual'
       | 'budgetAllocatedCents'
       | 'budgetActualCents'
+      | 'properties'
     >
   >,
 ) {
@@ -100,25 +109,25 @@ export function updatePhaseDetails(
     end: Object.prototype.hasOwnProperty.call(patch, 'end'),
   })
 
-  const phaseUpdate: Record<string, unknown> = {
-    title: merged.title,
-    description: merged.description,
-    status: merged.status,
-    statusIsManual: merged.statusIsManual ?? true,
-    priority: merged.priority,
-    start: merged.start,
-    end: merged.end,
-    assigneeUserIdsJson: json(merged.assigneeUserIds),
-  }
+  const phaseUpdate = phaseToInstantUpdate(merged)
 
   if ('budgetAllocatedCents' in patch) {
-    phaseUpdate.budgetAllocatedCents = merged.budgetAllocatedCents
+    phaseUpdate.budgetAllocatedCents = merged.budgetAllocatedCents ?? undefined
   }
   if ('budgetActualCents' in patch) {
-    phaseUpdate.budgetActualCents = merged.budgetActualCents
+    phaseUpdate.budgetActualCents = merged.budgetActualCents ?? undefined
   }
 
   transact(db.tx.phases[phase.id].update(phaseUpdate))
+}
+
+export function updatePhaseProperties(phase: Phase, patch: PhaseProperties) {
+  const properties = mergePhaseProperties(phase.properties, patch)
+  transact(
+    db.tx.phases[phase.id].update({
+      propertiesJson: json(properties),
+    }),
+  )
 }
 
 export function toggleChecklistTask(phase: Phase, checklistTaskId: string) {
@@ -180,17 +189,7 @@ export function createPhaseInPlan(plan: Plan, overrides?: Partial<Phase>): Phase
     transact(
       db.tx.phases[id]
         .update({
-          title: phase.title,
-          description: phase.description,
-          status: phase.status,
-          statusIsManual: phase.statusIsManual,
-          priority: phase.priority,
-          section: phase.section,
-          start: phase.start,
-          end: phase.end,
-          assigneeUserIdsJson: json(phase.assigneeUserIds),
-          assigneeAgentIdsJson: json(phase.assigneeAgentIds),
-          tasksJson: json(phase.tasks),
+          ...phaseToInstantUpdate(phase),
           sortOrder,
         })
         .link({ plan: plan.id }),
@@ -208,6 +207,143 @@ export function createPhaseInPlan(plan: Plan, overrides?: Partial<Phase>): Phase
   }
 
   return phase
+}
+
+export interface CreatePlanInput {
+  name: string
+  description?: string
+  start?: string
+  end?: string
+  ownerUserId?: string
+  location?: string
+}
+
+function defaultPlanSpan(): { start: string; end: string } {
+  const start = startOfDay(new Date())
+  const end = addDays(start, 90)
+  return {
+    start: format(start, 'yyyy-MM-dd'),
+    end: format(end, 'yyyy-MM-dd'),
+  }
+}
+
+function phaseDatesFromTemplate(
+  planStart: string,
+  startOffsetDays: number,
+  durationDays: number,
+): { start: string; end: string } {
+  const base = startOfDay(new Date(`${planStart}T12:00:00`))
+  const start = addDays(base, startOffsetDays)
+  const end = addDays(start, Math.max(durationDays - 1, 0))
+  return coerceOrderedPhaseDates(format(start, 'yyyy-MM-dd'), format(end, 'yyyy-MM-dd'))
+}
+
+/** Build plan + template phases in memory (no Instant write). */
+export function buildPlanFromTemplate(
+  planType: PlanType,
+  input: CreatePlanInput,
+): { plan: Plan; phases: Phase[] } {
+  const recipe = PLAN_TEMPLATE_RECIPES[planType]
+  const span = defaultPlanSpan()
+  const start = input.start ?? span.start
+  const end = input.end ?? span.end
+  const ordered = coerceOrderedPhaseDates(start, end)
+  const planId = crypto.randomUUID()
+  const ownerUserId = input.ownerUserId ?? CURRENT_USER_ID
+
+  const plan: Plan = {
+    id: planId,
+    name: input.name.trim() || recipe.label,
+    description: input.description?.trim() ?? recipe.description,
+    phaseIds: [],
+    status: 'healthy',
+    ownerUserId,
+    start: ordered.start,
+    end: ordered.end,
+    planType,
+    ...(input.location?.trim() ? { location: input.location.trim() } : {}),
+  }
+
+  const phases: Phase[] = recipe.defaultPhases.map((seed) => {
+    const id = crypto.randomUUID()
+    const { start: phStart, end: phEnd } = phaseDatesFromTemplate(
+      ordered.start,
+      seed.startOffsetDays,
+      seed.durationDays,
+    )
+    const status = seed.status ?? (seed.startOffsetDays === 0 ? 'todo' : 'backlog')
+    return {
+      id,
+      planId,
+      title: seed.title,
+      description: '',
+      status,
+      statusIsManual: true,
+      priority: 'medium',
+      phaseKind: seed.phaseKind,
+      section: seed.section,
+      start: phStart,
+      end: phEnd,
+      assigneeUserIds: [],
+      assigneeAgentIds: [],
+      tasks: [],
+    }
+  })
+
+  plan.phaseIds = phases.map((p) => p.id)
+
+  return { plan, phases }
+}
+
+/** Persist a newly built plan to Instant (call after optimistic overlay). */
+export function transactPlanFromTemplate(
+  workspaceId: string,
+  plan: Plan,
+  phases: Phase[],
+): void {
+  if (!hasInstantConfig) return
+
+  const planRow: Record<string, unknown> = {
+    name: plan.name,
+    description: plan.description,
+    status: plan.status,
+    ownerUserId: plan.ownerUserId,
+    start: plan.start,
+    end: plan.end,
+  }
+  if (plan.planType) planRow.planType = plan.planType
+  if (plan.location) planRow.location = plan.location
+
+  const ops: unknown[] = [
+    db.tx.plans[plan.id].update(planRow).link({ workspace: workspaceId }),
+  ]
+
+  phases.forEach((phase, sortOrder) => {
+    ops.push(
+      db.tx.phases[phase.id]
+        .update({
+          ...phaseToInstantUpdate(phase),
+          sortOrder,
+        })
+        .link({ plan: plan.id }),
+    )
+  })
+
+  ops.push(
+    appendActivity({
+      timestamp: new Date().toISOString(),
+      actorId: CURRENT_USER_ID,
+      actorIsAgent: false,
+      verb: 'created',
+      objectType: 'plan',
+      objectId: plan.id,
+      objectLabel: plan.name,
+      planId: plan.id,
+      payload: { planType: plan.planType },
+    }),
+  )
+
+  transact(...ops)
 }
 
 export function addPlanNote(planId: string, planName: string, body: string) {
@@ -283,6 +419,9 @@ export function patchPlanOverview(planId: string, patch: PlanOverviewPatch) {
   }
   if ('budgetCurrency' in patch) {
     planPatch.budgetCurrency = patch.budgetCurrency ?? undefined
+  }
+  if (patch.planType !== undefined) {
+    planPatch.planType = patch.planType
   }
 
   transact(db.tx.plans[planId].update(planPatch))

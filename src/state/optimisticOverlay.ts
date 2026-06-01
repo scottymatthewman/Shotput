@@ -4,18 +4,38 @@ import { immer } from 'zustand/middleware/immer'
 
 export type { PlanOverviewPatch }
 
+export interface AddedPlanBundle {
+  plan: Plan
+  phases: Phase[]
+  addedAt: number
+}
+
 export interface OptimisticOverlayState {
   phasePatches: Record<string, Partial<Phase>>
   planPatches: Record<string, PlanOverviewPatch>
   removedPhaseIds: string[]
+  removedPlanIds: string[]
   addedPhases: Record<string, Phase>
+  addedPlans: Record<string, AddedPlanBundle>
   patchPhase: (phaseId: string, patch: Partial<Phase>) => void
   addPhaseToPlan: (phase: Phase) => void
+  addPlanWithPhases: (plan: Plan, phases: Phase[]) => void
   removePhase: (phaseId: string) => void
+  removePlan: (planId: string, phaseIds: string[]) => void
   patchPlan: (planId: string, patch: PlanOverviewPatch) => void
   clear: () => void
   pruneAgainst: (workspace: Workspace) => void
 }
+
+type OverlaySlice = Pick<
+  OptimisticOverlayState,
+  | 'phasePatches'
+  | 'planPatches'
+  | 'removedPhaseIds'
+  | 'removedPlanIds'
+  | 'addedPhases'
+  | 'addedPlans'
+>
 
 function phasePatchSatisfied(phase: Phase, patch: Partial<Phase>): boolean {
   for (const [key, value] of Object.entries(patch)) {
@@ -49,7 +69,9 @@ export const useOptimisticOverlay = create<OptimisticOverlayState>()(
     phasePatches: {},
     planPatches: {},
     removedPhaseIds: [],
+    removedPlanIds: [],
     addedPhases: {},
+    addedPlans: {},
 
     patchPhase: (phaseId, patch) => {
       set((state) => {
@@ -71,6 +93,16 @@ export const useOptimisticOverlay = create<OptimisticOverlayState>()(
       })
     },
 
+    addPlanWithPhases: (plan, phases) => {
+      set((state) => {
+        state.addedPlans[plan.id] = { plan, phases, addedAt: Date.now() }
+        for (const phase of phases) {
+          state.addedPhases[phase.id] = phase
+          delete state.phasePatches[phase.id]
+        }
+      })
+    },
+
     removePhase: (phaseId) => {
       set((state) => {
         if (!state.removedPhaseIds.includes(phaseId)) {
@@ -78,6 +110,23 @@ export const useOptimisticOverlay = create<OptimisticOverlayState>()(
         }
         delete state.addedPhases[phaseId]
         delete state.phasePatches[phaseId]
+      })
+    },
+
+    removePlan: (planId, phaseIds) => {
+      set((state) => {
+        if (!state.removedPlanIds.includes(planId)) {
+          state.removedPlanIds.push(planId)
+        }
+        delete state.addedPlans[planId]
+        delete state.planPatches[planId]
+        for (const phaseId of phaseIds) {
+          if (!state.removedPhaseIds.includes(phaseId)) {
+            state.removedPhaseIds.push(phaseId)
+          }
+          delete state.addedPhases[phaseId]
+          delete state.phasePatches[phaseId]
+        }
       })
     },
 
@@ -92,7 +141,9 @@ export const useOptimisticOverlay = create<OptimisticOverlayState>()(
         phasePatches: {},
         planPatches: {},
         removedPhaseIds: [],
+        removedPlanIds: [],
         addedPhases: {},
+        addedPlans: {},
       })
     },
 
@@ -104,9 +155,25 @@ export const useOptimisticOverlay = create<OptimisticOverlayState>()(
           }
         }
 
+        for (const planId of [...state.removedPlanIds]) {
+          if (!workspace.plans[planId]) {
+            state.removedPlanIds = state.removedPlanIds.filter((x) => x !== planId)
+          }
+        }
+
         for (const id of Object.keys(state.addedPhases)) {
           if (workspace.phases[id]) {
             delete state.addedPhases[id]
+          }
+        }
+
+        const now = Date.now()
+        for (const planId of Object.keys(state.addedPlans)) {
+          const bundle = state.addedPlans[planId]
+          if (!bundle) continue
+          // Keep optimistic plan visible until Instant has echoed it for a beat.
+          if (workspace.plans[planId] && now - bundle.addedAt > 2_000) {
+            delete state.addedPlans[planId]
           }
         }
 
@@ -128,14 +195,49 @@ export const useOptimisticOverlay = create<OptimisticOverlayState>()(
   })),
 )
 
+function applyRemovedPlans(merged: Workspace, removedPlanIds: string[]) {
+  for (const planId of removedPlanIds) {
+    const plan = merged.plans[planId]
+    if (!plan) continue
+    for (const phaseId of plan.phaseIds) {
+      delete merged.phases[phaseId]
+    }
+    delete merged.plans[planId]
+  }
+  for (const [phaseId, phase] of Object.entries(merged.phases)) {
+    if (removedPlanIds.includes(phase.planId)) {
+      delete merged.phases[phaseId]
+    }
+  }
+}
+
 export function mergeWorkspaceWithOverlay(
   workspace: Workspace,
-  overlay: Pick<
-    OptimisticOverlayState,
-    'phasePatches' | 'planPatches' | 'removedPhaseIds' | 'addedPhases'
-  >,
+  overlay: OverlaySlice,
 ): Workspace {
   const merged = structuredClone(workspace)
+
+  for (const { plan, phases } of Object.values(overlay.addedPlans)) {
+    if (overlay.removedPlanIds.includes(plan.id)) continue
+    const planPatch = overlay.planPatches[plan.id]
+    const mergedPlan: Plan = { ...plan }
+    if (planPatch) {
+      const patch = { ...planPatch }
+      if ('externalRecord' in patch && patch.externalRecord === null) delete patch.externalRecord
+      if ('budgetCents' in patch && patch.budgetCents == null) delete patch.budgetCents
+      if ('budgetCurrency' in patch && patch.budgetCurrency == null) delete patch.budgetCurrency
+      Object.assign(mergedPlan, patch)
+    }
+    merged.plans[plan.id] = mergedPlan
+    for (const phase of phases) {
+      const patch = overlay.phasePatches[phase.id]
+      merged.phases[phase.id] = patch ? applyPhasePatch(phase, patch) : phase
+    }
+    const phaseIds = phases.map((p) => p.id)
+    merged.plans[plan.id]!.phaseIds = [
+      ...new Set([...merged.plans[plan.id]!.phaseIds, ...phaseIds]),
+    ]
+  }
 
   for (const [id, patch] of Object.entries(overlay.phasePatches)) {
     const phase = merged.phases[id]
@@ -155,6 +257,7 @@ export function mergeWorkspaceWithOverlay(
   }
 
   for (const phase of Object.values(overlay.addedPhases)) {
+    if (overlay.removedPlanIds.includes(phase.planId)) continue
     const patch = overlay.phasePatches[phase.id]
     merged.phases[phase.id] = patch ? applyPhasePatch(phase, patch) : phase
     const plan = merged.plans[phase.planId]
@@ -164,6 +267,7 @@ export function mergeWorkspaceWithOverlay(
   }
 
   for (const [planId, patch] of Object.entries(overlay.planPatches)) {
+    if (overlay.removedPlanIds.includes(planId)) continue
     const plan = merged.plans[planId]
     if (!plan) continue
     Object.assign(plan, patch)
@@ -172,15 +276,14 @@ export function mergeWorkspaceWithOverlay(
     if ('externalRecord' in patch && patch.externalRecord == null) delete plan.externalRecord
   }
 
+  applyRemovedPlans(merged, overlay.removedPlanIds)
+
   return merged
 }
 
 export function getOverlayPhase(
   workspace: Workspace,
-  overlay: Pick<
-    OptimisticOverlayState,
-    'phasePatches' | 'planPatches' | 'removedPhaseIds' | 'addedPhases'
-  >,
+  overlay: OverlaySlice,
   phaseId: string,
 ): Phase | undefined {
   if (overlay.removedPhaseIds.includes(phaseId)) return undefined
@@ -191,6 +294,7 @@ export function getOverlayPhase(
   }
   const base = workspace.phases[phaseId]
   if (!base) return undefined
+  if (overlay.removedPlanIds.includes(base.planId)) return undefined
   const patch = overlay.phasePatches[phaseId]
   return patch ? applyPhasePatch(base, patch) : base
 }

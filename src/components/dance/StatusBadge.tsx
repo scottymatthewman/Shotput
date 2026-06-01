@@ -5,6 +5,7 @@ import type { PhaseStatus, PlanStatus } from '@/types/domain'
 import { cn } from '@/lib/utils'
 
 const phaseStatusIconClass: Record<PhaseStatus, string> = {
+  backlog: 'text-status-todo',
   todo: 'text-status-todo',
   in_progress: 'text-status-progress',
   in_review: 'text-status-review',
@@ -14,6 +15,7 @@ const phaseStatusIconClass: Record<PhaseStatus, string> = {
 
 function isPhaseStatus(status: string): status is PhaseStatus {
   return (
+    status === 'backlog' ||
     status === 'todo' ||
     status === 'in_progress' ||
     status === 'in_review' ||

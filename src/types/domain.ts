@@ -1,5 +1,66 @@
 /** Workflow status for a phase (Gantt bar). */
-export type PhaseStatus = 'todo' | 'in_progress' | 'in_review' | 'blocked' | 'done'
+export type PhaseStatus =
+  | 'backlog'
+  | 'todo'
+  | 'in_progress'
+  | 'in_review'
+  | 'blocked'
+  | 'done'
+
+/** Program archetype — drives default phases and property UI emphasis. */
+export type PlanType =
+  | 'trade_show_booth'
+  | 'trade_show_meetings'
+  | 'company_offsite'
+  | 'customer_happy_hour'
+  | 'sponsor_event'
+  | 'speaker_event'
+
+/** Functional category of work on a phase (distinct from Gantt `section` swimlane). */
+export type PhaseKind =
+  | 'outreach'
+  | 'design'
+  | 'logistics'
+  | 'activation'
+  | 'procurement'
+  | 'custom'
+
+export type PhasePropertyGroup = 'procurement' | 'logistics' | 'counterparty' | 'audience'
+
+export type PhasePaymentStatus =
+  | 'none'
+  | 'invoice_received'
+  | 'deposit_paid'
+  | 'cleared'
+
+export interface PhaseProcurementProperties {
+  paymentStatus?: PhasePaymentStatus
+}
+
+export interface PhaseLogisticsProperties {
+  locationOrVenue?: string
+  trackingNumbers?: string[]
+}
+
+export interface PhaseCounterpartyProperties {
+  vendorName?: string
+  pointOfContact?: string
+  associatedEmails?: string[]
+}
+
+export interface PhaseAudienceProperties {
+  targetCount?: number
+  currentRsvpCount?: number
+  leadGoal?: number
+}
+
+/** Optional metadata groups stored as JSON on the phase entity. */
+export interface PhaseProperties {
+  procurement?: PhaseProcurementProperties
+  logistics?: PhaseLogisticsProperties
+  counterparty?: PhaseCounterpartyProperties
+  audience?: PhaseAudienceProperties
+}
 
 /** Health of a plan timeline. */
 export type PlanStatus = 'healthy' | 'at_risk' | 'paused'
@@ -37,12 +98,18 @@ export interface Phase {
    */
   statusIsManual?: boolean
   priority: 'low' | 'medium' | 'high' | 'urgent'
+  phaseKind?: PhaseKind
   section: string
   start: string
   end: string
+  /** Real-world immovable deadline (ISO date), separate from Gantt bar end. */
+  hardStop?: string
+  /** Phase IDs that must complete before this phase can start. */
+  dependencyIds?: string[]
   assigneeUserIds: string[]
   assigneeAgentIds: string[]
   tasks: Task[]
+  properties?: PhaseProperties
   /** Planned budget allocation for this phase (cents). */
   budgetAllocatedCents?: number
   /** Actual spend to date for this phase (cents). */
@@ -79,6 +146,8 @@ export interface Plan {
   budgetCents?: number
   /** ISO 4217 currency code; defaults to USD when omitted. */
   budgetCurrency?: string
+  /** Event program template (trade show, offsite, etc.). */
+  planType?: PlanType
 }
 
 export interface PlanOverviewPatch {
@@ -92,6 +161,7 @@ export interface PlanOverviewPatch {
   teamMemberUserIds?: string[]
   budgetCents?: number | null
   budgetCurrency?: string | null
+  planType?: PlanType
 }
 
 export interface Workspace {

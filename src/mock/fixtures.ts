@@ -57,6 +57,7 @@ const plans: Plan[] = [
     },
     budgetCents: 50_000_00,
     budgetCurrency: 'USD',
+    planType: 'trade_show_booth',
   },
   {
     id: 'p2',
@@ -75,6 +76,7 @@ const plans: Plan[] = [
     },
     budgetCents: 25_000_00,
     budgetCurrency: 'USD',
+    planType: 'customer_happy_hour',
   },
 ]
 

@@ -1,18 +1,13 @@
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+  BloomDropdown,
+  BloomDropdownMenuLabel,
+  BloomDropdownRadioRow,
+} from '@/components/ui/bloom-menu'
 import { armTimelineRowClickSuppression } from '@/components/dance/phaseStatusMenu'
 import { PriorityIcon } from '@/components/dance/PriorityIcon'
 import { PHASE_PRIORITY_ORDER, phasePriorityLabel } from '@/lib/phasePriority'
-import { cn } from '@/lib/utils'
 import { usePlansStore } from '@/state/store'
 import type { Phase } from '@/types/domain'
-import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
-import { Check } from 'lucide-react'
 import { cloneElement, isValidElement, useCallback, useEffect, useState, type ReactElement } from 'react'
 
 export { PriorityIcon }
@@ -79,47 +74,29 @@ export function PhasePriorityDropdown({
   }, [open, phaseId, updatePhaseDetails])
 
   return (
-    <DropdownMenu open={open} onOpenChange={handleOpenChange}>
-      <DropdownMenuTrigger asChild>
-        {triggerWithRowAction(stopParentRowNavigate, children)}
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="start"
-        sideOffset={4}
-        className="min-w-[12rem] border-0 shadow-md"
-        onCloseAutoFocus={(e) => e.preventDefault()}
-      >
-        <DropdownMenuLabel className="font-normal text-muted-foreground">Priority</DropdownMenuLabel>
-        <DropdownMenuRadioGroup
-          value={currentPriority}
-          onValueChange={(v) => {
-            updatePhaseDetails(phaseId, { priority: v as Phase['priority'] })
+    <BloomDropdown
+      open={open}
+      onOpenChange={handleOpenChange}
+      menuWidth={192}
+      trigger={triggerWithRowAction(stopParentRowNavigate, children)}
+    >
+      <BloomDropdownMenuLabel>Priority</BloomDropdownMenuLabel>
+      {PHASE_PRIORITY_ORDER.map((p, i) => (
+        <BloomDropdownRadioRow
+          key={p}
+          selected={currentPriority === p}
+          shortcut={String(i + 1)}
+          onSelect={() => {
+            updatePhaseDetails(phaseId, { priority: p })
             armTimelineRowClickSuppression()
           }}
         >
-          {PHASE_PRIORITY_ORDER.map((p, i) => (
-            <DropdownMenuPrimitive.RadioItem
-              key={p}
-              value={p}
-              className={cn(
-                'relative flex cursor-default select-none items-center gap-2 rounded-[var(--radius-nested-md-p1)] py-1.5 pl-2 pr-2 text-sm outline-none transition-surface duration-150',
-                'focus:bg-accent/40 data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-              )}
-            >
-              <span className="w-6 shrink-0 text-center text-xs font-medium tabular-nums text-muted-foreground">
-                {i + 1}
-              </span>
-              <PriorityIcon priority={p} />
-              <span className="min-w-0 flex-1">{phasePriorityLabel(p)}</span>
-              <span className="flex size-4 shrink-0 items-center justify-center" aria-hidden>
-                <DropdownMenuPrimitive.ItemIndicator>
-                  <Check className="size-3.5 text-primary" strokeWidth={2.5} />
-                </DropdownMenuPrimitive.ItemIndicator>
-              </span>
-            </DropdownMenuPrimitive.RadioItem>
-          ))}
-        </DropdownMenuRadioGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          <span className="flex min-w-0 items-center gap-2">
+            <PriorityIcon priority={p} />
+            {phasePriorityLabel(p)}
+          </span>
+        </BloomDropdownRadioRow>
+      ))}
+    </BloomDropdown>
   )
 }

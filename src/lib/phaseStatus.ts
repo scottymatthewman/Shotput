@@ -4,6 +4,7 @@ import type { Phase, PhaseStatus, Workspace } from '@/types/domain'
 /** Coerce persisted / partial phases so UI maps never see `undefined` or garbage strings. */
 export function normalizePhaseStatus(raw: unknown): PhaseStatus {
   if (
+    raw === 'backlog' ||
     raw === 'todo' ||
     raw === 'in_progress' ||
     raw === 'in_review' ||
@@ -42,7 +43,12 @@ export function isPhaseStatusManual(phase: Phase): boolean {
  */
 export function getEffectivePhaseStatus(phase: Phase, now: Date = new Date()): PhaseStatus {
   const stored = normalizePhaseStatus(phase.status)
-  if (stored === 'done' || stored === 'in_progress' || stored === 'in_review') {
+  if (
+    stored === 'backlog' ||
+    stored === 'done' ||
+    stored === 'in_progress' ||
+    stored === 'in_review'
+  ) {
     return stored
   }
   if (isPhaseStatusManual(phase)) {

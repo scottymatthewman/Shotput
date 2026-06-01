@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils'
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 
 export function PageShell({
   children,
@@ -14,12 +14,14 @@ export function PageShell({
 export function PageScrollArea({
   children,
   className,
+  style,
 }: {
   children: ReactNode
   className?: string
+  style?: CSSProperties
 }) {
   return (
-    <div className={cn('min-h-0 flex-1 overflow-auto p-4', className)}>
+    <div className={cn('min-h-0 flex-1 overflow-auto p-4', className)} style={style}>
       {children}
     </div>
   )

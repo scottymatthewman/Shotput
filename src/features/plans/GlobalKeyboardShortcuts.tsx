@@ -286,7 +286,8 @@ export function GlobalKeyboardShortcuts() {
           const focusId = state.focusedPhaseId ?? state.hoveredPhaseId
           if (focusId) {
             e.preventDefault()
-            state.openPhaseModal(timelineRoute.planId, focusId)
+            state.setSelectedPhaseId(focusId)
+            navigate(phaseDetailPath(timelineRoute.planId, focusId))
           }
           return
         }

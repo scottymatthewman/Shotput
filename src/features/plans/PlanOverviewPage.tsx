@@ -22,11 +22,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+  BloomDropdown,
+  BloomDropdownItem,
+} from '@/components/ui/bloom-menu'
 import {
   Dialog,
   DialogContent,
@@ -43,9 +41,10 @@ import {
   formatBudgetCentsCompact,
   planBudgetCurrency,
 } from '@/lib/budget'
+import { PLAN_TEMPLATE_RECIPES, PLAN_TYPES } from '@/config/planTemplates'
 import { cn } from '@/lib/utils'
 import { usePlansStore } from '@/state/store'
-import type { Plan, User, Workspace } from '@/types/domain'
+import type { Plan, PlanType, User, Workspace } from '@/types/domain'
 import { ArrowLeftRight, ChevronLeft, Plus, Share2, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
@@ -476,6 +475,29 @@ export function PlanOverviewPage() {
             </div>
 
             <div className={overviewMetricSectionShell}>
+              <OverviewRow label="Program">
+                <select
+                  aria-label="Program type"
+                  className={cn(
+                    inkLocation,
+                    'h-8 w-full min-w-0 cursor-pointer rounded-sm bg-transparent py-0',
+                  )}
+                  value={plan.planType ?? ''}
+                  onChange={(e) => {
+                    const v = e.target.value as PlanType | ''
+                    patchPlanOverview(planId!, {
+                      planType: v ? v : undefined,
+                    })
+                  }}
+                >
+                  <option value="">Not set</option>
+                  {PLAN_TYPES.map((t) => (
+                    <option key={t} value={t}>
+                      {PLAN_TEMPLATE_RECIPES[t].label}
+                    </option>
+                  ))}
+                </select>
+              </OverviewRow>
               <OverviewRow label="Location">
                 <Input
                   value={locationDraft}
@@ -493,8 +515,10 @@ export function PlanOverviewPage() {
                 <span className="text-sm text-muted-foreground">Team Members</span>
                 <div className="flex shrink-0 items-center">
                   {addableMembers.length > 0 ? (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
+                    <BloomDropdown
+                      placement={{ direction: 'bottom', anchor: 'end' }}
+                      menuWidth={220}
+                      trigger={
                         <button
                           type="button"
                           className={overviewIconButtonClass}
@@ -502,18 +526,20 @@ export function PlanOverviewPage() {
                         >
                           <Plus className="mx-auto size-4" aria-hidden />
                         </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent
-                        align="end"
-                        className="max-h-[min(16rem,var(--radix-dropdown-menu-content-available-height))]"
-                      >
+                      }
+                    >
+                      <div className="max-h-64 overflow-y-auto">
                         {addableMembers.map((u) => (
-                          <DropdownMenuItem key={u.id} className="text-sm" onSelect={() => onAddMember(u.id)}>
+                          <BloomDropdownItem
+                            key={u.id}
+                            className="text-sm"
+                            onSelect={() => onAddMember(u.id)}
+                          >
                             {u.name}
-                          </DropdownMenuItem>
+                          </BloomDropdownItem>
                         ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                      </div>
+                    </BloomDropdown>
                   ) : null}
                 </div>
               </div>

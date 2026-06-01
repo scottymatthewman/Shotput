@@ -3,6 +3,7 @@ import { getEffectivePhaseStatus } from '@/lib/phaseStatus'
 import type { Phase, PhaseStatus, Workspace } from '@/types/domain'
 
 export const PHASE_STATUS_TABLE_SORT_RANK: Record<PhaseStatus, number> = {
+  backlog: 0,
   todo: 1,
   in_progress: 2,
   in_review: 3,

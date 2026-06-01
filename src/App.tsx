@@ -1,5 +1,6 @@
 import { AppBootSkeleton } from '@/components/AppBootSkeleton'
 import { AgentationDevTools } from '@/components/dev/AgentationDevTools'
+import { DialKitDevTools } from '@/components/dev/DialKitDevTools'
 import { AppShell } from '@/layouts/AppShell'
 import { Suspense, lazy, type ReactNode } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useParams } from 'react-router-dom'
@@ -18,6 +19,9 @@ const PhaseDetailPage = lazy(() =>
 )
 const SettingsPage = lazy(() =>
   import('@/features/settings/SettingsPage').then((m) => ({ default: m.SettingsPage })),
+)
+const InboxPage = lazy(() =>
+  import('@/features/inbox/InboxPage').then((m) => ({ default: m.InboxPage })),
 )
 
 function LegacyProjectToPlanRedirect() {
@@ -64,6 +68,14 @@ export default function App() {
         <Routes>
           <Route element={<AppShell />}>
             <Route path="/" element={<Navigate to="/plans" replace />} />
+            <Route
+              path="/inbox"
+              element={
+                <LazyPage>
+                  <InboxPage />
+                </LazyPage>
+              }
+            />
             <Route
               path="/plans"
               element={
@@ -121,7 +133,12 @@ export default function App() {
           <Route path="*" element={<Navigate to="/plans" replace />} />
         </Routes>
       </BrowserRouter>
-      {import.meta.env.DEV ? <AgentationDevTools /> : null}
+      {import.meta.env.DEV ? (
+        <>
+          <AgentationDevTools />
+          <DialKitDevTools />
+        </>
+      ) : null}
     </div>
   )
 }

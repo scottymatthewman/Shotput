@@ -41,9 +41,7 @@ export type TimelineViewMode = 'gantt' | 'table'
 
 export type PhaseQuickDialogKind = 'priority' | 'assignee' | 'assigneeOwner' | 'delete'
 
-export type PhaseModalState =
-  | { planId: string; mode: 'create' }
-  | { planId: string; phaseId: string; mode: 'edit'; autoFocusTitle?: boolean }
+export type PhaseModalState = { planId: string; mode: 'create' }
 
 export type ThemeMode = 'light' | 'dark'
 
@@ -77,12 +75,12 @@ export interface UiStore {
   setSelectedPhaseId: (id: string | null) => void
   phaseModal: PhaseModalState | null
   openNewPhaseModal: (planId: string) => void
-  openPhaseModal: (
-    planId: string,
-    phaseId: string,
-    options?: { autoFocusTitle?: boolean },
-  ) => void
   closePhaseModal: () => void
+  newPlanDialogOpen: boolean
+  setNewPlanDialogOpen: (open: boolean) => void
+  /** Pins a plan to the top of the Plans index grid after create. */
+  lastCreatedPlanId: string | null
+  setLastCreatedPlanId: (id: string | null) => void
   undoStack: UndoFrame[]
   redoStack: UndoFrame[]
   pushUndoFrame: (frame: UndoFrame) => void
@@ -138,25 +136,11 @@ export const useUiStore = create<UiStore>()(
         set({
           phaseModal: { planId, mode: 'create' },
         }),
-      openPhaseModal: (planId, phaseId, options) =>
-        set({
-          phaseModal: {
-            planId,
-            phaseId,
-            mode: 'edit',
-            autoFocusTitle: options?.autoFocusTitle,
-          },
-          selectedPhaseId: phaseId,
-        }),
-      closePhaseModal: () =>
-        set((s) => ({
-          phaseModal: null,
-          selectedPhaseId:
-            s.phaseModal?.mode === 'edit' &&
-            s.selectedPhaseId === s.phaseModal.phaseId
-              ? null
-              : s.selectedPhaseId,
-        })),
+      closePhaseModal: () => set({ phaseModal: null }),
+      newPlanDialogOpen: false,
+      setNewPlanDialogOpen: (open) => set({ newPlanDialogOpen: open }),
+      lastCreatedPlanId: null,
+      setLastCreatedPlanId: (id) => set({ lastCreatedPlanId: id }),
       undoStack: [],
       redoStack: [],
       pushUndoFrame: (frame) =>

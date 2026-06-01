@@ -32,7 +32,14 @@ export type NewPhaseDraft = Pick<
   | 'assigneeAgentIds'
 >
 
-const STATUSES: PhaseStatus[] = ['todo', 'in_progress', 'in_review', 'blocked', 'done']
+const STATUSES: PhaseStatus[] = [
+  'backlog',
+  'todo',
+  'in_progress',
+  'in_review',
+  'blocked',
+  'done',
+]
 
 const fieldSelectClass =
   'min-w-0 flex-1 cursor-pointer appearance-none rounded-sm border-0 bg-surface-3 py-1.5 pl-2 pr-8 text-sm text-foreground outline-none transition-surface duration-150 ease-hover focus-visible:outline-none focus-visible:ring-0'

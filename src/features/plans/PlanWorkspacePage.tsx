@@ -1,7 +1,8 @@
 import { PlanBudgetTracker } from '@/features/plans/PlanBudgetTracker'
 import { PageHeader } from '@/layouts/PageHeader'
 import { PageShell } from '@/layouts/PageShell'
-import { PhaseDetailModal } from '@/features/plans/PhaseDetailModal'
+import { NewPhaseModal } from '@/features/plans/NewPhaseModal'
+import { phaseDetailPath } from '@/lib/planRoute'
 import { PhaseQuickActionDialogs } from '@/features/plans/PhaseQuickActionDialogs'
 import { TimelineViewToggle } from '@/features/plans/TimelineViewToggle'
 import { GanttView } from '@/features/plans/gantt/GanttView'
@@ -37,7 +38,7 @@ export function PlanWorkspacePage() {
   const [tableSelectionCount, setTableSelectionCount] = useState(0)
   const selectedPhaseId = usePlansStore((s) => s.selectedPhaseId)
   const focusedPhaseId = usePlansStore((s) => s.focusedPhaseId)
-  const openPhaseModal = usePlansStore((s) => s.openPhaseModal)
+  const setSelectedPhaseId = usePlansStore((s) => s.setSelectedPhaseId)
   const openNewPhaseModal = usePlansStore((s) => s.openNewPhaseModal)
   const setHoveredPhaseId = usePlansStore((s) => s.setHoveredPhaseId)
   const setPhaseQuickDialog = usePlansStore((s) => s.setPhaseQuickDialog)
@@ -52,9 +53,9 @@ export function PlanWorkspacePage() {
 
   useEffect(() => {
     if (!phaseParam || !planId) return
-    openPhaseModal(planId, phaseParam)
-    navigate(`/plans/${planId}`, { replace: true })
-  }, [navigate, openPhaseModal, phaseParam, planId])
+    setSelectedPhaseId(phaseParam)
+    navigate(phaseDetailPath(planId, phaseParam), { replace: true })
+  }, [navigate, phaseParam, planId, setSelectedPhaseId])
 
   useEffect(() => {
     return () => {
@@ -70,9 +71,10 @@ export function PlanWorkspacePage() {
   const openPhase = useCallback(
     (id: string | null) => {
       if (!id || !planId) return
-      openPhaseModal(planId, id)
+      setSelectedPhaseId(id)
+      navigate(phaseDetailPath(planId, id))
     },
-    [openPhaseModal, planId],
+    [navigate, planId, setSelectedPhaseId],
   )
 
   if (!planId || !plan) {
@@ -157,7 +159,7 @@ export function PlanWorkspacePage() {
           <TimelineViewToggle value={viewMode} onChange={setViewMode} />
         </div>
       </footer>
-      <PhaseDetailModal />
+      <NewPhaseModal />
       <PhaseQuickActionDialogs planId={planId} />
     </PageShell>
   )

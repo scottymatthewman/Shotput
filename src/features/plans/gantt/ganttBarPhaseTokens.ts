@@ -24,6 +24,7 @@ export function ganttBarOuterRingClass(_status: PhaseStatus): string {
 
 /** @deprecated Use `GANTT_BAR_AVATAR_RING_CLASS`. */
 export const ganttBarStackRingByStatus: Record<PhaseStatus, string> = {
+  backlog: GANTT_BAR_AVATAR_RING_CLASS,
   todo: GANTT_BAR_AVATAR_RING_CLASS,
   in_progress: GANTT_BAR_AVATAR_RING_CLASS,
   in_review: GANTT_BAR_AVATAR_RING_CLASS,

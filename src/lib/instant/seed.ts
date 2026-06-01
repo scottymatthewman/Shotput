@@ -1,4 +1,5 @@
 import { createInitialWorkspace, initialActivityLog } from '@/mock/fixtures'
+import { phaseToInstantUpdate } from '@/lib/instant/phaseEntity'
 import type { ActivityEvent, Plan, Workspace } from '@/types/domain'
 import { db, hasInstantConfig } from '@/lib/instant/db'
 import { useLocalWorkspaceStore } from '@/state/localWorkspaceStore'
@@ -56,6 +57,7 @@ export function buildWorkspaceTransact(
           ...(p.industryEventId ? { industryEventId: p.industryEventId } : {}),
           ...(p.budgetCents != null ? { budgetCents: p.budgetCents } : {}),
           ...(p.budgetCurrency ? { budgetCurrency: p.budgetCurrency } : {}),
+          ...(p.planType ? { planType: p.planType } : {}),
         })
         .link({ workspace: workspace.id }),
     )
@@ -67,22 +69,8 @@ export function buildWorkspaceTransact(
     ops.push(
       tx.phases[ph.id]
         .update({
-          title: ph.title,
-          description: ph.description,
-          status: ph.status,
-          statusIsManual: ph.statusIsManual ?? true,
-          priority: ph.priority,
-          section: ph.section,
-          start: ph.start,
-          end: ph.end,
-          assigneeUserIdsJson: json(ph.assigneeUserIds),
-          assigneeAgentIdsJson: json(ph.assigneeAgentIds),
-          tasksJson: json(ph.tasks),
+          ...phaseToInstantUpdate(ph),
           sortOrder: order >= 0 ? order : 0,
-          ...(ph.budgetAllocatedCents != null
-            ? { budgetAllocatedCents: ph.budgetAllocatedCents }
-            : {}),
-          ...(ph.budgetActualCents != null ? { budgetActualCents: ph.budgetActualCents } : {}),
         })
         .link({ plan: ph.planId }),
     )

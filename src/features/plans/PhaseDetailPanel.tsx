@@ -5,15 +5,17 @@ import { PhaseStatusIcon } from '@/components/dance/StatusBadge'
 import { phaseStatusMenuLabel } from '@/components/dance/phaseStatusMenu'
 import { PhaseDatePickerField } from '@/features/plans/PhaseDatePickerField'
 import { ScheduleYearPickerField } from '@/features/plans/ScheduleYearPickerField'
+import { PhasePropertiesSection } from '@/features/plans/PhasePropertiesSection'
 import { PhaseStatusDropdown } from '@/features/plans/PhaseStatusDropdown'
 import {
   inkBody,
   inkDatePickers,
   inkTitle,
-  overviewMetricSectionShell,
+  overviewMetricCardBase,
   overviewSectionShell,
   OverviewRow,
 } from '@/features/plans/overviewPageLayout'
+import type { PhaseDetailLayoutDial } from '@/features/plans/usePhaseDetailDialKit'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -54,6 +56,8 @@ export type PhaseDetailPanelProps = {
   /** Focus title input when the panel opens (e.g. new phase). */
   autoFocusTitle?: boolean
   className?: string
+  /** Live layout tuning from DialKit (phase detail page). */
+  dialLayout?: PhaseDetailLayoutDial
 }
 
 export function PhaseDetailPanel({
@@ -61,11 +65,11 @@ export function PhaseDetailPanel({
   phaseId,
   autoFocusTitle = false,
   className,
+  dialLayout,
 }: PhaseDetailPanelProps) {
   const workspace = usePlansStore((s) => s.workspace)
   const updatePhaseDetails = usePlansStore((s) => s.updatePhaseDetails)
   const toggleChecklistTask = usePlansStore((s) => s.toggleChecklistTask)
-  const setPhaseQuickDialog = usePlansStore((s) => s.setPhaseQuickDialog)
   const activityLog = usePlansStore((s) => s.activityLog)
 
   const phase = workspace.phases[phaseId]
@@ -141,9 +145,39 @@ export function PhaseDetailPanel({
     return null
   }
 
+  const sectionShell = dialLayout
+    ? cn(
+        'flex flex-col rounded-lg inset-edge-ring inset-edge-ring-full inset-edge-soft bg-muted',
+      )
+    : overviewSectionShell
+  const sectionShellStyle = dialLayout
+    ? { gap: dialLayout.sectionCardGap, padding: dialLayout.sectionCardPadding }
+    : undefined
+  const metricSectionShell = dialLayout
+    ? cn(overviewMetricCardBase)
+    : cn(overviewMetricCardBase, 'py-3')
+  const metricSectionStyle = dialLayout
+    ? {
+        paddingTop: dialLayout.metricPaddingY,
+        paddingBottom: dialLayout.metricPaddingY,
+      }
+    : undefined
+  const rootStyle = dialLayout
+    ? {
+        gap: dialLayout.panelGap,
+        paddingLeft: dialLayout.panelPaddingX,
+        paddingRight: dialLayout.panelPaddingX,
+        paddingTop: dialLayout.panelPaddingTop,
+        paddingBottom: dialLayout.panelPaddingBottom,
+      }
+    : undefined
+
   return (
-    <div className={cn('flex flex-col gap-2 p-4 pb-8', className)}>
-      <div className={overviewSectionShell}>
+    <div
+      className={cn(!dialLayout && 'flex flex-col gap-2 p-4 pb-8', dialLayout && 'flex flex-col', className)}
+      style={rootStyle}
+    >
+      <div className={sectionShell} style={sectionShellStyle}>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
           <Input
             ref={titleRef}
@@ -201,7 +235,7 @@ export function PhaseDetailPanel({
         />
       </div>
 
-      <div className={overviewMetricSectionShell}>
+      <div className={metricSectionShell} style={metricSectionStyle}>
         <OverviewRow label="Status">
           <PhaseStatusDropdown phaseId={phaseId} currentStatus={storedStatus} modal={false}>
             <button
@@ -216,7 +250,7 @@ export function PhaseDetailPanel({
         </OverviewRow>
       </div>
 
-      <div className={overviewMetricSectionShell}>
+      <div className={metricSectionShell} style={metricSectionStyle}>
         <OverviewRow label="Schedule">
           <div className="flex min-w-0 items-center gap-2">
             <Checkbox
@@ -236,7 +270,7 @@ export function PhaseDetailPanel({
         </OverviewRow>
       </div>
 
-      <div className={overviewMetricSectionShell}>
+      <div className={metricSectionShell} style={metricSectionStyle}>
         <OverviewRow label="Priority">
           <PriorityIcon priority={livePhase.priority} tone="muted" />
           <select
@@ -258,7 +292,7 @@ export function PhaseDetailPanel({
         </OverviewRow>
       </div>
 
-      <div className={overviewMetricSectionShell}>
+      <div className={metricSectionShell} style={metricSectionStyle}>
         <OverviewRow label="Lead">
           {leadUser ? (
             <>
@@ -287,21 +321,21 @@ export function PhaseDetailPanel({
         </OverviewRow>
       </div>
 
-      <div className={overviewMetricSectionShell}>
+      <div className={metricSectionShell} style={metricSectionStyle}>
         <OverviewRow label="Members">
           <UserPlus className="size-4 shrink-0 text-muted-foreground" aria-hidden />
           <span className="text-sm text-muted-foreground">Add members</span>
         </OverviewRow>
       </div>
 
-      <div className={overviewMetricSectionShell}>
+      <div className={metricSectionShell} style={metricSectionStyle}>
         <OverviewRow label="Issues">
           <Layers2 className="size-4 shrink-0 text-muted-foreground" aria-hidden />
           <span className="text-sm tabular-nums">{livePhase.tasks.length}</span>
         </OverviewRow>
       </div>
 
-      <div className={cn(overviewMetricSectionShell, 'space-y-2')}>
+      <div className={cn(metricSectionShell, 'space-y-2')} style={metricSectionStyle}>
         <OverviewRow label="Allocated">
           <BudgetAmountField
             valueCents={livePhase.budgetAllocatedCents}
@@ -328,7 +362,7 @@ export function PhaseDetailPanel({
         </OverviewRow>
       </div>
 
-      <div className={overviewMetricSectionShell}>
+      <div className={metricSectionShell} style={metricSectionStyle}>
         <OverviewRow label="Start date">
           <PhaseDatePickerField
             value={livePhase.start}
@@ -341,7 +375,7 @@ export function PhaseDetailPanel({
         </OverviewRow>
       </div>
 
-      <div className={overviewMetricSectionShell}>
+      <div className={metricSectionShell} style={metricSectionStyle}>
         <OverviewRow label="End date">
           <PhaseDatePickerField
             value={livePhase.end}
@@ -354,28 +388,50 @@ export function PhaseDetailPanel({
         </OverviewRow>
       </div>
 
-      <div className={overviewMetricSectionShell}>
+      <div className={metricSectionShell} style={metricSectionStyle}>
+        <OverviewRow label="Hard stop">
+          <PhaseDatePickerField
+            value={livePhase.hardStop ?? ''}
+            ariaLabel="Hard stop date"
+            labelFormat="long"
+            leading={<CalendarPlus className="size-4 shrink-0 text-muted-foreground" aria-hidden />}
+            onChange={(v) =>
+              updatePhaseDetails(phaseId, { hardStop: v.trim() ? v : undefined })
+            }
+          />
+        </OverviewRow>
+      </div>
+
+      <PhasePropertiesSection
+        phaseId={phaseId}
+        planType={plan?.planType}
+        phase={livePhase}
+        sectionShell={metricSectionShell}
+        sectionShellStyle={metricSectionStyle}
+      />
+
+      <div className={metricSectionShell} style={metricSectionStyle}>
         <OverviewRow label="Teams">
           <Sparkles className="size-4 shrink-0 text-muted-foreground" aria-hidden />
           <span className="min-w-0 truncate text-sm">{teamAgent?.name ?? '—'}</span>
         </OverviewRow>
       </div>
 
-      <div className={overviewMetricSectionShell}>
+      <div className={metricSectionShell} style={metricSectionStyle}>
         <OverviewRow label="Slack">
           <MessageSquare className="size-4 shrink-0 text-muted-foreground" aria-hidden />
           <span className="text-sm text-muted-foreground">Slack channel</span>
         </OverviewRow>
       </div>
 
-      <div className={overviewMetricSectionShell}>
+      <div className={metricSectionShell} style={metricSectionStyle}>
         <OverviewRow label="Labels">
           <Tag className="size-4 shrink-0 text-muted-foreground" aria-hidden />
           <span className="text-sm text-muted-foreground">Add label</span>
         </OverviewRow>
       </div>
 
-      <div className={overviewSectionShell}>
+      <div className={sectionShell} style={sectionShellStyle}>
         <p className="text-sm font-medium text-foreground">Tasks</p>
         <ul className="space-y-1">
           {livePhase.tasks.map((st) => (
@@ -403,7 +459,7 @@ export function PhaseDetailPanel({
         </ul>
       </div>
 
-      <div className={overviewSectionShell}>
+      <div className={sectionShell} style={sectionShellStyle}>
         <p className="text-sm font-medium text-foreground">
           Activity
           <span className="font-normal text-muted-foreground"> · {plan.name}</span>
@@ -447,17 +503,6 @@ export function PhaseDetailPanel({
         </div>
       </div>
 
-      <div className="flex items-center justify-end gap-4 pt-2">
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="inset-edge-destructive-hover cursor-pointer text-muted-foreground transition-surface duration-150 ease-out hover:text-destructive"
-          onClick={() => setPhaseQuickDialog({ kind: 'delete', phaseId })}
-        >
-          Delete phase
-        </Button>
-      </div>
     </div>
   )
 }

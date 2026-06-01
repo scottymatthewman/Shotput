@@ -6,6 +6,7 @@ const UNKNOWN_PHASE_BADGE = {
 } as const
 
 const PHASE_BADGE_CLASS: Record<PhaseStatus, string> = {
+  backlog: 'phase-badge phase-badge-todo',
   todo: 'phase-badge phase-badge-todo',
   in_progress: 'phase-badge phase-badge-in-progress',
   in_review: 'phase-badge phase-badge-in-review',
@@ -14,6 +15,7 @@ const PHASE_BADGE_CLASS: Record<PhaseStatus, string> = {
 }
 
 const PHASE_BADGE_LABEL: Record<PhaseStatus, string> = {
+  backlog: 'Backlog',
   todo: 'Todo',
   in_progress: 'In progress',
   in_review: 'In review',

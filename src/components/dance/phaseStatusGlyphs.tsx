@@ -14,6 +14,7 @@ function themeStatusAssetSvg(raw: string): string {
 }
 
 const byStatusHtml: Record<PhaseStatus, string> = {
+  backlog: themeStatusAssetSvg(todoSvg),
   todo: themeStatusAssetSvg(todoSvg),
   in_progress: themeStatusAssetSvg(inProgressSvg),
   in_review: themeStatusAssetSvg(inReviewSvg),

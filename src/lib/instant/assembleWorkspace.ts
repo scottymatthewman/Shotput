@@ -15,6 +15,9 @@ import {
   DEFAULT_PLAN_NAV_COLOR,
   DEFAULT_PLAN_NAV_ICON_ID,
 } from '@/lib/planIconRegistry'
+import { normalizePlanType } from '@/lib/planType'
+import { parsePhaseProperties } from '@/lib/phaseProperties'
+import { normalizePhaseKind } from '@/lib/phaseKind'
 import { normalizePhaseStatus } from '@/lib/phaseStatus'
 
 export const workspaceQuery = {
@@ -48,6 +51,10 @@ function parseJson<T>(raw: string | undefined, fallback: T): T {
 }
 
 function mapPhase(p: InstantPhase, planId: string): Phase {
+  const phaseKind = normalizePhaseKind(p.phaseKind)
+  const properties = parsePhaseProperties(p.propertiesJson)
+  const dependencyIds = parseJson<string[]>(p.dependencyIdsJson, [])
+
   return {
     id: p.id,
     planId,
@@ -56,12 +63,16 @@ function mapPhase(p: InstantPhase, planId: string): Phase {
     status: normalizePhaseStatus(p.status),
     statusIsManual: p.statusIsManual,
     priority: p.priority as Phase['priority'],
+    ...(phaseKind ? { phaseKind } : {}),
     section: p.section,
     start: p.start,
     end: p.end,
+    ...(p.hardStop ? { hardStop: p.hardStop } : {}),
+    ...(dependencyIds.length ? { dependencyIds } : {}),
     assigneeUserIds: parseJson<string[]>(p.assigneeUserIdsJson, []),
     assigneeAgentIds: parseJson<string[]>(p.assigneeAgentIdsJson, []),
     tasks: parseJson<Task[]>(p.tasksJson, []),
+    ...(properties ? { properties } : {}),
     ...(p.budgetAllocatedCents != null ? { budgetAllocatedCents: p.budgetAllocatedCents } : {}),
     ...(p.budgetActualCents != null ? { budgetActualCents: p.budgetActualCents } : {}),
   }
@@ -127,6 +138,7 @@ export function assembleWorkspaceFromInstant(
       ...(p.industryEventId ? { industryEventId: p.industryEventId } : {}),
       ...(p.budgetCents != null ? { budgetCents: p.budgetCents } : {}),
       ...(p.budgetCurrency ? { budgetCurrency: p.budgetCurrency } : {}),
+      ...(normalizePlanType(p.planType) ? { planType: normalizePlanType(p.planType) } : {}),
     }
 
     planNavGlyph[p.id] = {
