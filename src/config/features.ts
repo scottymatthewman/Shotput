@@ -1,5 +1,5 @@
 export const features = {
-  home: false,
+  home: true,
   inbox: false,
   events: false,
   plans: true,

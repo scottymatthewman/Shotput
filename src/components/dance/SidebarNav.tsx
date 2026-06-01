@@ -39,18 +39,16 @@ function featureNavItem(
     end?: boolean
   },
 ) {
-  if (enabled) {
-    return (
-      <SidebarNavItem
-        variant="link"
-        to={props.to}
-        label={props.label}
-        icon={props.icon}
-        end={props.end}
-      />
-    )
-  }
-  return <SidebarNavItem variant="stub" label={props.label} icon={props.icon} />
+  if (!enabled) return null
+  return (
+    <SidebarNavItem
+      variant="link"
+      to={props.to}
+      label={props.label}
+      icon={props.icon}
+      end={props.end}
+    />
+  )
 }
 
 /** Primary nav column — workspace chrome lives in `ShellWorkspaceHeader`. */
