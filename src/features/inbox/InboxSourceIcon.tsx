@@ -1,4 +1,4 @@
-import type { InboxSource } from '@/features/inbox/inboxMockData'
+import type { InboxSource } from '@/features/inbox/inboxTypes'
 import { cn } from '@/lib/utils'
 
 function SlackIcon({ className }: { className?: string }) {

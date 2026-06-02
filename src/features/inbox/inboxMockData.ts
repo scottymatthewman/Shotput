@@ -1,89 +1,40 @@
-export type InboxSource = 'slack' | 'gmail' | 'generic'
+import type { InboxMessage } from '@/features/inbox/inboxTypes'
 
-export interface InboxMessage {
-  id: string
-  source: InboxSource
-  senderName: string
-  preview: string
-  body: string
+const PREVIEW =
+  'Message is here. they’re askign for a new thing and tagged you'
+
+const SOURCES: InboxMessage['source'][] = ['slack', 'slack', 'gmail', 'generic', 'gmail']
+
+function sourceUrl(source: InboxMessage['source'], index: number): string {
+  switch (source) {
+    case 'slack':
+      return `https://app.slack.com/client/T00000000/C00000000/p${index}`
+    case 'gmail':
+      return `https://mail.google.com/mail/u/0/#inbox/${index}`
+    default:
+      return '#'
+  }
 }
 
-export const INBOX_MOCK_MESSAGES: InboxMessage[] = [
-  {
-    id: '1',
-    source: 'slack',
+function buildMessage(index: number): InboxMessage {
+  const source = SOURCES[index % SOURCES.length]!
+  const day = String(Math.max(1, 28 - (index % 28))).padStart(2, '0')
+  return {
+    id: String(index + 1),
+    source,
     senderName: 'Firstname Lastname',
-    preview: 'Message is here. they’re askign for a new thing and tagged you',
-    body: 'Message is here. they’re askign for a new thing and tagged you',
-  },
-  {
-    id: '2',
-    source: 'slack',
-    senderName: 'Firstname Lastname',
-    preview: 'Message is here. they’re askign for a new thing and tagged you',
-    body: 'Message is here. they’re askign for a new thing and tagged you',
-  },
-  {
-    id: '3',
-    source: 'gmail',
-    senderName: 'Firstname Lastname',
-    preview: 'Message is here. they’re askign for a new thing and tagged you',
-    body: 'Message is here. they’re askign for a new thing and tagged you',
-  },
-  {
-    id: '4',
-    source: 'generic',
-    senderName: 'Firstname Lastname',
-    preview: 'Message is here. they’re askign for a new thing and tagged you',
-    body: 'Message is here. they’re askign for a new thing and tagged you',
-  },
-  {
-    id: '5',
-    source: 'gmail',
-    senderName: 'Firstname Lastname',
-    preview: 'Message is here. they’re askign for a new thing and tagged you',
-    body: 'Message is here. they’re askign for a new thing and tagged you',
-  },
-  {
-    id: '6',
-    source: 'gmail',
-    senderName: 'Firstname Lastname',
-    preview: 'Message is here. they’re askign for a new thing and tagged you',
-    body: 'Message is here. they’re askign for a new thing and tagged you',
-  },
-  {
-    id: '7',
-    source: 'generic',
-    senderName: 'Firstname Lastname',
-    preview: 'Message is here. they’re askign for a new thing and tagged you',
-    body: 'Message is here. they’re askign for a new thing and tagged you',
-  },
-  {
-    id: '8',
-    source: 'gmail',
-    senderName: 'Firstname Lastname',
-    preview: 'Message is here. they’re askign for a new thing and tagged you',
-    body: 'Message is here. they’re askign for a new thing and tagged you',
-  },
-  {
-    id: '9',
-    source: 'generic',
-    senderName: 'Firstname Lastname',
-    preview: 'Message is here. they’re askign for a new thing and tagged you',
-    body: 'Message is here. they’re askign for a new thing and tagged you',
-  },
-  {
-    id: '10',
-    source: 'gmail',
-    senderName: 'Firstname Lastname',
-    preview: 'Message is here. they’re askign for a new thing and tagged you',
-    body: 'Message is here. they’re askign for a new thing and tagged you',
-  },
-  {
-    id: '11',
-    source: 'gmail',
-    senderName: 'Firstname Lastname',
-    preview: 'Message is here. they’re askign for a new thing and tagged you',
-    body: 'Message is here. they’re askign for a new thing and tagged you',
-  },
-]
+    preview: PREVIEW,
+    body: PREVIEW,
+    receivedAt: `2026-05-${day}T${String(9 + (index % 10)).padStart(2, '0')}:00:00.000Z`,
+    read: index > 0,
+    archived: false,
+    resolved: index === 4,
+    sourceUrl: sourceUrl(source, index),
+    ...(index === 2 ? { linkedPlanId: undefined } : {}),
+  }
+}
+
+/** Seed list long enough to exercise pagination (25 per page). */
+export const INBOX_MOCK_MESSAGES: InboxMessage[] = Array.from({ length: 32 }, (_, i) =>
+  buildMessage(i),
+)
