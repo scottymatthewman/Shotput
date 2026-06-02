@@ -86,7 +86,7 @@ const bodyTd = tableCellBase
  * Column width locks that padding + checkbox + `pr-2` so `<col>` slack doesn’t grow this cell.
  *
  * Priority / status: fixed widths; Owner / dates fixed so they don’t scale with viewport %.
- * Task is the only unspecified `<col>` and absorbs leftover width.
+ * Task is the only unspecified `<col>` (second column) and absorbs leftover width.
  */
 const CHECKBOX_COL_PX = 48
 /** Priority / status column — ~125% of the prior 32px track for clearer icon hit targets. */
@@ -296,9 +296,9 @@ export function TimelineTableView({
           <caption className="sr-only">Tasks on this timeline</caption>
           <colgroup>
             <col style={checkboxColStyle} />
-            <col style={narrowIconColumnStyle} />
-            <col style={narrowIconColumnStyle} />
             <col />
+            <col style={narrowIconColumnStyle} />
+            <col style={narrowIconColumnStyle} />
             <col style={ownerColStyle} />
             <col style={dateColStyle} />
             <col style={dateColStyle} />
@@ -332,34 +332,32 @@ export function TimelineTableView({
                   />
                 </div>
               </th>
-              <th scope="col" className={narrowIconControlTh} style={narrowIconColumnStyle}>
-                <div className="flex h-full items-center justify-center">
-                  <button
-                    type="button"
-                    title="Priority"
-                    className={prioritySortHeaderButtonClass}
+              <th scope="col" className={cn(headTh, 'min-w-0')}>
+                <button
+                  type="button"
+                  className={sortHeaderButtonClass}
                   aria-sort={
-                    sort.mode === 'column' && sort.key === 'priority'
+                    sort.mode === 'column' && sort.key === 'task'
                       ? sort.dir === 'asc'
                         ? 'ascending'
                         : 'descending'
                       : undefined
                   }
                   aria-label={
-                    sort.mode === 'column' && sort.key === 'priority'
+                    sort.mode === 'column' && sort.key === 'task'
                       ? sort.dir === 'asc'
-                        ? 'Priority sorted urgent first through low. Click for low first through urgent.'
-                        : `Priority sorted low first through urgent. ${a11yClickRestoreTableBaseline}`
-                      : 'Sort by priority. Click for urgent through low, then reversed, then default order.'
+                        ? 'Tasks sorted A to Z. Click for Z to A.'
+                        : `Tasks sorted Z to A. ${a11yClickRestoreTableBaseline}`
+                      : 'Sort by task name. Click for A to Z, then Z to A, then default order.'
                   }
                   onClick={(e) => {
                     e.stopPropagation()
-                    toggleSort('priority')
+                    toggleSort('task')
                   }}
                 >
-                  <span className="sr-only">Priority</span>
-                  <span className="inline-flex size-4 items-center justify-center text-muted-foreground">
-                    {sort.mode === 'column' && sort.key === 'priority' ? (
+                  <span className="min-w-0 flex-1 truncate">Task</span>
+                  <span className="inline-flex size-4 shrink-0 items-center justify-center text-muted-foreground">
+                    {sort.mode === 'column' && sort.key === 'task' ? (
                       sort.dir === 'asc' ? (
                         <ChevronUp className="size-3.5" aria-hidden />
                       ) : (
@@ -370,7 +368,6 @@ export function TimelineTableView({
                     )}
                   </span>
                 </button>
-                </div>
               </th>
               <th scope="col" className={narrowIconControlTh} style={narrowIconColumnStyle}>
                 <div className="flex h-full items-center justify-center">
@@ -412,32 +409,34 @@ export function TimelineTableView({
                 </button>
                 </div>
               </th>
-              <th scope="col" className={cn(headTh, 'min-w-0')}>
-                <button
-                  type="button"
-                  className={sortHeaderButtonClass}
+              <th scope="col" className={narrowIconControlTh} style={narrowIconColumnStyle}>
+                <div className="flex h-full items-center justify-center">
+                  <button
+                    type="button"
+                    title="Priority"
+                    className={prioritySortHeaderButtonClass}
                   aria-sort={
-                    sort.mode === 'column' && sort.key === 'task'
+                    sort.mode === 'column' && sort.key === 'priority'
                       ? sort.dir === 'asc'
                         ? 'ascending'
                         : 'descending'
                       : undefined
                   }
                   aria-label={
-                    sort.mode === 'column' && sort.key === 'task'
+                    sort.mode === 'column' && sort.key === 'priority'
                       ? sort.dir === 'asc'
-                        ? 'Tasks sorted A to Z. Click for Z to A.'
-                        : `Tasks sorted Z to A. ${a11yClickRestoreTableBaseline}`
-                      : 'Sort by task name. Click for A to Z, then Z to A, then default order.'
+                        ? 'Priority sorted urgent first through low. Click for low first through urgent.'
+                        : `Priority sorted low first through urgent. ${a11yClickRestoreTableBaseline}`
+                      : 'Sort by priority. Click for urgent through low, then reversed, then default order.'
                   }
                   onClick={(e) => {
                     e.stopPropagation()
-                    toggleSort('task')
+                    toggleSort('priority')
                   }}
                 >
-                  <span className="min-w-0 flex-1 truncate">Task</span>
-                  <span className="inline-flex size-4 shrink-0 items-center justify-center text-muted-foreground">
-                    {sort.mode === 'column' && sort.key === 'task' ? (
+                  <span className="sr-only">Priority</span>
+                  <span className="inline-flex size-4 items-center justify-center text-muted-foreground">
+                    {sort.mode === 'column' && sort.key === 'priority' ? (
                       sort.dir === 'asc' ? (
                         <ChevronUp className="size-3.5" aria-hidden />
                       ) : (
@@ -448,6 +447,7 @@ export function TimelineTableView({
                     )}
                   </span>
                 </button>
+                </div>
               </th>
               <th
                 scope="col"
@@ -583,6 +583,28 @@ export function TimelineTableView({
                       />
                     </div>
                   </td>
+                  <td className={cn(bodyTd, 'max-w-0 px-3 font-medium text-foreground')}>
+                    <span className="block truncate">{live.title}</span>
+                  </td>
+                  <td
+                    className={cn(bodyTd, 'overflow-hidden px-0.5 text-muted-foreground')}
+                    style={narrowIconColumnStyle}
+                    data-phase-row-action
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="flex h-full items-center justify-center">
+                      <PhaseStatusDropdown phaseId={task.id} currentStatus={eff} hotkeyOpensDropdown>
+                        <button
+                          type="button"
+                          className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent text-foreground shadow-none outline-none transition-surface duration-150 ease-hover hover:bg-muted/40 data-[state=open]:bg-muted/40 dance-focus-ring"
+                          aria-label={`Status: ${phaseStatusMenuLabel(eff)}. Change status`}
+                          onPointerDown={(e) => e.stopPropagation()}
+                        >
+                          <PhaseStatusIcon status={eff} />
+                        </button>
+                      </PhaseStatusDropdown>
+                    </div>
+                  </td>
                   <td
                     className={cn(bodyTd, 'overflow-hidden px-0.5 text-muted-foreground')}
                     style={narrowIconColumnStyle}
@@ -604,28 +626,6 @@ export function TimelineTableView({
                         </button>
                       </PhasePriorityDropdown>
                     </div>
-                  </td>
-                  <td
-                    className={cn(bodyTd, 'overflow-hidden px-0.5 text-muted-foreground')}
-                    style={narrowIconColumnStyle}
-                    data-phase-row-action
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <div className="flex h-full items-center justify-center">
-                      <PhaseStatusDropdown phaseId={task.id} currentStatus={eff} hotkeyOpensDropdown>
-                        <button
-                          type="button"
-                          className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent text-foreground shadow-none outline-none transition-surface duration-150 ease-hover hover:bg-muted/40 data-[state=open]:bg-muted/40 dance-focus-ring"
-                          aria-label={`Status: ${phaseStatusMenuLabel(eff)}. Change status`}
-                          onPointerDown={(e) => e.stopPropagation()}
-                        >
-                          <PhaseStatusIcon status={eff} />
-                        </button>
-                      </PhaseStatusDropdown>
-                    </div>
-                  </td>
-                  <td className={cn(bodyTd, 'max-w-0 px-3 font-medium text-foreground')}>
-                    <span className="block truncate">{live.title}</span>
                   </td>
                   <td
                     className={cn(bodyTd, 'max-w-0 overflow-hidden px-2')}

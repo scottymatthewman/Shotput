@@ -148,6 +148,8 @@ export interface Plan {
   budgetCurrency?: string
   /** Event program template (trade show, offsite, etc.). */
   planType?: PlanType
+  /** Hidden from Upcoming/Past; shown under Archive on the plans index. */
+  archived?: boolean
 }
 
 export interface PlanOverviewPatch {
@@ -157,11 +159,13 @@ export interface PlanOverviewPatch {
   start?: string
   end?: string
   status?: Plan['status']
+  ownerUserId?: string
   externalRecord?: ExternalCrmRecord | null
   teamMemberUserIds?: string[]
   budgetCents?: number | null
   budgetCurrency?: string | null
   planType?: PlanType
+  archived?: boolean
 }
 
 export interface Workspace {

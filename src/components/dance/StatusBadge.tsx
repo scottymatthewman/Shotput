@@ -3,6 +3,7 @@ import { phaseStatusBadgeDefinition } from '@/components/dance/phaseStatusBadgeS
 import { Badge } from '@/components/ui/badge'
 import type { PhaseStatus, PlanStatus } from '@/types/domain'
 import { cn } from '@/lib/utils'
+import { CircleAlert, CircleCheck, CircleDashed, type LucideIcon } from 'lucide-react'
 
 const phaseStatusIconClass: Record<PhaseStatus, string> = {
   backlog: 'text-status-todo',
@@ -78,5 +79,35 @@ export function PlanStatusBadge({ status }: { status: PlanStatus | string }) {
     <Badge variant="status" className={cfg.className}>
       {cfg.label}
     </Badge>
+  )
+}
+
+const planStatusIconMap: Record<
+  PlanStatus,
+  { Icon: LucideIcon; iconClassName: string; label: string }
+> = {
+  healthy: { Icon: CircleCheck, iconClassName: 'text-primary', label: 'Healthy' },
+  at_risk: { Icon: CircleAlert, iconClassName: 'text-destructive', label: 'At risk' },
+  paused: { Icon: CircleDashed, iconClassName: 'text-muted-foreground', label: 'Paused' },
+}
+
+/** Plan health glyph for dense list rows (e.g. plan index cards). */
+export function PlanStatusIcon({
+  status,
+  className,
+}: {
+  status: PlanStatus | string
+  className?: string
+}) {
+  const cfg = isPlanStatus(status) ? planStatusIconMap[status] : planStatusIconMap.paused
+  const Icon = cfg.Icon
+  return (
+    <span
+      className={cn('flex size-7 shrink-0 items-center justify-center', className)}
+      title={cfg.label}
+    >
+      <Icon className={cn('size-6', cfg.iconClassName)} aria-hidden />
+      <span className="sr-only">{cfg.label}</span>
+    </span>
   )
 }

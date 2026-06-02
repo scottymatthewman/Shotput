@@ -414,6 +414,7 @@ export function patchPlanOverview(planId: string, patch: PlanOverviewPatch) {
     if (patch.end !== undefined) planPatch.end = ordered.end
   }
   if (patch.status !== undefined) planPatch.status = patch.status
+  if (patch.ownerUserId !== undefined) planPatch.ownerUserId = patch.ownerUserId
   if ('budgetCents' in patch) {
     planPatch.budgetCents = patch.budgetCents ?? undefined
   }

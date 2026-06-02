@@ -64,9 +64,8 @@ function BloomDropdownBody({
     const el = measureRef.current
     if (!el) return
     const measure = () => {
-      const rect = el.getBoundingClientRect()
-      const w = Math.max(1, Math.round(rect.width))
-      const h = Math.max(1, Math.round(rect.height))
+      const w = Math.max(1, Math.ceil(el.offsetWidth))
+      const h = Math.max(1, Math.ceil(el.offsetHeight))
       setButtonSize((prev) =>
         prev.width === w && prev.height === h ? prev : { width: w, height: h },
       )
@@ -78,16 +77,26 @@ function BloomDropdownBody({
   }, [trigger])
 
   return (
-    <span ref={measureRef} className="relative inline-flex max-w-full align-middle">
+    <span className="relative inline-flex h-full self-stretch overflow-visible align-middle">
+      {/* Intrinsic width + stretched height (Gantt status rail uses self-stretch). */}
+      <span
+        ref={measureRef}
+        aria-hidden
+        className="pointer-events-none invisible absolute right-0 top-0 inline-flex w-max max-w-none items-stretch whitespace-nowrap min-h-[var(--dance-gantt-bar-height)]"
+      >
+        {trigger}
+      </span>
       <Menu.Container
         buttonSize={buttonSize}
         menuWidth={menuWidth}
         menuRadius={menuRadius}
         buttonRadius={8}
-        className={cn(menuPanelClass, open && 'z-50 border border-border')}
+        className={cn(menuPanelClass, 'h-full', open && 'z-50 border border-border')}
       >
-        <Menu.Trigger className="inline-flex max-w-full">{trigger}</Menu.Trigger>
-        <Menu.Content className="bg-surface-1 p-1">{children}</Menu.Content>
+        <Menu.Trigger className="inline-flex h-full w-full items-stretch justify-end">
+          {trigger}
+        </Menu.Trigger>
+        <Menu.Content className="bg-surface-1 min-w-full overflow-visible p-1">{children}</Menu.Content>
       </Menu.Container>
     </span>
   )

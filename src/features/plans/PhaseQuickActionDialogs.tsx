@@ -1,3 +1,4 @@
+import { ActionDialog } from '@/components/ui/action-dialog'
 import { AssigneePill } from '@/components/dance/AssigneePill'
 import { armTimelineRowClickSuppression } from '@/components/dance/phaseStatusMenu'
 import { Button } from '@/components/ui/button'
@@ -190,42 +191,20 @@ export function PhaseQuickActionDialogs({ planId }: { planId: string }) {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={dialog.kind === 'delete'} onOpenChange={(v) => !v && close()}>
-        <DialogContent
-          className="sm:max-w-md"
-          aria-describedby="delete-task-desc"
-          onOpenAutoFocus={preventDialogInitialFocus}
-        >
-          <form
-            className="space-y-4"
-            onSubmit={(e) => {
-              e.preventDefault()
-              deletePhase(phase.id)
-              close()
-            }}
-          >
-            <DialogHeader className="gap-2 pb-1">
-              <DialogTitle>Delete this phase?</DialogTitle>
-              <DialogDescription id="delete-task-desc">
-                This removes the phase from this plan. Press ⌘Z (Ctrl+Z on Windows/Linux) afterward to undo the
-                delete.
-              </DialogDescription>
-            </DialogHeader>
-            <p className="truncate px-0.5 text-sm font-medium text-foreground">{phase.title}</p>
-            <div className="flex flex-col-reverse gap-2 pt-0 sm:flex-row sm:justify-end">
-              <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={close}>
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                className="w-full bg-destructive text-destructive-foreground hover:bg-destructive/90 sm:w-auto"
-              >
-                Delete phase
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <ActionDialog
+        open={dialog.kind === 'delete'}
+        onOpenChange={(v) => !v && close()}
+        title="Delete this phase?"
+        description="This removes the phase from this plan. Press ⌘Z (Ctrl+Z on Windows/Linux) afterward to undo the delete."
+        descriptionId="delete-task-desc"
+        confirmLabel="Delete phase"
+        confirmVariant="destructive"
+        contentClassName="sm:max-w-md"
+        onOpenAutoFocus={preventDialogInitialFocus}
+        onConfirm={() => deletePhase(phase.id)}
+      >
+        <p className="truncate px-0.5 text-sm font-medium text-foreground">{phase.title}</p>
+      </ActionDialog>
     </>
   )
 }

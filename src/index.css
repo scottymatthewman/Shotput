@@ -159,6 +159,7 @@
   --color-popover-foreground: var(--dance-text-primary);
   --color-muted: var(--dance-surface-3);
   --color-muted-foreground: var(--dance-text-secondary);
+  --color-tertiary: var(--dance-text-tertiary);
   --color-border: var(--dance-border-default);
   --color-border-subtle: var(--dance-border-subtle);
   --color-border-hover: var(--dance-border-hover);

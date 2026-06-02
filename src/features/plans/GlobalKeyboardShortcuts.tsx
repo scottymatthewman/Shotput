@@ -164,17 +164,6 @@ export function GlobalKeyboardShortcuts() {
           e.preventDefault()
           return
         }
-        const overviewPlanId = location.pathname.match(/^\/plans\/([^/]+)\/overview\/?$/)?.[1]
-        if (
-          overviewPlanId &&
-          !typing &&
-          !helpOpen &&
-          !document.querySelector('[role="dialog"][data-state="open"]')
-        ) {
-          navigate(`/plans/${overviewPlanId}`)
-          e.preventDefault()
-          return
-        }
         return
       }
 
@@ -372,7 +361,7 @@ export function GlobalKeyboardShortcuts() {
             <ShortcutRow keys={['?']} description="Show this help" />
             <ShortcutRow keys={['⌘', 'Z']} description="Undo" />
             <ShortcutRow keys={['⌘', '⇧', 'Z']} description="Redo" />
-            <ShortcutRow keys={['Esc']} description="Close menu, dialog, or leave phase detail / overview" />
+            <ShortcutRow keys={['Esc']} description="Close menu, dialog, or leave phase detail" />
             <ShortcutRow keys={['⌘', '.']} description="Toggle sidebar / leave phase detail" />
             <ShortcutRow keys={['⌘', '/']} description="Toggle agent chat" />
             <ShortcutRow keys={['⌘', '⇧', 'C']} description="Copy task link or page URL" />

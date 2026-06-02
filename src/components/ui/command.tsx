@@ -41,7 +41,7 @@ function CommandInput({ className, ...props }: ComponentProps<typeof CommandPrim
       <Search className="size-5 shrink-0 text-muted-foreground" />
       <CommandPrimitive.Input
         className={cn(
-          'dance-focus-ring flex h-full min-h-0 min-w-0 flex-1 bg-transparent py-0 text-base font-medium outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50',
+          'dance-focus-ring flex h-full min-h-0 min-w-0 flex-1 bg-transparent py-0 text-base font-medium outline-none placeholder:text-tertiary disabled:cursor-not-allowed disabled:opacity-50',
           className,
         )}
         {...props}

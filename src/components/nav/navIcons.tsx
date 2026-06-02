@@ -1,4 +1,5 @@
 import addSvg from '@/assets/NavIcons/Add.svg?raw'
+import copyLinkPng from '@/assets/NavIcons/CopyLink.png'
 import agentSvg from '@/assets/NavIcons/Agent.svg?raw'
 import chatActiveSvg from '@/assets/NavIcons/Chat-Active.svg?raw'
 import chatInactiveSvg from '@/assets/NavIcons/Chat-Inactive.svg?raw'
@@ -125,3 +126,23 @@ export const navTimelineIcon = createNavIcon('timeline')
 export const navTableIcon = createNavIcon('table')
 export const navCloseIcon = createNavIcon('close')
 export const navAddIcon = createNavIcon('add')
+
+/** Masked PNG — inherits `currentColor` from parent text color. */
+export function navCopyLinkIcon({ className, 'aria-hidden': ariaHidden }: SidebarNavIconProps) {
+  return (
+    <span
+      aria-hidden={ariaHidden}
+      className={cn('inline-block size-[18px] shrink-0 bg-current', className)}
+      style={{
+        WebkitMaskImage: `url("${copyLinkPng}")`,
+        maskImage: `url("${copyLinkPng}")`,
+        WebkitMaskRepeat: 'no-repeat',
+        maskRepeat: 'no-repeat',
+        WebkitMaskPosition: 'center',
+        maskPosition: 'center',
+        WebkitMaskSize: 'contain',
+        maskSize: 'contain',
+      }}
+    />
+  )
+}

@@ -34,25 +34,9 @@ export function ShellAgentControls({
       )}
       style={{ height: SHELL_TOP_HEIGHT_PX }}
     >
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className={cn(shellIconButtonClass, 'shrink-0 text-foreground')}
-        onClick={onToggleAgentChat}
-        aria-label={agentChatOpen ? 'Hide agent chat' : 'Show agent chat'}
-        aria-pressed={agentChatOpen}
-        title={agentChatOpen ? 'Hide agent chat' : 'Show agent chat'}
-      >
-        {(agentChatOpen ? navChatActiveIcon : navChatInactiveIcon)({
-          className: sidebarNavDensity.icon,
-          'aria-hidden': true,
-        })}
-      </Button>
-
       <div
         aria-hidden={!agentChatOpen}
-        className={cn('shrink-0 overflow-hidden', agentChatOpen ? 'ml-2 w-7' : 'w-0')}
+        className={cn('shrink-0 overflow-hidden', agentChatOpen ? 'mr-2 w-7' : 'w-0')}
       >
         <Button
           type="button"
@@ -71,6 +55,22 @@ export function ShellAgentControls({
           {navHistoryIcon({ className: sidebarNavDensity.icon, 'aria-hidden': true })}
         </Button>
       </div>
+
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        className={cn(shellIconButtonClass, 'shrink-0 text-foreground')}
+        onClick={onToggleAgentChat}
+        aria-label={agentChatOpen ? 'Hide agent chat' : 'Show agent chat'}
+        aria-pressed={agentChatOpen}
+        title={agentChatOpen ? 'Hide agent chat' : 'Show agent chat'}
+      >
+        {(agentChatOpen ? navChatActiveIcon : navChatInactiveIcon)({
+          className: sidebarNavDensity.icon,
+          'aria-hidden': true,
+        })}
+      </Button>
     </div>
   )
 }
