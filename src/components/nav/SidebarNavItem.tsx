@@ -82,11 +82,7 @@ export function SidebarNavItem(props: SidebarNavItemProps) {
     const cfg = sidebarNavItem.search
     const SearchIcon = navSearchIcon
     return (
-      <button
-        type="button"
-        className={cn(cfg.root, className)}
-        data-search-trigger
-      >
+      <button type="button" className={cn(cfg.root, className)} data-search-trigger>
         <span className={cfg.leading}>
           <SearchIcon className={cfg.icon} aria-hidden />
           <span className="min-w-0 truncate">Search</span>

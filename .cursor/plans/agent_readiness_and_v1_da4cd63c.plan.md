@@ -6,7 +6,7 @@ todos:
     content: Refactor mutations.ts to accept ActorContext; add phase comments + activity for checklist/assignee changes
     status: pending
   - id: tool-registry
-    content: "Add src/agents/ tool registry (read + 4–5 write tools) wrapping mutations with actorIsAgent: true"
+    content: 'Add src/agents/ tool registry (read + 4–5 write tools) wrapping mutations with actorIsAgent: true'
     status: pending
   - id: agent-runs-schema
     content: Add agentRuns to Instant schema, domain types, query, seed, perms
@@ -18,7 +18,7 @@ todos:
     content: Agent assign UI in PhaseQuickActionDialogs + Run/status in PhaseDetailPanel
     status: pending
   - id: llm-milestone
-    content: "Follow-up: server-side LLM orchestrator using same tool registry (deferred)"
+    content: 'Follow-up: server-side LLM orchestrator using same tool registry (deferred)'
     status: pending
 isProject: false
 ---
@@ -27,12 +27,12 @@ isProject: false
 
 ## Current state (what you can reuse)
 
-| Area | Status |
-|------|--------|
-| Data | [`agents`](src/instant.schema.ts) entity; `assigneeAgentIds` on phases; [`ActivityEvent.actorIsAgent`](src/types/domain.ts) |
-| UI shell | [`AgentChatPanel`](src/layouts/AgentChatPanel.tsx) stub; [`ShellAgentControls`](src/layouts/ShellAgentControls.tsx); assignee pills in Gantt/table/phase detail |
-| Writes | Centralized in [`src/lib/instant/mutations.ts`](src/lib/instant/mutations.ts) via `plansStore` + optimistic overlay |
-| Gaps | Every mutation hardcodes `actorId: CURRENT_USER_ID` and `actorIsAgent: false`; no `agentRuns`; no agent assign UI in [`PhaseQuickActionDialogs`](src/features/plans/PhaseQuickActionDialogs.tsx); checklist toggles emit **no** activity |
+| Area     | Status                                                                                                                                                                                                                                   |
+| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Data     | [`agents`](src/instant.schema.ts) entity; `assigneeAgentIds` on phases; [`ActivityEvent.actorIsAgent`](src/types/domain.ts)                                                                                                              |
+| UI shell | [`AgentChatPanel`](src/layouts/AgentChatPanel.tsx) stub; [`ShellAgentControls`](src/layouts/ShellAgentControls.tsx); assignee pills in Gantt/table/phase detail                                                                          |
+| Writes   | Centralized in [`src/lib/instant/mutations.ts`](src/lib/instant/mutations.ts) via `plansStore` + optimistic overlay                                                                                                                      |
+| Gaps     | Every mutation hardcodes `actorId: CURRENT_USER_ID` and `actorIsAgent: false`; no `agentRuns`; no agent assign UI in [`PhaseQuickActionDialogs`](src/features/plans/PhaseQuickActionDialogs.tsx); checklist toggles emit **no** activity |
 
 Your choices: **phase-scoped Run** first, **tools before LLM**.
 
@@ -93,14 +93,14 @@ New module tree (suggested):
 
 **V1 tool set (keep to ~6):**
 
-| Tool | Risk | Maps to |
-|------|------|---------|
-| `getPhaseContext` | read | phase + plan + checklist + assignees |
-| `postPhaseComment` | low | new comment activity on phase |
-| `setPhaseStatus` | medium | existing `setPhaseStatus` |
-| `toggleChecklistTask` | low | existing `toggleChecklistTask` |
-| `updatePhaseDescription` | medium | `updatePhaseDetails({ description })` |
-| *(defer)* `updatePhaseDates`, `deletePhase` | high | approval gate later |
+| Tool                                        | Risk   | Maps to                               |
+| ------------------------------------------- | ------ | ------------------------------------- |
+| `getPhaseContext`                           | read   | phase + plan + checklist + assignees  |
+| `postPhaseComment`                          | low    | new comment activity on phase         |
+| `setPhaseStatus`                            | medium | existing `setPhaseStatus`             |
+| `toggleChecklistTask`                       | low    | existing `toggleChecklistTask`        |
+| `updatePhaseDescription`                    | medium | `updatePhaseDetails({ description })` |
+| _(defer)_ `updatePhaseDates`, `deletePhase` | high   | approval gate later                   |
 
 Each tool: Zod or hand-rolled input validation, idempotent where possible, returns structured `{ ok, summary, data? }` for UI + future LLM transcripts.
 
@@ -113,8 +113,8 @@ agentRuns: i.entity({
   agentId: i.string(),
   phaseId: i.string(),
   planId: i.string(),
-  status: i.string(),        // queued | running | completed | failed | cancelled
-  briefJson: i.string(),     // user instruction optional
+  status: i.string(), // queued | running | completed | failed | cancelled
+  briefJson: i.string(), // user instruction optional
   resultSummaryJson: i.string().optional(),
   toolTraceJson: i.string().optional(), // [{ tool, input, output, at }]
   requestedByUserId: i.string(),
@@ -138,7 +138,7 @@ Add verbs if needed: `agent_run_started` / `agent_run_completed` as `commented` 
 3. Execute **fixed playbook** (no LLM yet), e.g. for assigned agent on phase:
    - If status is `todo` and phase has agent assignee → `setPhaseStatus(in_progress)`
    - `postPhaseComment` with templated summary from context (open checklist count, dates, plan name)
-   - If exactly one open checklist item → `toggleChecklistTask` *(optional; gate behind env flag if too aggressive)*
+   - If exactly one open checklist item → `toggleChecklistTask` _(optional; gate behind env flag if too aggressive)_
 4. Mark run `completed` + write `resultSummaryJson` + `toolTraceJson`
 
 Expose via [`plansStore`](src/state/plansStore.ts): `startAgentRunOnPhase(phaseId, agentId, brief?)`.
@@ -207,12 +207,12 @@ Replace deterministic playbook in `runEngine` with an **orchestrator** that:
 
 ## Suggested implementation order
 
-1. `ActorContext` + activity gaps on mutations  
-2. Tool registry + read/write tools (unit-test playbook inputs/outputs)  
-3. `agentRuns` schema + query + seed  
-4. Deterministic `runEngine` + `plansStore.startAgentRunOnPhase`  
-5. Phase UI: assign agents + Run + run status  
-6. (Later) LLM orchestrator + server proxy + enable chat send tied to active phase context  
+1. `ActorContext` + activity gaps on mutations
+2. Tool registry + read/write tools (unit-test playbook inputs/outputs)
+3. `agentRuns` schema + query + seed
+4. Deterministic `runEngine` + `plansStore.startAgentRunOnPhase`
+5. Phase UI: assign agents + Run + run status
+6. (Later) LLM orchestrator + server proxy + enable chat send tied to active phase context
 
 ---
 
@@ -230,13 +230,13 @@ Replace deterministic playbook in `runEngine` with an **orchestrator** that:
 
 ## Key files to touch
 
-| File | Change |
-|------|--------|
-| [`src/instant.schema.ts`](src/instant.schema.ts) | `agentRuns` entity + link |
-| [`src/types/domain.ts`](src/types/domain.ts) | `AgentRun`, types |
-| [`src/lib/instant/mutations.ts`](src/lib/instant/mutations.ts) | `ActorContext`, phase comments, activity on checklist/assign |
-| [`src/agents/*`](src/agents/) | tools + run engine (new) |
-| [`src/state/plansStore.ts`](src/state/plansStore.ts) | `startAgentRunOnPhase` |
-| [`src/features/plans/PhaseDetailPanel.tsx`](src/features/plans/PhaseDetailPanel.tsx) | Run UX |
-| [`src/features/plans/PhaseQuickActionDialogs.tsx`](src/features/plans/PhaseQuickActionDialogs.tsx) | Agent assignees |
-| [`src/lib/instant/assembleWorkspace.ts`](src/lib/instant/assembleWorkspace.ts) | hydrate runs |
+| File                                                                                               | Change                                                       |
+| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| [`src/instant.schema.ts`](src/instant.schema.ts)                                                   | `agentRuns` entity + link                                    |
+| [`src/types/domain.ts`](src/types/domain.ts)                                                       | `AgentRun`, types                                            |
+| [`src/lib/instant/mutations.ts`](src/lib/instant/mutations.ts)                                     | `ActorContext`, phase comments, activity on checklist/assign |
+| [`src/agents/*`](src/agents/)                                                                      | tools + run engine (new)                                     |
+| [`src/state/plansStore.ts`](src/state/plansStore.ts)                                               | `startAgentRunOnPhase`                                       |
+| [`src/features/plans/PhaseDetailPanel.tsx`](src/features/plans/PhaseDetailPanel.tsx)               | Run UX                                                       |
+| [`src/features/plans/PhaseQuickActionDialogs.tsx`](src/features/plans/PhaseQuickActionDialogs.tsx) | Agent assignees                                              |
+| [`src/lib/instant/assembleWorkspace.ts`](src/lib/instant/assembleWorkspace.ts)                     | hydrate runs                                                 |

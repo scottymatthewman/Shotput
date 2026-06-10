@@ -14,7 +14,12 @@ function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
 }
 
 function CardHeader({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('flex flex-col gap-1.5 inset-edge-ring inset-edge-ring-b p-4', className)} {...props} />
+  return (
+    <div
+      className={cn('flex flex-col gap-1.5 inset-edge-ring inset-edge-ring-b p-4', className)}
+      {...props}
+    />
+  )
 }
 
 function CardTitle({ className, ...props }: HTMLAttributes<HTMLHeadingElement>) {

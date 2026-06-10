@@ -4,10 +4,11 @@ import { SHELL_MAIN_TOP_PADDING_CLASS } from '@/layouts/shellLayout'
 import { cn } from '@/lib/utils'
 import { navAgentIcon, navSendIcon, navSuggestedSendIcon } from '@/components/nav/navIcons'
 
+/** UI shell only — wire these to your agent backend per-product. */
 const SUGGESTED_PROMPTS = [
-  'Follow up with the chair vendors',
+  'Summarize what changed this week',
   'What is the next most impactful task for me to do?',
-  'How our team uses agents',
+  'Draft an update for the team',
 ] as const
 
 function SuggestedPromptRow({ children }: { children: string }) {
@@ -20,12 +21,12 @@ function SuggestedPromptRow({ children }: { children: string }) {
         'text-left text-[13px] text-muted-foreground opacity-60',
         'transition-surface duration-150 ease-hover',
         'hover:bg-fill-hover hover:opacity-80',
-        'dance-focus-ring outline-none',
+        'app-focus-ring outline-none',
       )}
       title="Coming soon"
     >
       <span className="min-h-6 min-w-0 flex-1 leading-normal">{children}</span>
-      {navSuggestedSendIcon({ className: 'mt-0.5 size-6 shrink-0 opacity-70', 'aria-hidden': true })}
+      {navSuggestedSendIcon({ className: 'mt-0.5 size-5 shrink-0 opacity-70', 'aria-hidden': true })}
     </button>
   )
 }
@@ -76,7 +77,7 @@ export function AgentChatPanel() {
             disabled
             aria-label="Send message"
           >
-            {navSendIcon({ className: 'size-7', 'aria-hidden': true })}
+            {navSendIcon({ className: 'size-6', 'aria-hidden': true })}
           </Button>
         </div>
       </div>

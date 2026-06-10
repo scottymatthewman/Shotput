@@ -3,7 +3,7 @@
 @import './styles/typography.css';
 
 /* Radix Presence only defers unmount for CSS animations (not transitions). */
-@keyframes dance-sheet-in-right {
+@keyframes app-sheet-in-right {
   from {
     transform: translate3d(100%, 0, 0);
   }
@@ -12,7 +12,7 @@
   }
 }
 
-@keyframes dance-sheet-out-right {
+@keyframes app-sheet-out-right {
   from {
     transform: translate3d(0, 0, 0);
   }
@@ -21,7 +21,7 @@
   }
 }
 
-@keyframes dance-sheet-in-left {
+@keyframes app-sheet-in-left {
   from {
     transform: translate3d(-100%, 0, 0);
   }
@@ -30,7 +30,7 @@
   }
 }
 
-@keyframes dance-sheet-out-left {
+@keyframes app-sheet-out-left {
   from {
     transform: translate3d(0, 0, 0);
   }
@@ -39,7 +39,7 @@
   }
 }
 
-@keyframes dance-sheet-overlay-in {
+@keyframes app-sheet-overlay-in {
   from {
     opacity: 0;
   }
@@ -48,7 +48,7 @@
   }
 }
 
-@keyframes dance-sheet-overlay-out {
+@keyframes app-sheet-overlay-out {
   from {
     opacity: 1;
   }
@@ -58,9 +58,9 @@
 }
 
 @theme {
-  --font-sans: var(--dance-font-family);
-  --font-mono: var(--dance-font-family);
-  --font-serif: var(--dance-font-family);
+  --font-sans: var(--app-font-family);
+  --font-mono: var(--app-font-family);
+  --font-serif: var(--app-font-family);
 
   /* ─── Layer 1: Palette utilities (bg-neutral-100, text-red-500, etc.) ─── */
   --color-neutral-0: var(--palette-neutral-0);
@@ -77,10 +77,10 @@
   --color-neutral-950: var(--palette-neutral-950);
   --color-white: var(--palette-white);
   --color-black: var(--palette-black);
-  --color-frost-surface: var(--dance-frost-surface);
-  --color-surface-frost: var(--dance-surface-frost);
-  --color-progress-track: var(--dance-progress-track);
-  --color-progress-fill: var(--dance-progress-fill);
+  --color-frost-surface: var(--app-frost-surface);
+  --color-surface-frost: var(--app-surface-frost);
+  --color-progress-track: var(--app-progress-track);
+  --color-progress-fill: var(--app-progress-fill);
 
   --color-red-50: var(--palette-red-50);
   --color-red-100: var(--palette-red-100);
@@ -143,68 +143,55 @@
   --color-purple-950: var(--palette-purple-950);
 
   /* ─── UI foundations → Tailwind utilities ─── */
-  --color-bg: var(--dance-bg);
-  --color-surface-1: var(--dance-surface-1);
-  --color-surface-2: var(--dance-surface-2);
-  --color-surface-3: var(--dance-surface-3);
-  --color-surface-contrast: var(--dance-surface-contrast);
+  --color-bg: var(--app-bg);
+  --color-surface-1: var(--app-surface-1);
+  --color-surface-2: var(--app-surface-2);
+  --color-surface-3: var(--app-surface-3);
+  --color-surface-contrast: var(--app-surface-contrast);
 
   /* Shadcn-compatible aliases → foundations */
-  --color-background: var(--dance-bg);
-  --color-content: var(--dance-surface-1);
-  --color-foreground: var(--dance-text-primary);
-  --color-card: var(--dance-surface-1);
-  --color-card-foreground: var(--dance-text-primary);
-  --color-popover: var(--dance-surface-overlay);
-  --color-popover-foreground: var(--dance-text-primary);
-  --color-muted: var(--dance-surface-3);
-  --color-muted-foreground: var(--dance-text-secondary);
-  --color-tertiary: var(--dance-text-tertiary);
-  --color-border: var(--dance-border-default);
-  --color-border-subtle: var(--dance-border-subtle);
-  --color-border-hover: var(--dance-border-hover);
-  --color-border-strong: var(--dance-border-strong);
-  --color-input: var(--dance-surface-3);
-  --color-ring: var(--dance-border-focus);
-  --color-fill-hover: var(--dance-fill-hover);
-  --color-fill-selected: var(--dance-fill-selected);
-  --color-primary: var(--dance-interactive-primary);
-  --color-primary-foreground: var(--dance-interactive-primary-fg);
-  --color-secondary: var(--dance-surface-muted);
-  --color-secondary-foreground: var(--dance-text-primary);
-  --color-accent: var(--dance-interactive-accent);
-  --color-accent-foreground: var(--dance-interactive-accent-fg);
-  --color-destructive: var(--dance-interactive-destructive);
-  --color-destructive-foreground: var(--dance-interactive-destructive-fg);
+  --color-background: var(--app-bg);
+  --color-content: var(--app-surface-1);
+  --color-foreground: var(--app-text-primary);
+  --color-card: var(--app-surface-1);
+  --color-card-foreground: var(--app-text-primary);
+  --color-popover: var(--app-surface-overlay);
+  --color-popover-foreground: var(--app-text-primary);
+  --color-muted: var(--app-surface-3);
+  --color-muted-foreground: var(--app-text-secondary);
+  --color-tertiary: var(--app-text-tertiary);
+  --color-border: var(--app-border-default);
+  --color-border-subtle: var(--app-border-subtle);
+  --color-border-hover: var(--app-border-hover);
+  --color-border-strong: var(--app-border-strong);
+  --color-input: var(--app-surface-3);
+  --color-ring: var(--app-border-focus);
+  --color-fill-hover: var(--app-fill-hover);
+  --color-fill-selected: var(--app-fill-selected);
+  --color-primary: var(--app-interactive-primary);
+  --color-primary-foreground: var(--app-interactive-primary-fg);
+  --color-secondary: var(--app-surface-muted);
+  --color-secondary-foreground: var(--app-text-primary);
+  --color-accent: var(--app-interactive-accent);
+  --color-accent-foreground: var(--app-interactive-accent-fg);
+  --color-destructive: var(--app-interactive-destructive);
+  --color-destructive-foreground: var(--app-interactive-destructive-fg);
 
-  /* ─── Domain semantics (use these in feature UI) ─── */
-  --color-gantt-canvas: var(--dance-surface-1);
-  --color-nav-hover: var(--dance-interactive-nav-hover);
-  --color-on-canvas: var(--dance-text-on-canvas);
-  --color-on-canvas-muted: var(--dance-text-on-canvas-muted);
-  --color-chrome-fg: var(--dance-chrome-fg);
-  --color-chrome-fg-hover: var(--dance-chrome-fg-hover);
-  --color-chrome-border: var(--dance-chrome-border);
-  --color-chrome-border-hover: var(--dance-chrome-border-hover);
+  /* ─── Semantic accents ─── */
+  --color-nav-hover: var(--app-interactive-nav-hover);
+  --color-on-canvas: var(--app-text-on-canvas);
+  --color-on-canvas-muted: var(--app-text-on-canvas-muted);
+  --color-chrome-fg: var(--app-chrome-fg);
+  --color-chrome-fg-hover: var(--app-chrome-fg-hover);
+  --color-chrome-border: var(--app-chrome-border);
+  --color-chrome-border-hover: var(--app-chrome-border-hover);
 
-  --color-agent: var(--dance-status-agent);
-  --color-assignee-blue: var(--dance-status-assignee);
-  /* Legacy alias — blocked/urgent now uses red from the palette */
-  --color-coral: var(--dance-status-blocked);
-  --color-assignee-coral: var(--dance-status-blocked);
-
-  --color-status-neutral: var(--dance-status-neutral);
-  --color-status-todo: var(--dance-status-todo);
-  --color-status-progress: var(--dance-status-progress);
-  --color-status-review: var(--dance-status-review);
-  --color-status-blocked: var(--dance-status-blocked);
-  --color-status-done: var(--dance-status-done);
-
-  --color-phase-todo-fg: var(--dance-phase-todo-fg);
-  --color-phase-in-progress-fg: var(--dance-phase-in-progress-fg);
-  --color-phase-in-review-fg: var(--dance-phase-in-review-fg);
-  --color-phase-blocked-fg: var(--dance-phase-blocked-fg);
-  --color-phase-done-fg: var(--dance-phase-done-fg);
+  --color-status-neutral: var(--app-status-neutral);
+  --color-status-todo: var(--app-status-todo);
+  --color-status-progress: var(--app-status-progress);
+  --color-status-review: var(--app-status-review);
+  --color-status-blocked: var(--app-status-blocked);
+  --color-status-done: var(--app-status-done);
 
   /*
    * Radius scale — outermost anchor is `--radius-lg` (1rem). Medium / small step down by 0.25rem.
@@ -231,12 +218,12 @@
   --default-transition-duration: 180ms;
   --default-transition-timing-function: var(--ease-out);
 
-  --animate-dance-sheet-in-right: dance-sheet-in-right 250ms var(--ease-out) both;
-  --animate-dance-sheet-out-right: dance-sheet-out-right 250ms var(--ease-out) both;
-  --animate-dance-sheet-in-left: dance-sheet-in-left 250ms var(--ease-out) both;
-  --animate-dance-sheet-out-left: dance-sheet-out-left 250ms var(--ease-out) both;
-  --animate-dance-sheet-overlay-in: dance-sheet-overlay-in 250ms var(--ease-out) both;
-  --animate-dance-sheet-overlay-out: dance-sheet-overlay-out 250ms var(--ease-out) both;
+  --animate-app-sheet-in-right: app-sheet-in-right 250ms var(--ease-out) both;
+  --animate-app-sheet-out-right: app-sheet-out-right 250ms var(--ease-out) both;
+  --animate-app-sheet-in-left: app-sheet-in-left 250ms var(--ease-out) both;
+  --animate-app-sheet-out-left: app-sheet-out-left 250ms var(--ease-out) both;
+  --animate-app-sheet-overlay-in: app-sheet-overlay-in 250ms var(--ease-out) both;
+  --animate-app-sheet-overlay-out: app-sheet-overlay-out 250ms var(--ease-out) both;
 }
 
 @layer base {
@@ -262,26 +249,17 @@
 @layer components {
   .transition-surface {
     transition-property:
-      color,
-      background-color,
-      border-color,
-      box-shadow,
-      outline-color,
-      text-decoration-color,
-      fill,
-      stroke,
-      opacity,
-      transform,
-      filter;
+      color, background-color, border-color, box-shadow, outline-color, text-decoration-color,
+      fill, stroke, opacity, transform, filter;
     transition-duration: var(--default-transition-duration);
     transition-timing-function: var(--ease-out);
   }
 
-  .dance-focus-ring {
+  .app-focus-ring {
     outline: none;
   }
 
-  .dance-focus-ring:focus-visible {
+  .app-focus-ring:focus-visible {
     outline: 1px solid var(--color-ring);
     outline-offset: 2px;
   }
@@ -301,7 +279,7 @@
    * `--inset-edge-color` drives both ring-on-self and overlay variants.
    */
   .inset-edge-ring {
-    --inset-edge-color: var(--dance-border-default);
+    --inset-edge-color: var(--app-border-default);
     border: none;
     transition-property: box-shadow;
     transition-duration: var(--default-transition-duration);
@@ -329,10 +307,10 @@
     box-shadow: inset -1px 0 0 0 var(--inset-edge-color);
   }
 
-  /* Overlay variant — edge paints above inner layers (e.g. Gantt bar fill). */
+  /* Overlay variant — edge paints above inner layers. */
   .inset-edge {
     position: relative;
-    --inset-edge-color: var(--dance-border-default);
+    --inset-edge-color: var(--app-border-default);
   }
 
   .inset-edge::after {
@@ -369,46 +347,46 @@
 
   /* Token + opacity modifiers (shared) */
   .inset-edge-strong {
-    --inset-edge-color: var(--dance-border-strong);
+    --inset-edge-color: var(--app-border-strong);
   }
 
   /** Modal panels: inset border + drop shadow (do not pair with shadow-lg — one box-shadow wins). */
-  .dance-modal-panel {
-    --inset-edge-color: var(--dance-border-strong);
+  .app-modal-panel {
+    --inset-edge-color: var(--app-border-strong);
     box-shadow:
       inset 0 0 0 1px var(--inset-edge-color),
       0 10px 15px -3px rgb(0 0 0 / 0.1),
       0 4px 6px -4px rgb(0 0 0 / 0.08);
   }
 
-  .dark .dance-modal-panel {
+  .dark .app-modal-panel {
     box-shadow:
       inset 0 0 0 1px var(--inset-edge-color),
       0 16px 40px -8px rgb(0 0 0 / 0.5);
   }
 
   .inset-edge-subtle {
-    --inset-edge-color: var(--dance-border-subtle);
+    --inset-edge-color: var(--app-border-subtle);
   }
 
   .inset-edge-soft {
-    --inset-edge-color: rgb(from var(--dance-border-default) r g b / 0.5);
+    --inset-edge-color: rgb(from var(--app-border-default) r g b / 0.5);
   }
 
   .inset-edge-softer {
-    --inset-edge-color: rgb(from var(--dance-border-default) r g b / 0.6);
+    --inset-edge-color: rgb(from var(--app-border-default) r g b / 0.6);
   }
 
   .inset-edge-soft70 {
-    --inset-edge-color: rgb(from var(--dance-border-default) r g b / 0.7);
+    --inset-edge-color: rgb(from var(--app-border-default) r g b / 0.7);
   }
 
   .inset-edge-soft80 {
-    --inset-edge-color: rgb(from var(--dance-border-default) r g b / 0.8);
+    --inset-edge-color: rgb(from var(--app-border-default) r g b / 0.8);
   }
 
   .inset-edge-chrome {
-    --inset-edge-color: var(--dance-chrome-border);
+    --inset-edge-color: var(--app-chrome-border);
   }
 
   .inset-edge-primary-soft {
@@ -421,15 +399,15 @@
 
   @media (hover: hover) and (pointer: fine) {
     .inset-edge-hover:hover {
-      --inset-edge-color: var(--dance-border-hover);
+      --inset-edge-color: var(--app-border-hover);
     }
 
     .inset-edge-chrome-hover:hover {
-      --inset-edge-color: var(--dance-chrome-border-hover);
+      --inset-edge-color: var(--app-chrome-border-hover);
     }
 
     .inset-edge-destructive-hover:hover {
-      --inset-edge-color: rgb(from var(--dance-status-blocked) r g b / 0.4);
+      --inset-edge-color: rgb(from var(--app-status-blocked) r g b / 0.4);
     }
   }
 
@@ -449,117 +427,17 @@
 
   /*
    * Semantic badges — edge color follows fill family.
-   * Neutral fills use --dance-border-default; colored fills set --badge-edge-color.
-   * Use Badge variant="status". Do not combine with inset-edge-ring (resets edge to grey).
+   * Colored fills set --badge-edge-color. Use Badge variant="status".
+   * Do not combine with inset-edge-ring (resets edge to grey).
    */
-  .semantic-badge,
-  .phase-badge,
-  .plan-badge-healthy,
-  .plan-badge-at-risk,
-  .plan-badge-paused {
-    --badge-edge-color: var(--dance-border-default);
+  .semantic-badge {
+    --badge-edge-color: var(--app-border-default);
     border: none;
     box-shadow: inset 0 0 0 1px var(--badge-edge-color);
     font-weight: 400;
     transition-property: box-shadow;
     transition-duration: var(--default-transition-duration);
     transition-timing-function: var(--ease-hover);
-  }
-
-  .phase-badge-todo {
-    --badge-edge-color: var(--dance-phase-todo-border);
-    background-color: var(--dance-phase-todo-bg);
-    color: var(--dance-phase-todo-fg);
-  }
-
-  .phase-badge-in-progress {
-    --badge-edge-color: var(--dance-phase-in-progress-border);
-    background-color: var(--dance-phase-in-progress-bg);
-    color: var(--dance-phase-in-progress-fg);
-  }
-
-  .phase-badge-in-review {
-    --badge-edge-color: var(--dance-phase-in-review-border);
-    background-color: var(--dance-phase-in-review-bg);
-    color: var(--dance-phase-in-review-fg);
-  }
-
-  .phase-badge-blocked {
-    --badge-edge-color: var(--dance-phase-blocked-border);
-    background-color: var(--dance-phase-blocked-bg);
-    color: var(--dance-phase-blocked-fg);
-  }
-
-  .phase-badge-done {
-    --badge-edge-color: var(--dance-phase-done-border);
-    background-color: var(--dance-phase-done-bg);
-    color: var(--dance-phase-done-fg);
-  }
-
-  .plan-badge-healthy {
-    --badge-edge-color: rgb(from var(--color-primary) r g b / 0.4);
-    background-color: rgb(from var(--color-primary) r g b / 0.15);
-    color: var(--color-primary);
-  }
-
-  .plan-badge-at-risk {
-    --badge-edge-color: rgb(from var(--color-destructive) r g b / 0.4);
-    background-color: rgb(from var(--color-destructive) r g b / 0.15);
-    color: var(--color-destructive);
-  }
-
-  .plan-badge-paused {
-    background-color: var(--dance-surface-2);
-    color: var(--dance-text-secondary);
-  }
-
-  .timeline-phase-checkbox {
-    appearance: none;
-    -webkit-appearance: none;
-    display: inline-grid;
-    place-content: center;
-    width: 1rem;
-    height: 1rem;
-    margin: 0;
-    flex-shrink: 0;
-    border-radius: 4px;
-    border: 1px solid var(--dance-border-default);
-    background-color: var(--dance-surface-1);
-    color: var(--color-primary-foreground);
-    cursor: pointer;
-    transition-property: border-color, background-color;
-    transition-duration: var(--default-transition-duration);
-    transition-timing-function: var(--ease-hover);
-  }
-
-  .timeline-phase-checkbox::after {
-    content: '';
-    width: 0.5625rem;
-    height: 0.3125rem;
-    border: solid currentColor;
-    border-width: 0 0 2px 2px;
-    transform: rotate(-45deg) scale(0);
-    transform-origin: center;
-    transition: transform 150ms var(--ease-out);
-  }
-
-  .timeline-phase-checkbox:checked {
-    border-color: var(--color-primary);
-    background-color: var(--color-primary);
-  }
-
-  .timeline-phase-checkbox:checked::after {
-    transform: rotate(-45deg) scale(1);
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .timeline-phase-checkbox:hover:not(:checked) {
-      border-color: var(--palette-neutral-400);
-    }
-
-    .dark .timeline-phase-checkbox:hover:not(:checked) {
-      border-color: var(--palette-neutral-600);
-    }
   }
 
   /* Panel chrome — clip children; keep inset edge above scrolling fills */
@@ -571,24 +449,6 @@
 
   .inset-edge-panel.inset-edge::after {
     z-index: 50;
-  }
-
-  /* Gantt bar — frosted surface-1 (matches workspace card) */
-  .gantt-bar-surface {
-    overflow: hidden;
-  }
-
-  .gantt-bar-fill {
-    border-radius: inherit;
-    background-color: var(--dance-surface-frost);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-  }
-
-  .gantt-resize-pill {
-    background-color: var(--dance-gantt-scrubber);
-    box-shadow: 0 1px 2px rgb(from var(--dance-gantt-highlight) r g b / 0.18);
-    outline: 1px solid var(--dance-chrome-border);
   }
 
   /** App shell — column tracks set inline via --shell-top-cols / --shell-main-cols */
@@ -606,6 +466,10 @@
     min-height: 0;
     flex: 1 1 0%;
     grid-template-columns: 1fr;
+  }
+
+  .shell-main-grid > * {
+    min-width: 0;
   }
 
   @media (width >= 48rem) {

@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dance — UI prototype</title>
+    <title>Webapp Template</title>
     <link
       rel="preload"
       href="/fonts/gen-interface-jp/GenInterfaceJP-Regular.ttf"
@@ -28,7 +28,7 @@
         --boot-border: #e7e5e4;
         --boot-text: #1c1917;
         --boot-font-family: 'Gen Interface JP', ui-sans-serif, system-ui, sans-serif;
-        --sidebar-width: 244px;
+        --sidebar-width: 260px;
       }
       html.dark {
         --boot-bg: #0c0a09;
@@ -58,26 +58,26 @@
         overflow: hidden;
         overscroll-behavior: none;
       }
-      .dance-boot {
+      .app-boot {
         display: flex;
         min-height: 100dvh;
         gap: 12px;
         padding: 0;
         box-sizing: border-box;
       }
-      .dance-boot-sidebar {
+      .app-boot-sidebar {
         display: none;
         width: var(--sidebar-width);
         flex-shrink: 0;
         border-right: 1px solid var(--boot-border);
         padding: 12px;
       }
-      .dance-boot-main {
+      .app-boot-main {
         flex: 1;
         min-width: 0;
         padding: 12px 12px 12px 0;
       }
-      .dance-boot-panel {
+      .app-boot-panel {
         height: calc(100dvh - 24px);
         border: 1px solid var(--boot-border);
         border-radius: 12px;
@@ -87,7 +87,7 @@
         --sidebar-width: 56px;
       }
       @media (min-width: 768px) {
-        .dance-boot-sidebar {
+        .app-boot-sidebar {
           display: block;
         }
       }
@@ -95,7 +95,7 @@
     <script>
       performance.mark('appStart')
       try {
-        var ui = localStorage.getItem('dance-ui-v2') || localStorage.getItem('dance-ui-v1')
+        var ui = localStorage.getItem('webapp-template-ui-v1')
         if (ui) {
           var parsed = JSON.parse(ui)
           var state = parsed && parsed.state
@@ -106,18 +106,15 @@
             document.documentElement.classList.add('dark')
           }
         }
-        if (localStorage.getItem('dance-prototype-v1') || localStorage.getItem('dance-ui-v1') || localStorage.getItem('dance-ui-v2')) {
-          document.documentElement.dataset.hasPersistedData = '1'
-        }
       } catch (e) {}
     </script>
   </head>
   <body>
     <div id="root">
-      <div class="dance-boot" aria-hidden="true">
-        <div class="dance-boot-sidebar"></div>
-        <div class="dance-boot-main">
-          <div class="dance-boot-panel"></div>
+      <div class="app-boot" aria-hidden="true">
+        <div class="app-boot-sidebar"></div>
+        <div class="app-boot-main">
+          <div class="app-boot-panel"></div>
         </div>
       </div>
     </div>

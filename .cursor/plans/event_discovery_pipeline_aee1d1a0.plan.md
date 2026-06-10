@@ -1,6 +1,6 @@
 ---
 name: Event Discovery Pipeline
-overview: "Add a Vercel-hosted discovery API with Inngest-orchestrated Firecrawl + LLM pipeline, Postgres catalog storage, and two SPA surfaces: public `/try` (top 3–4 preview + signup CTA) and in-app Find (full results for paid workspaces using onboarding context)."
+overview: 'Add a Vercel-hosted discovery API with Inngest-orchestrated Firecrawl + LLM pipeline, Postgres catalog storage, and two SPA surfaces: public `/try` (top 3–4 preview + signup CTA) and in-app Find (full results for paid workspaces using onboarding context).'
 todos:
   - id: shared-schemas
     content: Create packages/shared with Zod schemas (CompanyProfile, DiscoveredEvent, API DTOs) extending FindIndustryEvent shape
@@ -12,7 +12,7 @@ todos:
     content: Add Supabase migrations for discovery_runs, company_profiles, industry_events, discovery_run_events
     status: pending
   - id: discovery-pipeline
-    content: "Implement packages/discovery pipeline: Firecrawl ingest, LLM extract, search, rank, persist with cost caps"
+    content: 'Implement packages/discovery pipeline: Firecrawl ingest, LLM extract, search, rank, persist with cost caps'
     status: pending
   - id: entitlements-ratelimit
     content: Build entitlements + rate limiting middleware; tier-slice GET responses (top 3 anonymous, full paid)
@@ -46,12 +46,12 @@ isProject: false
 
 ## Current codebase anchors
 
-| Concern | Today | Reuse |
-|---------|--------|--------|
-| Event result shape | [`FindIndustryEvent`](src/mock/findIndustryCatalog.ts) | Extend with optional provenance fields server-side |
-| Find UI | [`FindIndustryEventsPage`](src/pages/FindIndustryEventsPage.tsx), [`FindIndustryEventDetailPage`](src/pages/FindIndustryEventDetailPage.tsx) | Add Discover tab + wire to API |
-| Plan linkage | `plans.industryEventId` in [`instant.schema.ts`](src/instant.schema.ts) + [`Plan`](src/types/domain.ts) | "Add to workspace" creates plan with catalog id |
-| Backend | None ([`README.md`](README.md)) | Greenfield `api/` + Inngest |
+| Concern            | Today                                                                                                                                        | Reuse                                              |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| Event result shape | [`FindIndustryEvent`](src/mock/findIndustryCatalog.ts)                                                                                       | Extend with optional provenance fields server-side |
+| Find UI            | [`FindIndustryEventsPage`](src/pages/FindIndustryEventsPage.tsx), [`FindIndustryEventDetailPage`](src/pages/FindIndustryEventDetailPage.tsx) | Add Discover tab + wire to API                     |
+| Plan linkage       | `plans.industryEventId` in [`instant.schema.ts`](src/instant.schema.ts) + [`Plan`](src/types/domain.ts)                                      | "Add to workspace" creates plan with catalog id    |
+| Backend            | None ([`README.md`](README.md))                                                                                                              | Greenfield `api/` + Inngest                        |
 
 ---
 
@@ -144,14 +144,17 @@ Add npm workspaces in root [`package.json`](package.json) (`packages/*`). Vite i
 ### Postgres (discovery catalog — source of truth for scraped events)
 
 **`discovery_runs`**
+
 - `id`, `status` (`queued` | `reading_site` | `finding_events` | `ranking` | `complete` | `failed`)
 - `input_url`, `normalized_domain`, `tier`, `workspace_id` (nullable), `anonymous_fingerprint`
 - `progress_step`, `error_message`, `total_count`, `created_at`, `completed_at`
 
 **`company_profiles`** (1:1 with run, or cached by domain)
+
 - `run_id`, `domain`, `profile_json` (industry, products, ICP, geos, keywords)
 
 **`industry_events`** (deduped catalog rows)
+
 - `id`, `canonical_key` (hash of name+start+organizer), fields matching `FindIndustryEvent`
 - `source_url`, `confidence`, `discovered_at`
 - Join table **`discovery_run_events`**: `run_id`, `event_id`, `rank`, `fit_score`, `rationale`
@@ -161,6 +164,7 @@ Domain-level cache: if `normalized_domain` scraped within 7 days, skip Firecrawl
 ### InstantDB extensions ([`instant.schema.ts`](src/instant.schema.ts))
 
 Add to **`workspaces`** (onboarding stub for v1):
+
 - `companyWebsiteUrl`, `industry`, `icpDescription`, `targetGeosJson`, `productCategory`
 
 Optional later: `savedIndustryEventIdsJson` on workspace or link entity.
@@ -173,16 +177,16 @@ Optional later: `savedIndustryEventIdsJson` on workspace or link entity.
 
 Single function `discovery/run` with step retries and hard budgets:
 
-| Step | Action | Caps |
-|------|--------|------|
-| 1 | Normalize URL; block private IPs / localhost | — |
-| 2 | Firecrawl **map + scrape** company domain (about, product, pricing) | max 8 pages, 60s |
-| 3 | LLM → `CompanyProfile` (Zod schema) | token budget |
-| 4 | Merge workspace onboarding fields when `workspaceId` + paid tier | — |
-| 5 | Firecrawl **search** for industry events (fixed query templates from profile keywords) + scrape top result pages | max 5 searches, 10 pages |
-| 6 | LLM → `DiscoveredEvent[]` (dates required; drop low confidence) | token budget |
-| 7 | Dedupe → upsert `industry_events` → rank (date proximity + geo/ICP match + LLM `fitScore`) | — |
-| 8 | Mark run `complete`; store `total_count` | wall clock 3 min max |
+| Step | Action                                                                                                           | Caps                     |
+| ---- | ---------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| 1    | Normalize URL; block private IPs / localhost                                                                     | —                        |
+| 2    | Firecrawl **map + scrape** company domain (about, product, pricing)                                              | max 8 pages, 60s         |
+| 3    | LLM → `CompanyProfile` (Zod schema)                                                                              | token budget             |
+| 4    | Merge workspace onboarding fields when `workspaceId` + paid tier                                                 | —                        |
+| 5    | Firecrawl **search** for industry events (fixed query templates from profile keywords) + scrape top result pages | max 5 searches, 10 pages |
+| 6    | LLM → `DiscoveredEvent[]` (dates required; drop low confidence)                                                  | token budget             |
+| 7    | Dedupe → upsert `industry_events` → rank (date proximity + geo/ICP match + LLM `fitScore`)                       | —                        |
+| 8    | Mark run `complete`; store `total_count`                                                                         | wall clock 3 min max     |
 
 **`DISCOVERY_MOCK=1`:** skip Firecrawl/LLM; return fixture JSON from [`FIND_INDUSTRY_CATALOG`](src/mock/findIndustryCatalog.ts) for cheap UI iteration.
 
@@ -218,10 +222,10 @@ Firecrawl v1 path: **search + scrape** (not Agent) to keep cost predictable.
 
 ### Entitlements ([`api/_lib/entitlements.ts`](api/_lib/entitlements.ts))
 
-| Tier | How resolved | Events returned | Filters | Rate limit |
-|------|----------------|-----------------|---------|------------|
-| `anonymous` | no auth | top **3** | reject query params | 2 runs / IP / day |
-| `paid` | dev stub header → later Instant JWT + Stripe | **all ranked** | enabled | generous per workspace |
+| Tier        | How resolved                                 | Events returned | Filters             | Rate limit             |
+| ----------- | -------------------------------------------- | --------------- | ------------------- | ---------------------- |
+| `anonymous` | no auth                                      | top **3**       | reject query params | 2 runs / IP / day      |
+| `paid`      | dev stub header → later Instant JWT + Stripe | **all ranked**  | enabled             | generous per workspace |
 
 **Critical:** anonymous response never includes event ids beyond rank 3 (prevents client devtools bypass). `totalCount` drives "We found N events" + blurred placeholder cards in UI.
 
@@ -306,7 +310,7 @@ gantt
 **Phase 3 — Real pipeline:** Firecrawl + LLM with cost caps and `DISCOVERY_MOCK` fallback  
 **Phase 4 — Entitlements:** anonymous preview enforcement, paid stub via header/dev flag  
 **Phase 5 — App integration:** Find Discover tab, workspace prefill, create plan from event  
-**Phase 6 — Onboarding:** workspace profile fields; merge into paid ranking  
+**Phase 6 — Onboarding:** workspace profile fields; merge into paid ranking
 
 ---
 

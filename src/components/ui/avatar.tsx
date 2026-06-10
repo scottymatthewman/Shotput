@@ -12,10 +12,15 @@ function Avatar({ className, ...props }: ComponentProps<typeof AvatarPrimitive.R
 }
 
 function AvatarImage({ className, ...props }: ComponentProps<typeof AvatarPrimitive.Image>) {
-  return <AvatarPrimitive.Image className={cn('aspect-square size-full', className)} {...props} />
+  return (
+    <AvatarPrimitive.Image className={cn('aspect-square size-full', className)} {...props} />
+  )
 }
 
-function AvatarFallback({ className, ...props }: ComponentProps<typeof AvatarPrimitive.Fallback>) {
+function AvatarFallback({
+  className,
+  ...props
+}: ComponentProps<typeof AvatarPrimitive.Fallback>) {
   return (
     <AvatarPrimitive.Fallback
       className={cn(

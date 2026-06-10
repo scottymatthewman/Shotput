@@ -1,4 +1,6 @@
-import { SidebarNav } from '@/components/dance/SidebarNav'
+import { CommandMenu } from '@/components/CommandMenu'
+import { SidebarNav } from '@/components/nav/SidebarNav'
+import { APP_NAME } from '@/config/app'
 import { AgentChatPanel } from '@/layouts/AgentChatPanel'
 import { ShellAgentControls } from '@/layouts/ShellAgentControls'
 import { ShellTabBar } from '@/layouts/ShellTabBar'
@@ -11,16 +13,10 @@ import {
   shellNavMainColumnWidth,
   shellNavTopColumnWidth,
 } from '@/layouts/shellLayout'
-import { CommandMenuProvider } from '@/features/plans/CommandMenu'
-import { GlobalKeyboardShortcuts } from '@/features/plans/GlobalKeyboardShortcuts'
-import { NewPlanDialog } from '@/features/plans/NewPlanDialog'
-import { features } from '@/config/features'
-import { resolvePhaseDetailRoute } from '@/lib/planRoute'
 import { cn } from '@/lib/utils'
-import { usePlansStore } from '@/state/store'
-import { selectSidebarNav } from '@/state/selectors'
+import { useUiStore } from '@/state/uiStore'
 import { useEffect, type CSSProperties, type ReactNode } from 'react'
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { Link, Outlet } from 'react-router-dom'
 
 function shellGridTemplate(sidebarCollapsed: boolean, agentChatOpen: boolean) {
   const navTop = shellNavTopColumnWidth(sidebarCollapsed)
@@ -36,14 +32,11 @@ function shellGridTemplate(sidebarCollapsed: boolean, agentChatOpen: boolean) {
 }
 
 export function AppShell({ children }: { children?: ReactNode }) {
-  const workspaceName = usePlansStore((s) => selectSidebarNav(s).name)
-  const setCommandOpen = usePlansStore((s) => s.setCommandOpen)
-  const sidebarCollapsed = usePlansStore((s) => s.sidebarCollapsed)
-  const toggleSidebarCollapsed = usePlansStore((s) => s.toggleSidebarCollapsed)
-  const agentChatOpen = usePlansStore((s) => s.agentChatOpen)
-  const toggleAgentChatOpen = usePlansStore((s) => s.toggleAgentChatOpen)
-  const navigate = useNavigate()
-  const location = useLocation()
+  const setCommandOpen = useUiStore((s) => s.setCommandOpen)
+  const sidebarCollapsed = useUiStore((s) => s.sidebarCollapsed)
+  const toggleSidebarCollapsed = useUiStore((s) => s.toggleSidebarCollapsed)
+  const agentChatOpen = useUiStore((s) => s.agentChatOpen)
+  const toggleAgentChatOpen = useUiStore((s) => s.toggleAgentChatOpen)
 
   const { topTemplate, mainTemplate, navMain } = shellGridTemplate(
     sidebarCollapsed,
@@ -53,8 +46,8 @@ export function AppShell({ children }: { children?: ReactNode }) {
   const topGridStyle = { '--shell-top-cols': topTemplate } as CSSProperties
   const mainGridStyle = { '--shell-main-cols': mainTemplate } as CSSProperties
 
-  const shellMaximized =
-    sidebarCollapsed && !agentChatOpen
+  /** Both side surfaces hidden → page content reaches the viewport edges. */
+  const shellMaximized = sidebarCollapsed && !agentChatOpen
 
   const pageContent = children ?? <Outlet />
 
@@ -72,36 +65,18 @@ export function AppShell({ children }: { children?: ReactNode }) {
         return
       }
 
-      if (e.key !== '.' && e.code !== 'Period') return
-
-      const state = usePlansStore.getState()
-      const phaseRoute = resolvePhaseDetailRoute(location.pathname, state.workspace)
-
-      if (!phaseRoute && !state.selectedPhaseId && inEditable) return
-
-      e.preventDefault()
-
-      if (state.phaseModal) {
-        state.closePhaseModal()
-        state.setSidebarCollapsed(true)
-      } else if (phaseRoute) {
-        navigate(`/plans/${phaseRoute.planId}`)
-        state.setSidebarCollapsed(true)
-      } else if (state.selectedPhaseId) {
-        state.setSelectedPhaseId(null)
-        state.setSidebarCollapsed(true)
-      } else {
+      if (e.key === '.' || e.code === 'Period') {
+        e.preventDefault()
         toggleSidebarCollapsed()
       }
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
-  }, [location.pathname, navigate, toggleSidebarCollapsed, toggleAgentChatOpen])
+  }, [toggleSidebarCollapsed, toggleAgentChatOpen])
 
   return (
-    <CommandMenuProvider>
-      <GlobalKeyboardShortcuts />
-      <NewPlanDialog />
+    <>
+      <CommandMenu />
       <div
         className="flex h-full min-h-0 w-full max-w-full flex-col overflow-hidden overscroll-none bg-background"
         onPointerDownCapture={(e) => {
@@ -113,33 +88,17 @@ export function AppShell({ children }: { children?: ReactNode }) {
       >
         <div className="flex items-center gap-3 inset-edge inset-edge-b px-3 py-2 md:hidden">
           <Link
-            to="/plans"
+            to="/"
             className="text-sm font-semibold text-foreground transition-surface duration-150 ease-hover hover:text-primary"
           >
-            Dance
+            {APP_NAME}
           </Link>
           <Link
-            to="/plans"
+            to="/settings"
             className="text-xs text-muted-foreground transition-surface duration-150 ease-hover hover:text-foreground"
           >
-            Plans
+            Settings
           </Link>
-          {features.inbox ? (
-            <Link
-              to="/inbox"
-              className="text-xs text-muted-foreground transition-surface duration-150 ease-hover hover:text-foreground"
-            >
-              Inbox
-            </Link>
-          ) : null}
-          {features.settings ? (
-            <Link
-              to="/settings"
-              className="text-xs text-muted-foreground transition-surface duration-150 ease-hover hover:text-foreground"
-            >
-              Settings
-            </Link>
-          ) : null}
           <span className="text-xs text-muted-foreground">Press / to search</span>
         </div>
 
@@ -148,7 +107,7 @@ export function AppShell({ children }: { children?: ReactNode }) {
           style={topGridStyle}
         >
           <ShellWorkspaceHeader
-            workspaceName={workspaceName}
+            workspaceName={APP_NAME}
             collapsed={sidebarCollapsed}
             onToggleCollapsed={toggleSidebarCollapsed}
           />
@@ -211,6 +170,6 @@ export function AppShell({ children }: { children?: ReactNode }) {
           </div>
         </div>
       </div>
-    </CommandMenuProvider>
+    </>
   )
 }

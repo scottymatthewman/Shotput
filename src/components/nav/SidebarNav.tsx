@@ -1,9 +1,5 @@
 import {
-  navEventsIcon,
   navHomeIcon,
-  navInboxIcon,
-  navPlansIcon,
-  navReportsIcon,
   navSettingsIcon,
   type SidebarNavIcon,
 } from '@/components/nav/navIcons'
@@ -12,23 +8,8 @@ import { sidebarNavDensity } from '@/components/nav/sidebarNavStyles'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { features } from '@/config/features'
 import { SHELL_SIDEBAR_NAV_TOP_PADDING_CLASS } from '@/layouts/shellLayout'
+import { db, hasInstantConfig } from '@/lib/instant/db'
 import { cn } from '@/lib/utils'
-import { CURRENT_USER_ID, usePlansStore } from '@/state/store'
-
-export {
-  SidebarNavDropdownItem,
-  SidebarNavNestedItem,
-  SidebarNavStandardItem,
-  SidebarNavStubItem,
-  SidebarNavItem,
-} from '@/components/nav/SidebarNavItem'
-
-function userInitials(name: string) {
-  const parts = name.trim().split(/\s+/)
-  if (parts.length === 0) return '—'
-  if (parts.length === 1) return parts[0]!.slice(0, 2).toUpperCase()
-  return `${parts[0]!.charAt(0)}${parts[parts.length - 1]!.charAt(0)}`.toUpperCase()
-}
 
 function featureNavItem(
   enabled: boolean,
@@ -53,7 +34,8 @@ function featureNavItem(
 
 /** Primary nav column — workspace chrome lives in `ShellWorkspaceHeader`. */
 export function SidebarNav({ className }: { className?: string }) {
-  const me = usePlansStore((s) => s.workspace.users[CURRENT_USER_ID])
+  const { user } = db.useAuth()
+  const accountLabel = user?.email ?? (hasInstantConfig ? 'Account' : 'Guest')
 
   return (
     <aside
@@ -80,26 +62,6 @@ export function SidebarNav({ className }: { className?: string }) {
                 icon: navHomeIcon,
                 end: true,
               })}
-              {featureNavItem(features.inbox, {
-                to: '/inbox',
-                label: 'Inbox',
-                icon: navInboxIcon,
-              })}
-              {featureNavItem(features.events, {
-                to: '/events',
-                label: 'Events',
-                icon: navEventsIcon,
-              })}
-              {featureNavItem(features.plans, {
-                to: '/plans',
-                label: 'Plans',
-                icon: navPlansIcon,
-              })}
-              {featureNavItem(features.reports, {
-                to: '/reports',
-                label: 'Reports',
-                icon: navReportsIcon,
-              })}
             </div>
           </ScrollArea>
         </nav>
@@ -112,9 +74,8 @@ export function SidebarNav({ className }: { className?: string }) {
         <SidebarNavItem
           variant="user"
           to="/settings"
-          label={me?.name ?? 'Account'}
-          avatarUrl={me?.avatarUrl}
-          initials={me?.name ? userInitials(me.name) : '—'}
+          label={accountLabel}
+          initials={(user?.email ?? 'G').charAt(0).toUpperCase()}
         />
         {featureNavItem(features.settings, {
           to: '/settings',

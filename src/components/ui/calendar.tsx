@@ -1,21 +1,12 @@
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import {
-  DayPicker,
-  getDefaultClassNames,
-  type DayPickerProps,
-} from 'react-day-picker'
+import { DayPicker, getDefaultClassNames, type DayPickerProps } from 'react-day-picker'
 
 export type CalendarProps = DayPickerProps
 
 /** Branded month grid — uses app tokens (popover, border, primary) instead of browser-native date UI. */
-function Calendar({
-  className,
-  classNames,
-  showOutsideDays = true,
-  ...props
-}: CalendarProps) {
+function Calendar({ className, classNames, showOutsideDays = true, ...props }: CalendarProps) {
   const defaults = getDefaultClassNames()
 
   return (
@@ -62,14 +53,17 @@ function Calendar({
           buttonVariants({ variant: 'ghost' }),
           'size-8 rounded-md p-0 font-normal text-foreground transition-surface duration-150 ease-hover',
           'hover:bg-accent/40 hover:text-accent-foreground',
-          'dance-focus-ring aria-selected:opacity-100',
+          'app-focus-ring aria-selected:opacity-100',
           defaults.day_button,
         ),
         selected: cn(
           '[&_button]:border-transparent [&_button]:bg-primary [&_button]:text-primary-foreground [&_button]:hover:bg-primary/90 [&_button]:hover:text-primary-foreground',
           defaults.selected,
         ),
-        today: cn('bg-accent/25 [&_button]:font-semibold [&_button]:text-foreground', defaults.today),
+        today: cn(
+          'bg-accent/25 [&_button]:font-semibold [&_button]:text-foreground',
+          defaults.today,
+        ),
         outside: cn('text-muted-foreground/60', defaults.outside),
         disabled: cn('opacity-40', defaults.disabled),
         hidden: cn('invisible', defaults.hidden),

@@ -18,14 +18,11 @@ function SheetPortal({ ...props }: ComponentProps<typeof DialogPrimitive.Portal>
   return <DialogPrimitive.Portal {...props} />
 }
 
-function SheetOverlay({
-  className,
-  ...props
-}: ComponentProps<typeof DialogPrimitive.Overlay>) {
+function SheetOverlay({ className, ...props }: ComponentProps<typeof DialogPrimitive.Overlay>) {
   return (
     <DialogPrimitive.Overlay
       className={cn(
-        'fixed inset-0 z-50 bg-black/50 data-[state=closed]:animate-dance-sheet-overlay-out data-[state=open]:animate-dance-sheet-overlay-in motion-reduce:animate-none',
+        'fixed inset-0 z-50 bg-black/50 data-[state=closed]:animate-app-sheet-overlay-out data-[state=open]:animate-app-sheet-overlay-in motion-reduce:animate-none',
         className,
       )}
       {...props}
@@ -48,9 +45,9 @@ function SheetContent({
         className={cn(
           'fixed z-50 flex flex-col bg-card shadow-lg motion-reduce:animate-none',
           side === 'right' &&
-            'top-0 right-0 h-full w-full max-w-lg overflow-hidden rounded-l-lg inset-edge inset-edge-l inset-edge-strong data-[state=closed]:animate-dance-sheet-out-right data-[state=open]:animate-dance-sheet-in-right',
+            'top-0 right-0 h-full w-full max-w-lg overflow-hidden rounded-l-lg inset-edge inset-edge-l inset-edge-strong data-[state=closed]:animate-app-sheet-out-right data-[state=open]:animate-app-sheet-in-right',
           side === 'left' &&
-            'top-0 left-0 h-full w-full max-w-md overflow-hidden rounded-r-lg inset-edge inset-edge-r inset-edge-strong data-[state=closed]:animate-dance-sheet-out-left data-[state=open]:animate-dance-sheet-in-left',
+            'top-0 left-0 h-full w-full max-w-md overflow-hidden rounded-r-lg inset-edge inset-edge-r inset-edge-strong data-[state=closed]:animate-app-sheet-out-left data-[state=open]:animate-app-sheet-in-left',
           className,
         )}
         {...props}
@@ -62,13 +59,15 @@ function SheetContent({
 }
 
 function SheetHeader({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('flex flex-col gap-2 inset-edge-ring inset-edge-ring-b p-4', className)} {...props} />
+  return (
+    <div
+      className={cn('flex flex-col gap-2 inset-edge-ring inset-edge-ring-b p-4', className)}
+      {...props}
+    />
+  )
 }
 
-function SheetTitle({
-  className,
-  ...props
-}: ComponentProps<typeof DialogPrimitive.Title>) {
+function SheetTitle({ className, ...props }: ComponentProps<typeof DialogPrimitive.Title>) {
   return (
     <DialogPrimitive.Title
       className={cn('text-base font-semibold text-foreground', className)}

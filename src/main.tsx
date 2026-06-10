@@ -4,6 +4,7 @@ import './index.css'
 import { AppBootGate } from '@/components/AppBootGate'
 import { AppBootSkeleton } from '@/components/AppBootSkeleton'
 
+// eslint-disable-next-line react-refresh/only-export-components -- entry file, never hot-reloaded
 const App = lazy(() => import('./App.tsx'))
 
 createRoot(document.getElementById('root')!).render(

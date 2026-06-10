@@ -2,22 +2,22 @@
  * App typography — single source of truth.
  *
  * To change the app font:
- * 1. Update --dance-font-family-name and --dance-font-file-base below.
+ * 1. Update --app-font-family-name and --app-font-file-base below.
  * 2. Replace files in public/fonts/ (match filenames or update @font-face src paths).
- * 3. Keep the literal font-family in each @font-face in sync with --dance-font-family-name.
+ * 3. Keep the literal font-family in each @font-face in sync with --app-font-family-name.
  * 4. Sync index.html boot @font-face / font-family to match.
  *
  * Numeric utility overrides (tabular-nums, etc.): typography-utilities.css
  */
 
 :root {
-  --dance-font-family-name: 'Gen Interface JP';
-  --dance-font-family-fallback: ui-sans-serif, system-ui, sans-serif;
-  --dance-font-family: var(--dance-font-family-name), var(--dance-font-family-fallback);
-  --dance-font-file-base: '/fonts/gen-interface-jp';
+  --app-font-family-name: 'Gen Interface JP';
+  --app-font-family-fallback: ui-sans-serif, system-ui, sans-serif;
+  --app-font-family: var(--app-font-family-name), var(--app-font-family-fallback);
+  --app-font-file-base: '/fonts/gen-interface-jp';
 }
 
-/* font-family literal must match --dance-font-family-name */
+/* font-family literal must match --app-font-family-name */
 @font-face {
   font-family: 'Gen Interface JP';
   font-style: normal;
@@ -84,12 +84,12 @@
 
 @layer base {
   html {
-    font-family: var(--dance-font-family);
+    font-family: var(--app-font-family);
   }
 
   body,
   #root {
-    font-family: var(--dance-font-family);
+    font-family: var(--app-font-family);
   }
 
   :where(
@@ -142,6 +142,6 @@
 
   /* Portals (Radix, etc.) mount on body; reinforce when a wrapper sets its own stack */
   :where([data-radix-portal], [data-radix-popper-content-wrapper]) {
-    font-family: var(--dance-font-family);
+    font-family: var(--app-font-family);
   }
 }

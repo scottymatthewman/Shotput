@@ -8,7 +8,11 @@ export function PageShell({
   children: ReactNode
   className?: string
 }) {
-  return <div className={cn('flex min-h-0 flex-1 flex-col overflow-clip', className)}>{children}</div>
+  return (
+    <div className={cn('flex min-h-0 flex-1 flex-col overflow-clip', className)}>
+      {children}
+    </div>
+  )
 }
 
 export function PageScrollArea({

@@ -20,7 +20,7 @@ function Checkbox({ className, ...props }: ComponentProps<typeof CheckboxPrimiti
   return (
     <CheckboxPrimitive.Root
       className={cn(
-        'peer grid size-4 shrink-0 place-content-center rounded-[4px] border border-border bg-card shadow-none transition-surface dance-focus-ring duration-150',
+        'peer grid size-4 shrink-0 place-content-center rounded-[4px] border border-border bg-card shadow-none transition-surface app-focus-ring duration-150',
         'disabled:cursor-not-allowed disabled:opacity-50',
         'data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground',
         className,

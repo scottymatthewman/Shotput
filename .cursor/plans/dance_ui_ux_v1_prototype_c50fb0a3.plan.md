@@ -18,7 +18,7 @@ todos:
     content: Implement Project index, Project home (timeline cards), Settings integrations gallery
     status: completed
   - id: timeline-workspace
-    content: "Build TimelineWorkspace: Gantt primary, Table secondary, minimal Board stub; task drawer slide-over"
+    content: 'Build TimelineWorkspace: Gantt primary, Table secondary, minimal Board stub; task drawer slide-over'
     status: completed
   - id: interactions-store
     content: Add Zustand/reducer mock store; bar drag updates task dates; emit ActivityEvent entries
@@ -50,7 +50,6 @@ Ship a **clickable, locally runnable** prototype that answers: “Can a team nav
 
 ## Recommended stack (greenfield repo)
 
-
 | Layer         | Choice                                                            | Rationale                                                                                                                                                                                            |
 | ------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | App           | **Vite + React + TypeScript**                                     | Fast dev loop, no server assumptions; easy to add Next later if you standardize on it.                                                                                                               |
@@ -61,7 +60,6 @@ Ship a **clickable, locally runnable** prototype that answers: “Can a team nav
 | Icons         | **lucide-react**                                                  | Neutral, product-y.                                                                                                                                                                                  |
 | Dates         | **date-fns**                                                      | Lightweight formatting and day math for the chart.                                                                                                                                                   |
 | Gantt         | **Start custom (CSS grid / flex rows)** or a **thin OSS wrapper** | For v1, prefer a **small custom renderer** (rows = tasks, bars = date ranges) so you are not fighting library APIs before the model is stable. Add a library only if drag-resize becomes too costly. |
-
 
 If you strongly prefer **Next.js** for future SSR, the same component plan applies—just swap the bootstrap step; keep data client-side.
 
@@ -87,7 +85,7 @@ When mockup spacing (e.g. sidebar pixel spec) conflicts with Linear density, **p
 
 ### Tokens and global styles
 
-- `**src/styles/globals.css` (or equivalent):** define **semantic CSS variables** (shadcn-style): background/foreground/card/border/input/ring/primary/accent/destructive/muted, plus **Dance semantics** mapped to Tailwind utilities (examples: `--status-todo`, `--status-in-progress`, `--status-blocked`, `--status-done`, `--timeline-healthy`, `--timeline-at-risk`, `**--accent-agent`** distinct from primary so agent affordances stay recognizable).
+- `**src/styles/globals.css` (or equivalent):** define **semantic CSS variables** (shadcn-style): background/foreground/card/border/input/ring/primary/accent/destructive/muted, plus **Dance semantics** mapped to Tailwind utilities (examples: `--status-todo`, `--status-in-progress`, `--status-blocked`, `--status-done`, `--timeline-healthy`, `--timeline-at-risk`, `**--accent-agent`\*\* distinct from primary so agent affordances stay recognizable).
 - **Typography:** pick one sans stack (e.g. **Geist Sans** or **Inter**) via `@font-face` or hosting-friendly import; define a small **type ramp** (page title, section, body, table/meta, monospace for IDs if needed) using Tailwind `@apply` or utility classes documented in one place.
 - **Radius and elevation:** align `radius` with shadcn defaults; use **subtle borders** over heavy shadows for Linear-like density.
 - **Motion:** standard transition tokens for sheet/dialog open; **respect `prefers-reduced-motion`** for drag and panel animations.
@@ -95,10 +93,9 @@ When mockup spacing (e.g. sidebar pixel spec) conflicts with Linear density, **p
 
 ### Color palette (dark UI reference)
 
-Extracted from the filter UI reference. These are **Dance's** dark surfaces and accent—they support the **Linear-like** shell (density, borders, keyboard UX) without imitating Linear's purple brand. Use these hex values in `**globals.css`** (CSS variables) and mirror them in `**tailwind.config**` so primitives and Dance wrappers pull from tokens—not raw hex in components.
+Extracted from the filter UI reference. These are **Dance's** dark surfaces and accent—they support the **Linear-like** shell (density, borders, keyboard UX) without imitating Linear's purple brand. Use these hex values in `**globals.css`** (CSS variables) and mirror them in `**tailwind.config\*\*` so primitives and Dance wrappers pull from tokens—not raw hex in components.
 
 **Core palette**
-
 
 | Role                            | Hex       | Usage                                                                                 |
 | ------------------------------- | --------- | ------------------------------------------------------------------------------------- |
@@ -111,11 +108,9 @@ Extracted from the filter UI reference. These are **Dance's** dark surfaces and 
 | Avatar / chip accent (blue)     | `#5C6BC0` | Assignee letter tiles, categorical accent 1                                           |
 | Avatar / chip accent (coral)    | `#FF6B6B` | Assignee letter tiles, categorical accent 2, warm contrast                            |
 
-
 **Suggested semantic map (shadcn-style HSL variables)**
 
 Map the above into your theme; example pairings for a **dark-first** `:root`:
-
 
 | Semantic token           | Suggested source                    | Notes                                            |
 | ------------------------ | ----------------------------------- | ------------------------------------------------ |
@@ -137,16 +132,15 @@ Map the above into your theme; example pairings for a **dark-first** `:root`:
 | `--accent`               | `rgba(0, 230, 153, 0.12)` (example) | Selected row wash derived from mint              |
 | `--accent-foreground`    | `#00E699` or `#E0E0E0`              | Tune for contrast on wash                        |
 
-
 **Dance / product semantics** (keep distinct from generic `primary` where clarity helps):
 
-- `**--accent-agent`:** use mint `#00E699` or a slightly adjusted green so AI assignees stay on-brand.
+- `**--accent-agent`:\*\* use mint `#00E699` or a slightly adjusted green so AI assignees stay on-brand.
 - **Status / timeline health:** map `--status-*` and `--timeline-*` to mint for “healthy / on track,” coral `#FF6B6B` for risk/blocked (aligns with reference accent pairings), blue `#5C6BC0` for neutral/in-progress if needed.
 
 **Chrome notes**
 
 - **Radius:** reference UI reads ~4–6px on panels and inputs; align `--radius` to **6px** (0.375rem) unless you standardize on shadcn default.
-- **Data viz (e.g. histograms):** use `**#00E699`** for active series; muted bars can use `#2A2A2A` or low-opacity foreground.
+- **Data viz (e.g. histograms):** use `**#00E699`\*\* for active series; muted bars can use `#2A2A2A` or low-opacity foreground.
 
 ### shadcn/ui baseline (primitives)
 
@@ -155,7 +149,7 @@ Map the above into your theme; example pairings for a **dark-first** `:root`:
   - Shell and forms: **Button**, **Input**, **Textarea**, **Label**, **Checkbox** (optional for subtasks)
   - Surfacing structure: **Card**, **Separator**, **ScrollArea**, **Skeleton**
   - Navigation and mode switching: **Tabs**, **DropdownMenu**, **NavigationMenu** (optional)
-  - Overlays and command UI: **Dialog**, **Sheet**, **Popover**, **Tooltip**, **Command** (cmdk) for `**Cmd+K`**
+  - Overlays and command UI: **Dialog**, **Sheet**, **Popover**, **Tooltip**, **Command** (cmdk) for `**Cmd+K`\*\*
   - Density signals: **Badge**, **Avatar**
 
 This gives you consistent focus rings, radix behavior, and a path to iterate without swapping libraries later.
@@ -163,7 +157,6 @@ This gives you consistent focus rings, radix behavior, and a path to iterate wit
 ### Dance wrappers (design system layer)
 
 Thin **app-local components** built on primitives—keeps screens consistent and encodes Dance UX rules:
-
 
 | Wrapper                                          | Role                                                                                                    |
 | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
@@ -174,13 +167,11 @@ Thin **app-local components** built on primitives—keeps screens consistent and
 | `ActivityItem`                                   | One row in the history stream (actor, verb, object, relative time)                                      |
 | `GanttRow` / `GanttBar`                          | Row layout and bar fill using status tokens (implementation stays domain-aware but colors come from DS) |
 
-
 **Rule:** primitives live under `components/ui/`; Dance composites live under `components/dance/` (or `components/collie/` if you keep that folder name) so you never fork Button styles per screen.
 
 ### Side panel spacing (reference mockup)
 
-Use these measurements when implementing `**SidebarNav`** / the left shell so density and rhythm match the annotated reference (adapt colors and radius to Dance tokens).
-
+Use these measurements when implementing `**SidebarNav`\*\* / the left shell so density and rhythm match the annotated reference (adapt colors and radius to Dance tokens).
 
 | Token                   | Value                                                            | Notes                                                                                 |
 | ----------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
@@ -193,15 +184,14 @@ Use these measurements when implementing `**SidebarNav`** / the left shell so de
 | Logo ↔ title            | **12px**                                                         | Horizontal gap                                                                        |
 | Space below header      | **16px**                                                         | Before search block                                                                   |
 | Search margins          | **16px** top & bottom                                            | Around the search field                                                               |
-| Search field            | `**--card` or input surface**, rounded                           | Magnifier left, “Search” placeholder, **⌘K** hint right (kbd-style); border `--input` |
+| Search field            | `**--card` or input surface\*\*, rounded                         | Magnifier left, “Search” placeholder, **⌘K** hint right (kbd-style); border `--input` |
 | Nav row height          | **44px**                                                         | Each item                                                                             |
 | Row horizontal padding  | **12px** left of icon, **16px** right                            |                                                                                       |
 | Icon column             | **20px** wide                                                    | Icons centered in column                                                              |
 | Icon ↔ label            | **12px**                                                         |                                                                                       |
-| Section title           | Muted / light gray                                               | “Menu”, “Account” (or Dance `muted-foreground` equivalent)                          |
+| Section title           | Muted / light gray                                               | “Menu”, “Account” (or Dance `muted-foreground` equivalent)                            |
 | Active row              | Muted wash + rounded (`--accent` wash or `#1A1A1A` on `#0D0D0D`) | e.g. current route; optional mint left border or dot using `--primary`                |
 | Notification badges     | Right-aligned on row                                             | Pill/badge overlay (reference mock: blue count on “My Task”, purple on “Messages”)    |
-
 
 **Global panel chrome:** use **dark palette** surfaces (`--card` `#1A1A1A` on `--background` `#0D0D0D`, borders `#2A2A2A`) from **[Color palette (dark UI reference)](#color-palette-dark-ui-reference)**—the original mock showed a light sidebar; for Dance, keep **these spacing numbers** and **swap fills** to the dark tokens. Treat the sidebar as **Linear-like**: quiet background, **border separation** from main if needed, **muted section labels**, **obvious active row**—not a marketing panel.
 
@@ -222,7 +212,7 @@ Suggested routes:
 - `/projects/:projectId/timelines/:timelineId` — **Primary work surface** (see below)
 - `/settings` — **Integrations gallery** (static tiles: Slack, Gmail, Notion…) with “Not connected” and copy that explains intent—no OAuth
 
-Deep-linking goal: `**/projects/p1/timelines/t3?task=x7`** opens the task drawer for `x7`.
+Deep-linking goal: `**/projects/p1/timelines/t3?task=x7`\*\* opens the task drawer for `x7`.
 
 ```mermaid
 flowchart LR
@@ -232,8 +222,6 @@ flowchart LR
   SettingsIntegrations --> ProjectIndex
 ```
 
-
-
 ## Primary work surface (`TimelineWorkspace`)
 
 This is where “Linear + Gantt” must converge.
@@ -241,13 +229,15 @@ This is where “Linear + Gantt” must converge.
 **Layout (desktop-first):**
 
 1. **Left sidebar** — **260px** wide; spacing per **[Side panel spacing (reference mockup)](#side-panel-spacing-reference-mockup)**. Contents: project switcher (mock list), shortcuts to timelines within current project.
-2. **Main top bar** — timeline title + status badge + date range summary; segmented control: `**Gantt` | `Table` | `Board` (stub)**.
+2. **Main top bar** — timeline title + status badge + date range summary; segmented control: `**Gantt` | `Table` | `Board` (stub)\*\*.
 3. **Center** — main view per mode:
-  - **Gantt (v1 hero):** swimlane per **section/group** or flat list; each row shows task title, assignee pills, bar with start/end. Interactions:
-    - **Drag bar horizontally** → updates `start`/`end` in local state only
-    - **Resize ends** optional if timeboxed; horizontal move alone is acceptable for v1
-  - **Table:** dense list (Linear-like): status, priority (optional), assignee, dates, grouped by section.
-  - **Board:** Kanban columns by status — can be minimal columns with a few tasks to prove parity.
+
+- **Gantt (v1 hero):** swimlane per **section/group** or flat list; each row shows task title, assignee pills, bar with start/end. Interactions:
+  - **Drag bar horizontally** → updates `start`/`end` in local state only
+  - **Resize ends** optional if timeboxed; horizontal move alone is acceptable for v1
+- **Table:** dense list (Linear-like): status, priority (optional), assignee, dates, grouped by section.
+- **Board:** Kanban columns by status — can be minimal columns with a few tasks to prove parity.
+
 4. **Right panel (collapsible)** — **Activity / history** scoped to selection: whole timeline vs selected task; list of chronological events (“Alex moved Roo’s kickoff checklist from Todo → Doing”).
 5. **Command palette placeholder** (`Cmd+K`) — fuzzy jump to tasks/timelines; static index over mock data. This sells “Linear-like” discipline even before real search.
 
@@ -278,7 +268,7 @@ Centralize fixtures so UI stays honest:
 - `src/mock/fixtures.ts` — rich seed (2 projects, 3–4 timelines, 40–80 tasks, 2 agents, 10+ humans)
 - `src/state/store.ts` — **lightweight reducer or Zustand** for mutations (drag tasks, toggle status); emit **derived activity rows** onto an in-memory timeline so the right panel feels alive
 
-Optional: `**localStorage` persistence** behind a dev toggle so stakeholder demos survive refresh.
+Optional: `**localStorage` persistence\*\* behind a dev toggle so stakeholder demos survive refresh.
 
 Activity events should be **structured** even in mock (`actor`, `verb`, `object`, `timestamp`, optional `payload`) so the UI you build aligns with a future audit log.
 
@@ -292,8 +282,6 @@ sequenceDiagram
   Store->>Activity: appendEvent
   Activity-->>UI: rightPanelUpdates
 ```
-
-
 
 ## Key UX hypotheses to validate in v1
 

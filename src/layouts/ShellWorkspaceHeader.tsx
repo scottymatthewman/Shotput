@@ -1,4 +1,3 @@
-import { WorkspaceMark } from '@/components/dance/WorkspaceMark'
 import { navSidebarIcon } from '@/components/nav/navIcons'
 import { sidebarNavDensity } from '@/components/nav/sidebarNavStyles'
 import { Button } from '@/components/ui/button'
@@ -14,6 +13,22 @@ const shellIconButtonClass = cn(
   'transition-surface pressable duration-150 ease-hover',
   'hover:!bg-transparent hover:!text-foreground active:!bg-transparent',
 )
+
+export function WorkspaceMark({ name, className }: { name: string; className?: string }) {
+  return (
+    <div
+      className={cn(
+        'flex size-10 shrink-0 items-center justify-center rounded-sm',
+        'inset-edge-ring inset-edge-ring-full bg-surface-3',
+        'text-sm font-semibold text-foreground',
+        className,
+      )}
+      aria-hidden
+    >
+      {name.trim() ? name.trim().charAt(0).toUpperCase() : '—'}
+    </div>
+  )
+}
 
 export function ShellWorkspaceHeader({
   workspaceName,

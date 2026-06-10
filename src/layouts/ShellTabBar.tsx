@@ -1,10 +1,7 @@
-import { Button } from '@/components/ui/button'
-import { resolveActivePlanId } from '@/lib/planRoute'
-import { cn } from '@/lib/utils'
-import { SHELL_TOP_HEIGHT_PX, SHELL_TOP_PADDING_CLASS } from '@/layouts/shellLayout'
-import { usePlansStore } from '@/state/store'
 import { navAddIcon, navCloseIcon } from '@/components/nav/navIcons'
-import { useLocation } from 'react-router-dom'
+import { Button } from '@/components/ui/button'
+import { SHELL_TOP_HEIGHT_PX, SHELL_TOP_PADDING_CLASS } from '@/layouts/shellLayout'
+import { cn } from '@/lib/utils'
 
 const tabChipClass = cn(
   'flex h-8 max-w-[200px] min-w-0 items-center gap-2.5 rounded-sm pl-3 pr-2',
@@ -19,12 +16,11 @@ const tabAddClass = cn(
   'hover:text-foreground',
 )
 
-export function ShellTabBar() {
-  const location = useLocation()
-  const workspace = usePlansStore((s) => s.workspace)
-  const planId = resolveActivePlanId(location.pathname, workspace)
-  const plan = planId ? workspace.plans[planId] : undefined
-
+/**
+ * Top-strip tab bar — render a chip per open document/record once your
+ * product has tabbable entities (the original design opened one per plan).
+ */
+export function ShellTabBar({ activeTabLabel }: { activeTabLabel?: string }) {
   return (
     <div
       className={cn(
@@ -33,16 +29,16 @@ export function ShellTabBar() {
       )}
       style={{ height: SHELL_TOP_HEIGHT_PX }}
     >
-      {plan ? (
+      {activeTabLabel ? (
         <div className={tabChipClass}>
-          <span className="min-w-0 flex-1 truncate">{plan.name}</span>
+          <span className="min-w-0 flex-1 truncate">{activeTabLabel}</span>
           <button
             type="button"
             className={cn(
               'pressable shrink-0 rounded-sm text-muted-foreground transition-surface duration-150 ease-hover',
-              'hover:text-foreground dance-focus-ring outline-none',
+              'hover:text-foreground app-focus-ring outline-none',
             )}
-            aria-label={`Close ${plan.name} tab`}
+            aria-label={`Close ${activeTabLabel} tab`}
             title="Close tab (coming soon)"
             disabled
           >
@@ -55,8 +51,8 @@ export function ShellTabBar() {
         variant="ghost"
         size="icon"
         className={tabAddClass}
-        aria-label="Open plan tab"
-        title="Open plan tab (coming soon)"
+        aria-label="Open tab"
+        title="Open tab (coming soon)"
         disabled
       >
         {navAddIcon({ className: 'size-[18px]', 'aria-hidden': true })}

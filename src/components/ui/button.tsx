@@ -5,7 +5,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import type { ButtonHTMLAttributes } from 'react'
 
 const buttonVariants = cva(
-  'pressable inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-surface dance-focus-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+  'pressable inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-surface app-focus-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -13,10 +13,8 @@ const buttonVariants = cva(
         secondary:
           'inset-edge-ring inset-edge-ring-full bg-secondary text-secondary-foreground hover:bg-muted',
         ghost: 'hover:bg-accent/30 hover:text-accent-foreground',
-        outline:
-          'inset-edge-ring inset-edge-ring-full bg-transparent hover:bg-muted/80',
-        destructive:
-          'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+        outline: 'inset-edge-ring inset-edge-ring-full bg-transparent hover:bg-muted/80',
+        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
         link: 'active:scale-100 text-primary underline-offset-4 hover:underline',
         /**
          * Back / ancillary control on tinted `PageHeader` rows (timeline workspace).
@@ -43,16 +41,13 @@ const buttonVariants = cva(
 )
 
 export interface ButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  extends ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   asChild?: boolean
 }
 
 function Button({ className, variant, size, asChild = false, ...props }: ButtonProps) {
   const Comp = asChild ? Slot : 'button'
-  return (
-    <Comp className={cn(buttonVariants({ variant, size, className }))} {...props} />
-  )
+  return <Comp className={cn(buttonVariants({ variant, size, className }))} {...props} />
 }
 
 export { Button, buttonVariants }

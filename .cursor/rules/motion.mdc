@@ -1,9 +1,9 @@
 ---
-description: Dance UI motion — transitions, easing, and accessibility
+description: UI motion — transitions, easing, and accessibility
 alwaysApply: true
 ---
 
-# Motion and interaction (Dance)
+# Motion and interaction
 
 Source of truth: motion tokens and helpers live in `src/index.css` (`@theme` motion block, `.transition-surface`, `.pressable`).
 
@@ -21,7 +21,6 @@ Source of truth: motion tokens and helpers live in `src/index.css` (`@theme` mot
 
 - One-off `transition-all` on new components without a reason (harder to keep GPU-friendly and consistent).
 - **New random** duration/easing constants in components instead of theme defaults and Tailwind utilities.
-- **Expo AV** — never; this repo’s mobile rule is **Expo Audio only** (if/when React Native code exists).
 
 ## Quick reference
 
@@ -31,4 +30,4 @@ className={cn('transition-surface pressable', className)}
 className={cn('transition-surface pressable duration-150', className)}
 ```
 
-`Button` and timeline tabs already follow this pattern—match them for new controls.
+`Button` and the sidebar nav rows already follow this pattern—match them for new controls.

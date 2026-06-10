@@ -1,5 +1,5 @@
 /**
- * Dance color system
+ * Color system
  *
  * Layer 1 — Primitives: raw palette (red, yellow, blue, green, neutral, purple).
  *           Do not use hex in components — reference semantics, Tailwind palette utilities,
@@ -8,7 +8,7 @@
  * Layer 2 — UI foundations: bg, surface-1/2/3, borders, text, interactive.
  *           Prefer Tailwind: bg-background, bg-surface-1, border-border, etc.
  *
- * Layer 3 — Feature: Gantt, phase badges, canvas chrome (reference Layer 2).
+ * Layer 3 — Feature tokens: add product-specific tokens here (reference Layer 2).
  *
  * Tailwind utilities are wired in index.css @theme from semantic tokens.
  */
@@ -95,209 +95,116 @@
   /* ─── Layer 2: UI foundations (light) ─── */
 
   /* Surfaces — lowest → highest elevation */
-  --dance-bg: var(--palette-neutral-50);
-  --dance-surface-1: var(--palette-neutral-0);
-  --dance-surface-2: var(--palette-neutral-50);
-  --dance-surface-3: var(--palette-neutral-100);
+  --app-bg: var(--palette-neutral-50);
+  --app-surface-1: var(--palette-neutral-0);
+  --app-surface-2: var(--palette-neutral-50);
+  --app-surface-3: var(--palette-neutral-100);
   /** Lightest surface in light mode; darkest in dark (white ↔ black anchors). */
-  --dance-surface-contrast: var(--palette-white);
+  --app-surface-contrast: var(--palette-white);
 
   /* Borders — subtle → strong */
-  --dance-border-subtle: var(--palette-neutral-100);
-  --dance-border-default: var(--palette-neutral-200);
-  --dance-border-hover: var(--palette-neutral-300);
-  --dance-border-strong: var(--palette-neutral-300);
-  --dance-border-focus: var(--palette-neutral-900);
+  --app-border-subtle: var(--palette-neutral-100);
+  --app-border-default: var(--palette-neutral-200);
+  --app-border-hover: var(--palette-neutral-300);
+  --app-border-strong: var(--palette-neutral-300);
+  --app-border-focus: var(--palette-neutral-900);
 
   /* Text */
-  --dance-text-primary: var(--palette-neutral-900);
-  --dance-text-secondary: var(--palette-neutral-500);
-  --dance-text-tertiary: var(--palette-neutral-400);
-  --dance-text-inverse: var(--palette-neutral-0);
-  --dance-text-on-canvas: var(--palette-neutral-900);
-  --dance-text-on-canvas-muted: rgb(from var(--palette-neutral-900) r g b / 0.6);
+  --app-text-primary: var(--palette-neutral-900);
+  --app-text-secondary: var(--palette-neutral-500);
+  --app-text-tertiary: var(--palette-neutral-400);
+  --app-text-inverse: var(--palette-neutral-0);
+  --app-text-on-canvas: var(--palette-neutral-900);
+  --app-text-on-canvas-muted: rgb(from var(--palette-neutral-900) r g b / 0.6);
 
   /* Interactive fills */
-  --dance-fill-hover: rgb(from var(--palette-neutral-900) r g b / 0.04);
-  --dance-fill-selected: rgb(from var(--palette-neutral-900) r g b / 0.06);
-  --dance-interactive-primary: var(--palette-neutral-900);
-  --dance-interactive-primary-fg: var(--palette-neutral-0);
-  --dance-interactive-accent: rgb(from var(--palette-neutral-900) r g b / 0.06);
-  --dance-interactive-accent-fg: var(--palette-neutral-900);
-  --dance-interactive-destructive: var(--palette-red-600);
-  --dance-interactive-destructive-fg: var(--palette-neutral-0);
-  --dance-interactive-nav-hover: var(--palette-neutral-900);
+  --app-fill-hover: rgb(from var(--palette-neutral-900) r g b / 0.04);
+  --app-fill-selected: rgb(from var(--palette-neutral-900) r g b / 0.06);
+  --app-interactive-primary: var(--palette-neutral-900);
+  --app-interactive-primary-fg: var(--palette-neutral-0);
+  --app-interactive-accent: rgb(from var(--palette-neutral-900) r g b / 0.06);
+  --app-interactive-accent-fg: var(--palette-neutral-900);
+  --app-interactive-destructive: var(--palette-red-600);
+  --app-interactive-destructive-fg: var(--palette-neutral-0);
+  --app-interactive-nav-hover: var(--palette-neutral-900);
 
   /*
    * Frost + progress — when spec says “white @ 90%”, dark mode uses black @ 90%.
    * Same rule for solid black ↔ white on progress fills.
    */
-  --dance-frost-surface: rgb(from var(--palette-white) r g b / 0.9);
-  --dance-surface-frost: rgb(from var(--dance-surface-1) r g b / 0.9);
-  --dance-progress-track: var(--palette-neutral-200);
-  --dance-progress-fill: var(--palette-black);
+  --app-frost-surface: rgb(from var(--palette-white) r g b / 0.9);
+  --app-surface-frost: rgb(from var(--app-surface-1) r g b / 0.9);
+  --app-progress-track: var(--palette-neutral-200);
+  --app-progress-fill: var(--palette-black);
 
   /* Legacy aliases → foundations (shadcn + existing components) */
-  --dance-surface-app: var(--dance-bg);
-  --dance-surface-content: var(--dance-surface-1);
-  --dance-surface-canvas: var(--dance-surface-1);
-  --dance-surface-elevated: var(--dance-surface-1);
-  --dance-surface-muted: var(--dance-surface-3);
-  --dance-surface-overlay: var(--dance-surface-1);
-  --dance-surface-inset: var(--dance-surface-3);
+  --app-surface-muted: var(--app-surface-3);
+  --app-surface-overlay: var(--app-surface-1);
 
-  --dance-status-neutral: var(--palette-neutral-500);
-  --dance-status-todo: var(--palette-neutral-500);
-  /* Active → blue, review → purple, missed → red, done → green */
-  --dance-status-progress: var(--palette-blue-600);
-  --dance-status-progress-bright: var(--palette-blue-500);
-  --dance-status-review: var(--palette-purple-600);
-  --dance-status-review-soft: var(--palette-purple-200);
-  --dance-status-review-fg: var(--palette-purple-700);
-  --dance-status-blocked: var(--palette-red-600);
-  --dance-status-blocked-bright: var(--palette-red-500);
-  --dance-status-blocked-fg: var(--palette-red-700);
-  --dance-status-done: var(--palette-green-500);
-  --dance-status-done-bright: var(--palette-green-500);
-  --dance-status-agent: var(--palette-neutral-900);
-  --dance-status-assignee: var(--palette-blue-600);
+  /* Status accents — icons/labels only, never structural borders */
+  --app-status-neutral: var(--palette-neutral-500);
+  --app-status-todo: var(--palette-neutral-500);
+  --app-status-progress: var(--palette-blue-600);
+  --app-status-review: var(--palette-purple-600);
+  --app-status-blocked: var(--palette-red-600);
+  --app-status-done: var(--palette-green-500);
 
-  --dance-gantt-bar-fill: var(--dance-surface-1);
-  /* Bar layout */
-  --dance-gantt-bar-height: 2.25rem;
-  --dance-gantt-bar-status-touch-inset-x: 0.125rem;
-  /* ─── Layer 3: Gantt (light) ─── */
-  --dance-gantt-highlight: var(--palette-neutral-900);
-  --dance-gantt-bar-glass: rgb(from var(--dance-gantt-highlight) r g b / 0.03);
-  --dance-gantt-bar-glass-end: rgb(from var(--dance-gantt-highlight) r g b / 0.06);
-  --dance-gantt-bar-accent-in-progress: rgb(from var(--dance-status-progress) r g b / 0.35);
-  --dance-gantt-bar-accent-in-review: rgb(from var(--dance-status-review) r g b / 0.28);
-  --dance-gantt-bar-accent-blocked: rgb(from var(--dance-status-blocked) r g b / 0.28);
-  --dance-gantt-bar-accent-done: rgb(from var(--dance-status-done-bright) r g b / 0.32);
-  --dance-gantt-scrubber: var(--palette-neutral-0);
-  --dance-gantt-scrubber-ring: var(--dance-surface-1);
-  --dance-gantt-row-hover: var(--dance-fill-hover);
-  --dance-gantt-today-line: rgb(from var(--dance-gantt-highlight) r g b / 0.28);
-  --dance-assignee-on-bar-bg: rgb(from var(--dance-gantt-highlight) r g b / 0.2);
-  --dance-assignee-on-bar-fg: var(--dance-text-on-canvas);
-
-  /* Phase badge surfaces (translucent fills) */
-  --dance-phase-todo-border: rgb(from var(--dance-text-secondary) r g b / 0.5);
-  --dance-phase-todo-bg: rgb(from var(--dance-text-secondary) r g b / 0.08);
-  --dance-phase-todo-fg: var(--dance-text-primary);
-  --dance-phase-in-progress-border: rgb(from var(--dance-status-progress) r g b / 0.35);
-  --dance-phase-in-progress-bg: rgb(from var(--dance-status-progress) r g b / 0.1);
-  --dance-phase-in-progress-fg: var(--dance-status-progress);
-  --dance-phase-in-review-border: var(--dance-status-review-soft);
-  --dance-phase-in-review-bg: rgb(from var(--dance-status-review-soft) r g b / 0.2);
-  --dance-phase-in-review-fg: var(--dance-status-review-fg);
-  --dance-phase-blocked-border: var(--dance-status-blocked);
-  --dance-phase-blocked-bg: rgb(from var(--dance-status-blocked) r g b / 0.12);
-  --dance-phase-blocked-fg: var(--dance-status-blocked);
-  --dance-phase-done-border: var(--dance-status-done-bright);
-  --dance-phase-done-bg: rgb(from var(--dance-status-done-bright) r g b / 0.12);
-  --dance-phase-done-fg: var(--dance-status-done);
-
-  --dance-chrome-fg: rgb(from var(--dance-text-on-canvas) r g b / 0.7);
-  --dance-chrome-fg-hover: var(--dance-text-on-canvas);
-  --dance-chrome-border: rgb(from var(--dance-text-on-canvas) r g b / 0.2);
-  --dance-chrome-border-hover: rgb(from var(--dance-text-on-canvas) r g b / 0.45);
+  /* Toolbar / chrome controls on page headers */
+  --app-chrome-fg: rgb(from var(--app-text-on-canvas) r g b / 0.7);
+  --app-chrome-fg-hover: var(--app-text-on-canvas);
+  --app-chrome-border: rgb(from var(--app-text-on-canvas) r g b / 0.2);
+  --app-chrome-border-hover: rgb(from var(--app-text-on-canvas) r g b / 0.45);
 }
 
 .dark {
   /* ─── Layer 2: UI foundations (dark) ─── */
 
-  --dance-bg: var(--palette-neutral-950);
-  --dance-surface-1: var(--palette-neutral-900);
-  --dance-surface-2: var(--palette-neutral-800);
-  --dance-surface-3: var(--palette-neutral-700);
-  --dance-surface-contrast: var(--palette-black);
+  --app-bg: var(--palette-neutral-950);
+  --app-surface-1: var(--palette-neutral-900);
+  --app-surface-2: var(--palette-neutral-800);
+  --app-surface-3: var(--palette-neutral-700);
+  --app-surface-contrast: var(--palette-black);
 
-  --dance-border-subtle: var(--palette-neutral-800);
-  --dance-border-default: var(--palette-neutral-700);
-  --dance-border-hover: var(--palette-neutral-500);
-  --dance-border-strong: var(--palette-neutral-600);
-  --dance-border-focus: var(--palette-neutral-0);
+  --app-border-subtle: var(--palette-neutral-800);
+  --app-border-default: var(--palette-neutral-700);
+  --app-border-hover: var(--palette-neutral-500);
+  --app-border-strong: var(--palette-neutral-600);
+  --app-border-focus: var(--palette-neutral-0);
 
-  --dance-text-primary: var(--palette-neutral-100);
-  --dance-text-secondary: var(--palette-neutral-400);
-  --dance-text-tertiary: var(--palette-neutral-500);
-  --dance-text-inverse: var(--palette-neutral-950);
-  --dance-text-on-canvas: var(--palette-neutral-100);
-  --dance-text-on-canvas-muted: rgb(from var(--palette-neutral-0) r g b / 0.6);
+  --app-text-primary: var(--palette-neutral-100);
+  --app-text-secondary: var(--palette-neutral-400);
+  --app-text-tertiary: var(--palette-neutral-500);
+  --app-text-inverse: var(--palette-neutral-950);
+  --app-text-on-canvas: var(--palette-neutral-100);
+  --app-text-on-canvas-muted: rgb(from var(--palette-neutral-0) r g b / 0.6);
 
-  --dance-fill-hover: rgb(from var(--palette-neutral-0) r g b / 0.05);
-  --dance-fill-selected: rgb(from var(--palette-neutral-0) r g b / 0.08);
-  --dance-interactive-primary: var(--palette-neutral-0);
-  --dance-interactive-primary-fg: var(--palette-neutral-950);
-  --dance-interactive-accent: rgb(from var(--palette-neutral-0) r g b / 0.12);
-  --dance-interactive-accent-fg: var(--palette-neutral-0);
-  --dance-interactive-destructive: var(--palette-red-400);
-  --dance-interactive-destructive-fg: var(--palette-neutral-950);
-  --dance-interactive-nav-hover: var(--palette-neutral-0);
+  --app-fill-hover: rgb(from var(--palette-neutral-0) r g b / 0.05);
+  --app-fill-selected: rgb(from var(--palette-neutral-0) r g b / 0.08);
+  --app-interactive-primary: var(--palette-neutral-0);
+  --app-interactive-primary-fg: var(--palette-neutral-950);
+  --app-interactive-accent: rgb(from var(--palette-neutral-0) r g b / 0.12);
+  --app-interactive-accent-fg: var(--palette-neutral-0);
+  --app-interactive-destructive: var(--palette-red-400);
+  --app-interactive-destructive-fg: var(--palette-neutral-950);
+  --app-interactive-nav-hover: var(--palette-neutral-0);
 
-  --dance-frost-surface: rgb(from var(--palette-black) r g b / 0.9);
-  --dance-surface-frost: rgb(from var(--dance-surface-1) r g b / 0.9);
-  --dance-progress-track: var(--palette-neutral-700);
-  --dance-progress-fill: var(--palette-white);
+  --app-frost-surface: rgb(from var(--palette-black) r g b / 0.9);
+  --app-surface-frost: rgb(from var(--app-surface-1) r g b / 0.9);
+  --app-progress-track: var(--palette-neutral-700);
+  --app-progress-fill: var(--palette-white);
 
-  --dance-surface-app: var(--dance-bg);
-  --dance-surface-content: var(--dance-surface-1);
-  --dance-surface-canvas: var(--dance-surface-1);
-  --dance-surface-elevated: var(--dance-surface-1);
-  --dance-surface-muted: var(--dance-surface-3);
-  --dance-surface-overlay: var(--dance-surface-1);
-  --dance-surface-inset: var(--dance-surface-3);
+  --app-surface-muted: var(--app-surface-3);
+  --app-surface-overlay: var(--app-surface-1);
 
-  --dance-status-neutral: var(--palette-neutral-400);
-  --dance-status-todo: var(--palette-neutral-400);
-  --dance-status-progress: var(--palette-blue-400);
-  --dance-status-progress-bright: var(--palette-blue-400);
-  --dance-status-review: var(--palette-purple-400);
-  --dance-status-review-soft: var(--palette-purple-300);
-  --dance-status-review-fg: var(--palette-purple-200);
-  --dance-status-blocked: var(--palette-red-400);
-  --dance-status-blocked-bright: var(--palette-red-400);
-  --dance-status-blocked-fg: var(--palette-red-200);
-  --dance-status-done: var(--palette-green-600);
-  --dance-status-done-bright: var(--palette-green-600);
-  --dance-status-agent: var(--palette-neutral-0);
-  --dance-status-assignee: var(--palette-blue-400);
+  --app-status-neutral: var(--palette-neutral-400);
+  --app-status-todo: var(--palette-neutral-400);
+  --app-status-progress: var(--palette-blue-400);
+  --app-status-review: var(--palette-purple-400);
+  --app-status-blocked: var(--palette-red-400);
+  --app-status-done: var(--palette-green-600);
 
-  /* ─── Layer 3: Gantt (dark) ─── */
-  --dance-gantt-bar-fill: var(--dance-surface-1);
-  --dance-gantt-highlight: var(--palette-neutral-0);
-  --dance-gantt-bar-glass: rgb(from var(--dance-gantt-highlight) r g b / 0.01);
-  --dance-gantt-bar-glass-end: rgb(from var(--dance-gantt-highlight) r g b / 0.01);
-  --dance-gantt-bar-accent-in-progress: rgb(from var(--dance-status-progress) r g b / 0.04);
-  --dance-gantt-bar-accent-in-review: rgb(from var(--dance-status-review) r g b / 0.04);
-  --dance-gantt-bar-accent-blocked: rgb(from var(--dance-status-blocked) r g b / 0.04);
-  --dance-gantt-bar-accent-done: rgb(from var(--dance-status-done-bright) r g b / 0.04);
-  --dance-gantt-scrubber: var(--palette-neutral-0);
-  --dance-gantt-scrubber-ring: var(--dance-surface-1);
-  --dance-gantt-row-hover: var(--dance-fill-hover);
-  --dance-gantt-today-line: rgb(from var(--dance-gantt-highlight) r g b / 0.28);
-  --dance-assignee-on-bar-bg: rgb(from var(--dance-gantt-highlight) r g b / 0.2);
-  --dance-assignee-on-bar-fg: var(--dance-text-on-canvas);
-
-  --dance-phase-todo-border: rgb(from var(--dance-gantt-highlight) r g b / 0.2);
-  --dance-phase-todo-bg: rgb(from var(--dance-gantt-highlight) r g b / 0.04);
-  --dance-phase-todo-fg: var(--dance-text-primary);
-  --dance-phase-in-progress-border: rgb(from var(--dance-status-progress) r g b / 0.45);
-  --dance-phase-in-progress-bg: rgb(from var(--dance-status-progress) r g b / 0.12);
-  --dance-phase-in-progress-fg: var(--dance-status-progress);
-  --dance-phase-in-review-border: var(--dance-status-review-soft);
-  --dance-phase-in-review-bg: rgb(from var(--dance-status-review-soft) r g b / 0.2);
-  --dance-phase-in-review-fg: var(--dance-status-review-fg);
-  --dance-phase-blocked-border: var(--dance-status-blocked);
-  --dance-phase-blocked-bg: rgb(from var(--dance-status-blocked) r g b / 0.12);
-  --dance-phase-blocked-fg: var(--dance-status-blocked);
-  --dance-phase-done-border: var(--dance-status-done-bright);
-  --dance-phase-done-bg: rgb(from var(--dance-status-done-bright) r g b / 0.12);
-  --dance-phase-done-fg: var(--dance-status-done-bright);
-
-  --dance-chrome-fg: rgb(from var(--dance-text-on-canvas) r g b / 0.6);
-  --dance-chrome-fg-hover: var(--dance-text-on-canvas);
-  --dance-chrome-border: rgb(from var(--dance-gantt-highlight) r g b / 0.4);
-  --dance-chrome-border-hover: var(--dance-gantt-highlight);
+  --app-chrome-fg: rgb(from var(--app-text-on-canvas) r g b / 0.6);
+  --app-chrome-fg-hover: var(--app-text-on-canvas);
+  --app-chrome-border: rgb(from var(--palette-neutral-0) r g b / 0.4);
+  --app-chrome-border-hover: var(--palette-neutral-0);
 }

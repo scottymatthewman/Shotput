@@ -2,13 +2,7 @@
   "mcpServers": {
     "agentation": {
       "command": "npx",
-      "args": [
-        "agentation-mcp",
-        "server",
-        "--mcp-only",
-        "--http-url",
-        "http://localhost:4747"
-      ]
+      "args": ["agentation-mcp", "server", "--mcp-only", "--http-url", "http://localhost:4747"]
     }
   }
 }

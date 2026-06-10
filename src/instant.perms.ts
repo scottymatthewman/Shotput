@@ -1,51 +1,16 @@
-/** Dev-open rules — tighten before production auth. */
+/**
+ * Owner-scoped rules — signed-in users can only touch their own items.
+ *
+ * Push changes with: npx instant-cli push perms
+ */
 const rules = {
-  workspaces: {
+  items: {
+    bind: ['isOwner', "auth.id != null && auth.id in data.ref('owner.id')"],
     allow: {
-      view: 'true',
-      create: 'true',
-      update: 'true',
-      delete: 'true',
-    },
-  },
-  users: {
-    allow: {
-      view: 'true',
-      create: 'true',
-      update: 'true',
-      delete: 'true',
-    },
-  },
-  agents: {
-    allow: {
-      view: 'true',
-      create: 'true',
-      update: 'true',
-      delete: 'true',
-    },
-  },
-  plans: {
-    allow: {
-      view: 'true',
-      create: 'true',
-      update: 'true',
-      delete: 'true',
-    },
-  },
-  phases: {
-    allow: {
-      view: 'true',
-      create: 'true',
-      update: 'true',
-      delete: 'true',
-    },
-  },
-  activityEvents: {
-    allow: {
-      view: 'true',
-      create: 'true',
-      update: 'true',
-      delete: 'true',
+      view: 'isOwner',
+      create: 'isOwner',
+      update: 'isOwner',
+      delete: 'isOwner',
     },
   },
 } as const

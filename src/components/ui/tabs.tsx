@@ -22,7 +22,7 @@ function TabsTrigger({ className, ...props }: ComponentProps<typeof TabsPrimitiv
   return (
     <TabsPrimitive.Trigger
       className={cn(
-        'pressable inline-flex h-full min-h-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-nested-md-p1)] px-3 text-xs font-medium transition-surface dance-focus-ring duration-150 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm',
+        'pressable inline-flex h-full min-h-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-nested-md-p1)] px-3 text-xs font-medium transition-surface app-focus-ring duration-150 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm',
         className,
       )}
       {...props}

@@ -1,9 +1,6 @@
+/** Feature flags — gate unfinished surfaces while shipping. */
 export const features = {
   home: true,
-  inbox: true,
-  events: false,
-  plans: true,
-  reports: false,
   settings: true,
 } as const
 

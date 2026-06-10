@@ -1,6 +1,6 @@
 ---
 name: Dance v2 Fresh Start
-overview: "Greenfield rebuild: InstantDB + Zustand (UI/actions), light/dark theme, nav shell (Home, Inbox, Plans, Reports) with full Plans feature set as the only live area. No Chat, Dashboard, Find, or other page code — nav stubs only."
+overview: 'Greenfield rebuild: InstantDB + Zustand (UI/actions), light/dark theme, nav shell (Home, Inbox, Plans, Reports) with full Plans feature set as the only live area. No Chat, Dashboard, Find, or other page code — nav stubs only.'
 todos:
   - id: scaffold
     content: Vite + React + Tailwind v4 + Router; Instant init; theme toggle; Zustand uiStore
@@ -106,14 +106,14 @@ This gives you everything Zustand is great at — snappy Gantt interactions, key
 
 **Zero code** for these (delete, don't stub pages):
 
-| Do not port | Files / areas |
-|-------------|---------------|
-| Chat | `WorkspaceChatPage.tsx`, chat nav |
-| Dashboard / Home page | `HomePage.tsx` |
+| Do not port            | Files / areas                                                                                  |
+| ---------------------- | ---------------------------------------------------------------------------------------------- |
+| Chat                   | `WorkspaceChatPage.tsx`, chat nav                                                              |
+| Dashboard / Home page  | `HomePage.tsx`                                                                                 |
 | Find / industry events | `FindIndustryEventsPage.tsx`, `FindIndustryEventDetailPage.tsx`, `mock/findIndustryCatalog.ts` |
-| Report placeholder | `ReportPlaceholderPage.tsx` |
-| Discovery backend | `packages/discovery`, `packages/shared`, `api/`, discovery plan migrations |
-| Deprecated naming | `Event*` pages, `resolveEventPlannerRoute`, `@deprecated` re-exports |
+| Report placeholder     | `ReportPlaceholderPage.tsx`                                                                    |
+| Discovery backend      | `packages/discovery`, `packages/shared`, `api/`, discovery plan migrations                     |
+| Deprecated naming      | `Event*` pages, `resolveEventPlannerRoute`, `@deprecated` re-exports                           |
 
 **Nav stubs only** for Home, Inbox, Reports — disabled rows in `SidebarNav`, no route, no page component, no mock data. When you're ready to build Inbox, you write it fresh against real Instant data.
 
@@ -142,9 +142,9 @@ This gives you everything Zustand is great at — snappy Gantt interactions, key
 ```ts
 // src/config/features.ts
 export const features = {
-  home: false,    // nav stub — no HomePage.tsx
-  inbox: false,   // nav stub — no InboxPage.tsx
-  plans: true,    // full feature set
+  home: false, // nav stub — no HomePage.tsx
+  inbox: false, // nav stub — no InboxPage.tsx
+  plans: true, // full feature set
   reports: false, // nav stub — no ReportsPage.tsx
   settings: false,
 } as const
@@ -152,13 +152,13 @@ export const features = {
 
 ### Routes (Plans only)
 
-| Route | Screen |
-|-------|--------|
-| `/` | Redirect → `/plans` |
-| `/plans` | Plan index (list + create) |
-| `/plans/:planId` | Workspace — Gantt / table |
-| `/plans/:planId/overview` | Plan overview |
-| `*` | Minimal 404 |
+| Route                     | Screen                     |
+| ------------------------- | -------------------------- |
+| `/`                       | Redirect → `/plans`        |
+| `/plans`                  | Plan index (list + create) |
+| `/plans/:planId`          | Workspace — Gantt / table  |
+| `/plans/:planId/overview` | Plan overview              |
+| `*`                       | Minimal 404                |
 
 Deep link: `?phase=:id` opens phase detail drawer on workspace.
 
@@ -210,13 +210,13 @@ This is the product. Ship it complete, not phased down to an MVP.
 
 ### Rename on port (no aliases)
 
-| Current | v2 |
-|---------|-----|
-| `EventIndexPage` | `PlanIndexPage` |
+| Current                 | v2                  |
+| ----------------------- | ------------------- |
+| `EventIndexPage`        | `PlanIndexPage`     |
 | `TimelineWorkspacePage` | `PlanWorkspacePage` |
-| `EventOverviewPage` | `PlanOverviewPage` |
-| `TaskSheet` | `PhaseSheet` |
-| `/plan/*` routes | `/plans/*` |
+| `EventOverviewPage`     | `PlanOverviewPage`  |
+| `TaskSheet`             | `PhaseSheet`        |
+| `/plan/*` routes        | `/plans/*`          |
 
 ---
 
@@ -281,8 +281,12 @@ activityEvents: { timestamp, actorId, actorIsAgent, verb, objectType,
 Semantic tokens via `.dark` on `<html>`:
 
 ```css
-:root { /* light */ }
-.dark { /* port current dark palette */ }
+:root {
+  /* light */
+}
+.dark {
+  /* port current dark palette */
+}
 ```
 
 - Toggle in sidebar; persist in `uiStore` + `localStorage`
@@ -340,22 +344,22 @@ Flip feature flags one at a time.
 
 ## Port list
 
-| Port (rename + clean) | Do not bring |
-|-----------------------|--------------|
-| `GanttView.tsx` | `HomePage.tsx` |
-| `TimelineTableView.tsx` | `WorkspaceChatPage.tsx` |
-| `TaskSheet.tsx` → `PhaseSheet.tsx` | `FindIndustryEventsPage.tsx` |
-| `EventOverviewPage.tsx` → `PlanOverviewPage.tsx` | `FindIndustryEventDetailPage.tsx` |
-| `EventIndexPage.tsx` → `PlanIndexPage.tsx` | `ReportPlaceholderPage.tsx` |
-| `TimelineWorkspacePage.tsx` → `PlanWorkspacePage.tsx` | `mock/findIndustryCatalog.ts` |
-| `CommandMenu.tsx`, `commandIndex.ts` | `packages/*`, `api/` |
-| `GlobalKeyboardShortcuts.tsx` | Deprecated event/timeline aliases |
-| `uiStore.ts` (as-is, + theme) | `domainStore` full clone pattern |
-| `mutations.ts`, `assembleWorkspace.ts`, `seed.ts` | 50 unused Event SVGs (Lucide for now) |
-| `instant.schema.ts` (minus industryEventId) | Agentation, nav debug probes |
-| `SidebarNav` (new item list) | |
-| `index.css` tokens (light + dark split) | |
-| shadcn `components/ui/*` | |
+| Port (rename + clean)                                 | Do not bring                          |
+| ----------------------------------------------------- | ------------------------------------- |
+| `GanttView.tsx`                                       | `HomePage.tsx`                        |
+| `TimelineTableView.tsx`                               | `WorkspaceChatPage.tsx`               |
+| `TaskSheet.tsx` → `PhaseSheet.tsx`                    | `FindIndustryEventsPage.tsx`          |
+| `EventOverviewPage.tsx` → `PlanOverviewPage.tsx`      | `FindIndustryEventDetailPage.tsx`     |
+| `EventIndexPage.tsx` → `PlanIndexPage.tsx`            | `ReportPlaceholderPage.tsx`           |
+| `TimelineWorkspacePage.tsx` → `PlanWorkspacePage.tsx` | `mock/findIndustryCatalog.ts`         |
+| `CommandMenu.tsx`, `commandIndex.ts`                  | `packages/*`, `api/`                  |
+| `GlobalKeyboardShortcuts.tsx`                         | Deprecated event/timeline aliases     |
+| `uiStore.ts` (as-is, + theme)                         | `domainStore` full clone pattern      |
+| `mutations.ts`, `assembleWorkspace.ts`, `seed.ts`     | 50 unused Event SVGs (Lucide for now) |
+| `instant.schema.ts` (minus industryEventId)           | Agentation, nav debug probes          |
+| `SidebarNav` (new item list)                          |                                       |
+| `index.css` tokens (light + dark split)               |                                       |
+| shadcn `components/ui/*`                              |                                       |
 
 Refactor `useDanceStore` → `plansStore`: keep action surface, drop domain mirror, wire directly to Instant query.
 

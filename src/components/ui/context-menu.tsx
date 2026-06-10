@@ -6,9 +6,7 @@ function ContextMenu({ ...props }: ComponentProps<typeof ContextMenuPrimitive.Ro
   return <ContextMenuPrimitive.Root {...props} />
 }
 
-function ContextMenuTrigger({
-  ...props
-}: ComponentProps<typeof ContextMenuPrimitive.Trigger>) {
+function ContextMenuTrigger({ ...props }: ComponentProps<typeof ContextMenuPrimitive.Trigger>) {
   return <ContextMenuPrimitive.Trigger {...props} />
 }
 
@@ -49,8 +47,17 @@ function ContextMenuSeparator({
   ...props
 }: ComponentProps<typeof ContextMenuPrimitive.Separator>) {
   return (
-    <ContextMenuPrimitive.Separator className={cn('-mx-1 my-1 h-px bg-border', className)} {...props} />
+    <ContextMenuPrimitive.Separator
+      className={cn('-mx-1 my-1 h-px bg-border', className)}
+      {...props}
+    />
   )
 }
 
-export { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger }
+export {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
+}

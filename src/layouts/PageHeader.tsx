@@ -37,8 +37,7 @@ export function PageHeader({
   leading,
   className,
 }: PageHeaderProps) {
-  const layout: PageHeaderLayout =
-    layoutProp ?? (descriptionInline ? 'inline' : 'stacked')
+  const layout: PageHeaderLayout = layoutProp ?? (descriptionInline ? 'inline' : 'stacked')
   const inline = layout === 'inline' && description != null && description !== ''
 
   return (
@@ -50,12 +49,7 @@ export function PageHeader({
       )}
     >
       <div className={cn('min-w-0', inline && 'flex-1', !inline && 'space-y-1')}>
-        <div
-          className={cn(
-            'flex min-w-0 items-center gap-3',
-            inline && 'min-w-0 flex-1',
-          )}
-        >
+        <div className={cn('flex min-w-0 items-center gap-3', inline && 'min-w-0 flex-1')}>
           {leading ? <div className="shrink-0">{leading}</div> : null}
           <h1 className={pageHeaderTitleClass}>{title}</h1>
           {inline ? (
@@ -68,9 +62,7 @@ export function PageHeader({
         {!inline && description ? (
           <p className={pageHeaderDescriptionBlockClass}>{description}</p>
         ) : null}
-        {meta ? (
-          <div className={cn(pageHeaderMetaClass, !inline && 'pt-1')}>{meta}</div>
-        ) : null}
+        {meta ? <div className={cn(pageHeaderMetaClass, !inline && 'pt-1')}>{meta}</div> : null}
       </div>
       {actions ? <div className={pageHeaderActionsClass}>{actions}</div> : null}
     </header>

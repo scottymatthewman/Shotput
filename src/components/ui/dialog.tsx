@@ -54,7 +54,7 @@ function DialogContent({
         className={cn(
           'fixed top-1/2 left-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg transition-surface data-[state=closed]:scale-95 data-[state=closed]:opacity-0 data-[state=open]:scale-100 data-[state=open]:opacity-100 motion-reduce:transition-none',
           variant === 'surface'
-            ? 'dance-modal-panel bg-surface-1 p-6'
+            ? 'app-modal-panel bg-surface-1 p-6'
             : 'inset-edge-ring inset-edge-ring-full inset-edge-strong bg-card p-6 shadow-lg',
           className,
         )}
@@ -62,7 +62,7 @@ function DialogContent({
       >
         {children}
         {hideClose ? null : (
-          <DialogPrimitive.Close className="pressable dance-focus-ring absolute top-4 right-4 rounded-sm opacity-70 transition-surface duration-150 ease-hover hover:opacity-100 disabled:pointer-events-none">
+          <DialogPrimitive.Close className="pressable app-focus-ring absolute top-4 right-4 rounded-sm opacity-70 transition-surface duration-150 ease-hover hover:opacity-100 disabled:pointer-events-none">
             <X className="size-4" />
             <span className="sr-only">Close</span>
           </DialogPrimitive.Close>
@@ -82,10 +82,7 @@ function DialogHeader({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   )
 }
 
-function DialogTitle({
-  className,
-  ...props
-}: ComponentProps<typeof DialogPrimitive.Title>) {
+function DialogTitle({ className, ...props }: ComponentProps<typeof DialogPrimitive.Title>) {
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"

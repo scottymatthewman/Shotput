@@ -1,6 +1,6 @@
 ---
 name: Linear-feel roadmap
-overview: "Phased roadmap to make Dance feel Linear-class: instant local interactions, keyboard/command UX, granular renders, trustworthy cold start, then InstantDB for domain data (local-first sync, optimistic writes, offline)—without building Linear’s custom sync engine."
+overview: 'Phased roadmap to make Dance feel Linear-class: instant local interactions, keyboard/command UX, granular renders, trustworthy cold start, then InstantDB for domain data (local-first sync, optimistic writes, offline)—without building Linear’s custom sync engine.'
 todos:
   - id: store-surgical-updates
     content: Replace structuredClone hot-path writes with Immer or surgical copies; add selectSidebarNav / selectTimelineBundle helpers in store.ts
@@ -68,6 +68,7 @@ Dance already has the **right stack and product direction** ([v1 plan](.cursor/p
 **Backend:** **[InstantDB](https://www.instantdb.com/)** is the chosen backend — client-side triple store, IndexedDB cache, optimistic `db.transact()`, realtime, and offline out of the box ([architecture](https://github.com/instantdb/instant)). This matches the [performance.dev Linear breakdown](https://performance.dev/how-is-linear-so-fast-a-technical-breakdown) without building a custom sync engine. **Phases 1–3** run on the current Zustand prototype; **Phase 4** migrates domain data to Instant. **Supabase is out of scope.**
 
 **Hybrid model (final architecture):**
+
 - **InstantDB** — projects, timelines, tasks, users, agents, activity log
 - **Zustand** — UI-only: sidebar, command open, hover/focus, view mode, dialogs, local undo/redo UX
 
@@ -76,6 +77,7 @@ Dance already has the **right stack and product direction** ([v1 plan](.cursor/p
 ## Current state snapshot (what the plan builds on)
 
 **Preserve — do not regress:**
+
 - Instant local mutations in [`store.ts`](src/state/store.ts) (no fetch/spinners on edits)
 - Gantt drag → `updateTaskDates` + activity events
 - Undo stack; keyboard shortcuts (`S`/`P`/`A`/`V`/`⌘Z`); hover hit-testing in Gantt/table
@@ -83,6 +85,7 @@ Dance already has the **right stack and product direction** ([v1 plan](.cursor/p
 - Zustand persist key `dance-prototype-v1`; [`sanitizeWorkspace`](src/lib/taskStatus.ts) for drift
 
 **Fix — known bottlenecks:**
+
 - `structuredClone` on every write → all task refs change → per-row Gantt selectors ineffective
 - **8 files** subscribe to full `s.workspace` (incl. [`TaskQuickActionDialogs.tsx`](src/components/dance/TaskQuickActionDialogs.tsx))
 - Static [`COMMAND_INDEX`](src/mock/fixtures.ts); trigger is `/` not `⌘K` (README/plan say `⌘K`)
@@ -90,6 +93,7 @@ Dance already has the **right stack and product direction** ([v1 plan](.cursor/p
 - ~637KB single JS chunk; Google Fonts blocking chain
 
 **Constraints during refactors:**
+
 - Keep `sanitizeWorkspace` working with new update strategy (Immer or surgical copy)
 - Define **list focus** vs **`selectedTaskId`** (sheet + `?task=` deep links + `registerTaskSheetAnimatedCloseHandler`)
 - [`TimelineTableView.tsx`](src/components/dance/timeline/TimelineTableView.tsx) is props-driven — fix parent re-renders first, not table internals
@@ -114,13 +118,13 @@ Today every mutation runs `structuredClone` on the whole workspace ([`store.ts`]
 
 Replace `useDanceStore((s) => s.workspace)` in:
 
-| File | Target selector |
-|------|-----------------|
-| [`AppShell.tsx`](src/layouts/AppShell.tsx) | `workspace.name` + `workspace.projects` via `useShallow` |
-| [`TimelineWorkspacePage.tsx`](src/pages/TimelineWorkspacePage.tsx) | Active project, timeline, `taskIds` list + task map slice for that timeline only |
-| [`GlobalKeyboardShortcuts.tsx`](src/components/dance/GlobalKeyboardShortcuts.tsx) | `getState()` in handlers only; drop full-workspace subscription |
-| [`TaskQuickActionDialogs.tsx`](src/components/dance/TaskQuickActionDialogs.tsx) | Users slice only (assignee dialogs) |
-| Other pages | Same pattern: smallest slice needed |
+| File                                                                              | Target selector                                                                  |
+| --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| [`AppShell.tsx`](src/layouts/AppShell.tsx)                                        | `workspace.name` + `workspace.projects` via `useShallow`                         |
+| [`TimelineWorkspacePage.tsx`](src/pages/TimelineWorkspacePage.tsx)                | Active project, timeline, `taskIds` list + task map slice for that timeline only |
+| [`GlobalKeyboardShortcuts.tsx`](src/components/dance/GlobalKeyboardShortcuts.tsx) | `getState()` in handlers only; drop full-workspace subscription                  |
+| [`TaskQuickActionDialogs.tsx`](src/components/dance/TaskQuickActionDialogs.tsx)   | Users slice only (assignee dialogs)                                              |
+| Other pages                                                                       | Same pattern: smallest slice needed                                              |
 
 Add `useShallow` from `zustand/react/shallow` where multi-field picks are needed.
 
@@ -133,11 +137,11 @@ Add `useShallow` from `zustand/react/shallow` where multi-field picks are needed
 
 Replace static [`COMMAND_INDEX`](src/mock/fixtures.ts) in [`CommandMenu.tsx`](src/components/dance/CommandMenu.tsx) with a **live index** built from domain data on open (Zustand `workspace` now → `db.useQuery` after Phase 4):
 
-| Group | Items |
-|-------|--------|
+| Group      | Items                                                                             |
+| ---------- | --------------------------------------------------------------------------------- |
 | Navigation | `/`, `/plan`, `/chat`, `/find`, `/settings`, each event, deep links with `?task=` |
-| Actions | Create task (current timeline), toggle Gantt/Table, toggle sidebar, reset demo |
-| Index | All tasks/events (search title + meta) |
+| Actions    | Create task (current timeline), toggle Gantt/Table, toggle sidebar, reset demo    |
+| Index      | All tasks/events (search title + meta)                                            |
 
 Use [`CommandShortcut`](src/components/ui/command.tsx) on rows; fuzzy match via existing cmdk `value` strings.
 
@@ -239,12 +243,12 @@ Verify production `index.html` emits `modulepreload` for entry + critical vendor
 
 ### Why Instant (committed)
 
-| Concern | Linear / article | InstantDB gives us |
-|---------|------------------|-------------------|
-| Local read model | IndexedDB + in-memory pool | Client triple store + IndexedDB cache |
-| Optimistic writes | Sync engine | `db.transact()` with automatic rollback |
-| Realtime / offline | WebSocket deltas | Built-in multiplayer + offline |
-| No CRUD spinners | Hide the network | Reads/writes feel like `setState` |
+| Concern            | Linear / article           | InstantDB gives us                      |
+| ------------------ | -------------------------- | --------------------------------------- |
+| Local read model   | IndexedDB + in-memory pool | Client triple store + IndexedDB cache   |
+| Optimistic writes  | Sync engine                | `db.transact()` with automatic rollback |
+| Realtime / offline | WebSocket deltas           | Built-in multiplayer + offline          |
+| No CRUD spinners   | Hide the network           | Reads/writes feel like `setState`       |
 
 Instant uses Postgres under the hood ([open source server](https://github.com/instantdb/instant)); we get sync semantics without hand-rolling Supabase + outbox + cache.
 
@@ -286,10 +290,12 @@ Add `@instantdb/react` dependency; include `@instantdb/react` in Vite `manualChu
 ### 4.3 Hybrid store split
 
 **Remove from Zustand (move to Instant):**
+
 - `workspace`, `activityLog`, `eventNavGlyph` (or move glyphs to project fields)
 - All domain mutations: `updateTaskDates`, `setTaskStatus`, `createTaskInTimeline`, etc.
 
 **Keep in Zustand:**
+
 - `sidebarCollapsed`, `commandOpen`, `hoveredTaskId`, `focusedTaskId`, `selectedTaskId`
 - `timelineViewMode`, `taskQuickDialog`, pending dropdown ids
 - Local undo/redo UX (optional: migrate to Instant transaction history later)
@@ -298,13 +304,13 @@ Refactor [`store.ts`](src/state/store.ts) → `uiStore.ts` + `src/lib/instant/mu
 
 ### 4.4 Page migration (route by route)
 
-| Page | Query shape |
-|------|-------------|
-| [`AppShell`](src/layouts/AppShell.tsx) / sidebar | `{ projects: {} }` |
+| Page                                                           | Query shape                                                      |
+| -------------------------------------------------------------- | ---------------------------------------------------------------- |
+| [`AppShell`](src/layouts/AppShell.tsx) / sidebar               | `{ projects: {} }`                                               |
 | [`TimelineWorkspacePage`](src/pages/TimelineWorkspacePage.tsx) | `{ projects: { timelines: { tasks: {} } } }` scoped to `eventId` |
-| [`HomePage`](src/pages/HomePage.tsx) | workspace summary query |
-| [`EventOverviewPage`](src/pages/EventOverviewPage.tsx) | single project + team |
-| Activity rail | `{ activityEvents: { $: { where: { timelineId } } } }` |
+| [`HomePage`](src/pages/HomePage.tsx)                           | workspace summary query                                          |
+| [`EventOverviewPage`](src/pages/EventOverviewPage.tsx)         | single project + team                                            |
+| Activity rail                                                  | `{ activityEvents: { $: { where: { timelineId } } } }`           |
 
 Replace `useDanceStore((s) => s.workspace)` with scoped `db.useQuery`. Mutations become:
 
@@ -330,6 +336,7 @@ Activity events: append via `db.transact` on each mutation (same verbs as today)
 ### 4.7 Render perf after Instant
 
 Instant `useQuery` subscriptions help, but **still apply Phase 1.2–1.3:**
+
 - Memo Gantt/table rows
 - Scope queries per route (don’t subscribe entire workspace on timeline page)
 - Keep derived client logic (timeline date expansion, task ordering, Gantt drag preview) in lib helpers — not in schema
@@ -362,29 +369,29 @@ Add `src/lib/instant/` with `db.ts` placeholder and mutation function signatures
 
 ## What we are explicitly not doing (prototype phase)
 
-| Item | Why defer / skip |
-|------|-----------|
-| Custom WebSocket sync engine | InstantDB provides sync |
-| Supabase + manual outbox | Committed to InstantDB |
-| MobX migration | Instant queries + Zustand UI + row memo is enough |
-| Next.js / RSC | CSR + Instant matches Linear’s production shape |
-| Pixel-perfect Linear clone | v1 plan: Dance palette, Linear **discipline** |
+| Item                         | Why defer / skip                                  |
+| ---------------------------- | ------------------------------------------------- |
+| Custom WebSocket sync engine | InstantDB provides sync                           |
+| Supabase + manual outbox     | Committed to InstantDB                            |
+| MobX migration               | Instant queries + Zustand UI + row memo is enough |
+| Next.js / RSC                | CSR + Instant matches Linear’s production shape   |
+| Pixel-perfect Linear clone   | v1 plan: Dance palette, Linear **discipline**     |
 
 ---
 
 ## Suggested implementation order
 
-| Order | Work | Outcome |
-|-------|------|---------|
-| 1 | Store surgical updates + narrow selectors | Edits stop re-rendering the shell (bridge until Phase 4) |
-| 2 | ⌘K palette + live index + shortcut docs | “Linear” command surface |
-| 3 | j/k focus + sheet/creation shortcuts | Keyboard-first timeline loop |
-| 4 | Boot shell + hydrate gate + fonts | No white flash / demo-data flash |
-| 5 | Vite chunks + lazy routes | Faster first interactive |
-| 6 | Redo, contextual palette, deep links | Polish |
-| 7 | Instant schema + db.ts + seed fixtures | Backend provisioned |
-| 8 | Migrate domain to Instant; slim Zustand to UI-only | Linear-class sync + offline |
-| 9 | Instant perms + auth | Production-ready access control |
+| Order | Work                                               | Outcome                                                  |
+| ----- | -------------------------------------------------- | -------------------------------------------------------- |
+| 1     | Store surgical updates + narrow selectors          | Edits stop re-rendering the shell (bridge until Phase 4) |
+| 2     | ⌘K palette + live index + shortcut docs            | “Linear” command surface                                 |
+| 3     | j/k focus + sheet/creation shortcuts               | Keyboard-first timeline loop                             |
+| 4     | Boot shell + hydrate gate + fonts                  | No white flash / demo-data flash                         |
+| 5     | Vite chunks + lazy routes                          | Faster first interactive                                 |
+| 6     | Redo, contextual palette, deep links               | Polish                                                   |
+| 7     | Instant schema + db.ts + seed fixtures             | Backend provisioned                                      |
+| 8     | Migrate domain to Instant; slim Zustand to UI-only | Linear-class sync + offline                              |
+| 9     | Instant perms + auth                               | Production-ready access control                          |
 
 ---
 

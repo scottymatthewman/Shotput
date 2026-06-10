@@ -64,7 +64,7 @@ export function ShellAgentControls({
         onClick={onToggleAgentChat}
         aria-label={agentChatOpen ? 'Hide agent chat' : 'Show agent chat'}
         aria-pressed={agentChatOpen}
-        title={agentChatOpen ? 'Hide agent chat' : 'Show agent chat'}
+        title={agentChatOpen ? 'Hide agent chat (⌘/)' : 'Show agent chat (⌘/)'}
       >
         {(agentChatOpen ? navChatActiveIcon : navChatInactiveIcon)({
           className: sidebarNavDensity.icon,

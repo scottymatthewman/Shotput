@@ -41,14 +41,14 @@ function CommandInput({ className, ...props }: ComponentProps<typeof CommandPrim
       <Search className="size-5 shrink-0 text-muted-foreground" />
       <CommandPrimitive.Input
         className={cn(
-          'dance-focus-ring flex h-full min-h-0 min-w-0 flex-1 bg-transparent py-0 text-base font-medium outline-none placeholder:text-tertiary disabled:cursor-not-allowed disabled:opacity-50',
+          'app-focus-ring flex h-full min-h-0 min-w-0 flex-1 bg-transparent py-0 text-base font-medium outline-none placeholder:text-tertiary disabled:cursor-not-allowed disabled:opacity-50',
           className,
         )}
         {...props}
       />
       <DialogClose
         className={cn(
-          'pressable dance-focus-ring flex size-10 shrink-0 items-center justify-center rounded-sm',
+          'pressable app-focus-ring flex size-10 shrink-0 items-center justify-center rounded-sm',
           'text-muted-foreground opacity-70 transition-surface duration-150 ease-hover',
           'hover:text-foreground hover:opacity-100',
         )}
@@ -71,14 +71,14 @@ function CommandList({ className, ...props }: ComponentProps<typeof CommandPrimi
 
 function CommandEmpty({ ...props }: ComponentProps<typeof CommandPrimitive.Empty>) {
   return (
-    <CommandPrimitive.Empty className="py-9 text-center text-sm text-muted-foreground" {...props} />
+    <CommandPrimitive.Empty
+      className="py-9 text-center text-sm text-muted-foreground"
+      {...props}
+    />
   )
 }
 
-function CommandGroup({
-  className,
-  ...props
-}: ComponentProps<typeof CommandPrimitive.Group>) {
+function CommandGroup({ className, ...props }: ComponentProps<typeof CommandPrimitive.Group>) {
   return (
     <CommandPrimitive.Group
       className={cn(
@@ -94,7 +94,7 @@ function CommandItem({ className, ...props }: ComponentProps<typeof CommandPrimi
   return (
     <CommandPrimitive.Item
       className={cn(
-        'dance-focus-ring relative flex h-12 min-h-12 cursor-default select-none items-center gap-3 rounded-[var(--radius-nested-md-p1)] p-2 text-base font-medium outline-none transition-surface duration-150 data-[disabled=true]:pointer-events-none data-[selected=true]:bg-accent/40 data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50',
+        'app-focus-ring relative flex h-12 min-h-12 cursor-default select-none items-center gap-3 rounded-[var(--radius-nested-md-p1)] p-2 text-base font-medium outline-none transition-surface duration-150 data-[disabled=true]:pointer-events-none data-[selected=true]:bg-accent/40 data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50',
         className,
       )}
       {...props}
@@ -106,7 +106,9 @@ function CommandSeparator({
   className,
   ...props
 }: ComponentProps<typeof CommandPrimitive.Separator>) {
-  return <CommandPrimitive.Separator className={cn('-mx-1 h-px bg-border', className)} {...props} />
+  return (
+    <CommandPrimitive.Separator className={cn('-mx-1 h-px bg-border', className)} {...props} />
+  )
 }
 
 function CommandShortcut({ className, ...props }: HTMLAttributes<HTMLSpanElement>) {

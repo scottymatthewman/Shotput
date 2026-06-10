@@ -1,8 +1,8 @@
 import { PAGE_HEADER_INSET_Y_PX } from '@/layouts/pageHeaderStyles'
 
-/** App shell column widths — keep top + main rows in sync with Figma Terrace layout. */
+/** App shell column widths — keep top + main rows in sync. */
 
-/** Top strip row — must fit `SHELL_TOP_PADDING_CLASS` (20px) + `WorkspaceMark` (40px). */
+/** Top strip row — must fit `SHELL_TOP_PADDING_CLASS` + workspace mark. */
 export const SHELL_TOP_HEIGHT_PX = 48
 export const SHELL_NAV_WIDTH_EXPANDED_PX = 260
 export const SHELL_NAV_WIDTH_COLLAPSED_TOP_PX = 56
@@ -13,7 +13,7 @@ export const SHELL_CHAT_TOP_CONTROLS_PX = SHELL_NAV_WIDTH_COLLAPSED_TOP_PX
 /** Horizontal padding for top-strip chrome (nav toggle, chat controls). */
 export const SHELL_TOP_CHROME_PADDING_CLASS = 'px-4'
 
-/** Top padding for top strip + nav column (20px). */
+/** Top padding for top strip + nav column. */
 export const SHELL_TOP_PADDING_CLASS = 'pt-1'
 
 /** Top padding for main-row content and chat columns (4px). */
@@ -29,7 +29,7 @@ export const SHELL_MAIN_TOP_INSET_PX = 4
 export const SHELL_SIDEBAR_SEARCH_ALIGN_TOP_PX =
   SHELL_MAIN_TOP_INSET_PX + PAGE_HEADER_INSET_Y_PX
 
-/** Tailwind top padding for `SidebarNav` — 16px (`pt-4`). */
+/** Tailwind top padding for `SidebarNav`. */
 export const SHELL_SIDEBAR_NAV_TOP_PADDING_CLASS = 'pt-5'
 
 export function shellNavTopColumnWidth(sidebarCollapsed: boolean): string {

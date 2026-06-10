@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- static icon factories, not hot-reloadable components */
 import addSvg from '@/assets/NavIcons/Add.svg?raw'
 import copyLinkPng from '@/assets/NavIcons/CopyLink.png'
 import agentSvg from '@/assets/NavIcons/Agent.svg?raw'

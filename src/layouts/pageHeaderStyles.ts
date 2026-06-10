@@ -35,8 +35,6 @@ export const pageHeaderDescriptionInlineClass = cn(
   'shrink-0 whitespace-nowrap',
 )
 
-export const pageHeaderActionsClass = cn(
-  'relative z-20 flex shrink-0 items-center gap-3',
-)
+export const pageHeaderActionsClass = cn('relative z-20 flex shrink-0 items-center gap-3')
 
 export const pageHeaderMetaClass = cn('flex flex-wrap items-stretch gap-2')

@@ -32,9 +32,7 @@ export const availableNavToneIdle = cn(
   'hover:opacity-100',
 )
 
-export const availableNavToneActive = cn(
-  'text-foreground opacity-100',
-)
+export const availableNavToneActive = cn('text-foreground opacity-100')
 
 function cnRowLayout(nested?: boolean) {
   return cn(
@@ -79,7 +77,7 @@ export const sidebarNavItem = {
       'cursor-pointer justify-between gap-2',
       'inset-edge-ring inset-edge-ring-full inset-edge-hover bg-surface-1',
       'text-foreground transition-surface duration-150 ease-hover',
-      'dance-focus-ring outline-none',
+      'app-focus-ring outline-none',
     ),
     leading: cn('flex min-w-0 flex-1 items-center', sidebarNavDensity.gap),
     icon: cn(sidebarNavDensity.icon, 'shrink-0 text-muted-foreground'),
@@ -91,10 +89,7 @@ export const sidebarNavItem = {
     ),
   },
   meta: {
-    root: cn(
-      cnRowLayout(),
-      'pointer-events-none opacity-40 text-muted-foreground',
-    ),
+    root: cn(cnRowLayout(), 'pointer-events-none opacity-40 text-muted-foreground'),
   },
 } as const
 

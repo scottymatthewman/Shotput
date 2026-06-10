@@ -39,7 +39,10 @@ export function CenteredPageScroll({
     : undefined
 
   return (
-    <PageScrollArea className={cn(layout && 'p-0', !layout && 'p-4', className)} style={scrollStyle}>
+    <PageScrollArea
+      className={cn(layout && 'p-0', !layout && 'p-4', className)}
+      style={scrollStyle}
+    >
       <div className="flex justify-center">
         <div
           className={cn(
