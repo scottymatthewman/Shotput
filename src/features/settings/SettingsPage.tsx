@@ -9,6 +9,7 @@ import { useUiStore } from '@/state/uiStore'
 import { cn } from '@/lib/utils'
 import { Moon, Sun } from 'lucide-react'
 import type { ReactNode } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const settingsSectionShell = cn(
   'flex flex-col gap-3 rounded-lg inset-edge-ring inset-edge-ring-full inset-edge-soft bg-surface-contrast p-6',
@@ -46,13 +47,26 @@ function SettingsSection({
   )
 }
 
+function authDebugStatus(userEmail: string | null): string {
+  if (!hasInstantConfig) return 'Guest mode — VITE_INSTANT_APP_ID is not set'
+  return userEmail
+    ? `Signed in as ${userEmail}`
+    : 'Instant configured — not signed in'
+}
+
 export function SettingsPage() {
   const { user } = db.useAuth()
   const theme = useUiStore((s) => s.theme)
   const toggleTheme = useUiStore((s) => s.toggleTheme)
+  const navigate = useNavigate()
 
   const email = user?.email ?? null
   const initials = (email ?? 'G').charAt(0).toUpperCase()
+
+  async function retryAuthFlow() {
+    if (user) await db.auth.signOut()
+    navigate('/sign-in', { state: { from: '/settings' } })
+  }
 
   return (
     <PageShell>
@@ -125,6 +139,24 @@ export function SettingsPage() {
             </Button>
           </div>
         </SettingsSection>
+
+        {import.meta.env.DEV ? (
+          <SettingsSection
+            title="Debug"
+            description="Development helpers — not shown in production builds."
+          >
+            <p className="font-mono text-xs text-muted-foreground">{authDebugStatus(email)}</p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="w-fit transition-surface duration-150 ease-hover"
+              onClick={() => void retryAuthFlow()}
+            >
+              {user ? 'Sign out and open sign-in' : 'Open sign-in flow'}
+            </Button>
+          </SettingsSection>
+        ) : null}
       </CenteredPageScroll>
     </PageShell>
   )
