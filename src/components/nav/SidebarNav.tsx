@@ -1,6 +1,9 @@
 import {
+  navAddIcon,
   navHomeIcon,
+  navInboxIcon,
   navSettingsIcon,
+  navTimelineIcon,
   type SidebarNavIcon,
 } from '@/components/nav/navIcons'
 import { SidebarNavItem } from '@/components/nav/SidebarNavItem'
@@ -61,6 +64,21 @@ export function SidebarNav({ className }: { className?: string }) {
                 label: 'Home',
                 icon: navHomeIcon,
                 end: true,
+              })}
+              {featureNavItem(features.composer, {
+                to: '/new',
+                label: 'New post',
+                icon: navAddIcon,
+              })}
+              {featureNavItem(features.queue, {
+                to: '/queue',
+                label: 'Queue',
+                icon: navTimelineIcon,
+              })}
+              {featureNavItem(features.accounts, {
+                to: '/accounts',
+                label: 'Accounts',
+                icon: navInboxIcon,
               })}
             </div>
           </ScrollArea>

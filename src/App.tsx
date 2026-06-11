@@ -9,6 +9,15 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 const HomePage = lazy(() =>
   import('@/features/home/HomePage').then((m) => ({ default: m.HomePage })),
 )
+const ComposerPage = lazy(() =>
+  import('@/features/composer/ComposerPage').then((m) => ({ default: m.ComposerPage })),
+)
+const QueuePage = lazy(() =>
+  import('@/features/queue/QueuePage').then((m) => ({ default: m.QueuePage })),
+)
+const AccountsPage = lazy(() =>
+  import('@/features/accounts/AccountsPage').then((m) => ({ default: m.AccountsPage })),
+)
 const SettingsPage = lazy(() =>
   import('@/features/settings/SettingsPage').then((m) => ({ default: m.SettingsPage })),
 )
@@ -45,6 +54,30 @@ export default function App() {
               element={
                 <LazyPage>
                   <HomePage />
+                </LazyPage>
+              }
+            />
+            <Route
+              path="/new"
+              element={
+                <LazyPage>
+                  <ComposerPage />
+                </LazyPage>
+              }
+            />
+            <Route
+              path="/queue"
+              element={
+                <LazyPage>
+                  <QueuePage />
+                </LazyPage>
+              }
+            />
+            <Route
+              path="/accounts"
+              element={
+                <LazyPage>
+                  <AccountsPage />
                 </LazyPage>
               }
             />

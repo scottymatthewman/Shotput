@@ -7,7 +7,17 @@ import {
   CommandList,
 } from '@/components/ui/command'
 import { useUiStore } from '@/state/uiStore'
-import { Home, MessageSquare, Moon, PanelLeft, Settings, Sun } from 'lucide-react'
+import {
+  CalendarClock,
+  Home,
+  MessageSquare,
+  Moon,
+  PanelLeft,
+  SquarePen,
+  Settings,
+  Sun,
+  Users,
+} from 'lucide-react'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -57,6 +67,18 @@ export function CommandMenu() {
           <CommandItem onSelect={() => run(() => navigate('/'))}>
             <Home className="size-4" aria-hidden />
             Home
+          </CommandItem>
+          <CommandItem onSelect={() => run(() => navigate('/new'))}>
+            <SquarePen className="size-4" aria-hidden />
+            New post
+          </CommandItem>
+          <CommandItem onSelect={() => run(() => navigate('/queue'))}>
+            <CalendarClock className="size-4" aria-hidden />
+            Queue
+          </CommandItem>
+          <CommandItem onSelect={() => run(() => navigate('/accounts'))}>
+            <Users className="size-4" aria-hidden />
+            Accounts
           </CommandItem>
           <CommandItem onSelect={() => run(() => navigate('/settings'))}>
             <Settings className="size-4" aria-hidden />
